@@ -1,81 +1,64 @@
 import Link from "next/link";
 import { PublicAuthStatus } from "@/components/auth/public-auth-status";
+import {
+  SiteMobileMenu,
+  type PublicHeaderNavLink,
+} from "@/components/layout/site-mobile-menu";
 import { brand, ROUTES } from "@/config/brand";
 
-function getNavTextProps(englishLabel: string) {
-  if (englishLabel === "Packages") {
-    return {
-      className: "urdu-text",
-      dir: "rtl" as const,
-      lang: "ur",
-    };
-  }
-
-  return {
-    className: "",
-    dir: "ltr" as const,
-    lang: "en",
-  };
-}
+const publicHeaderLinks: PublicHeaderNavLink[] = [
+  { href: ROUTES.packages, label: "Packages" },
+  { href: ROUTES.learn, label: "Learn" },
+  { href: "/how-it-works", label: "How It Works" },
+  { href: ROUTES.contact, label: "Contact" },
+  { href: ROUTES.fms, label: "Work as FMS" },
+];
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex items-start justify-between gap-4">
-          <Link
-            className="inline-flex flex-col text-start no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-gold"
-            href={ROUTES.home}
+    <header className="relative z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex min-h-20 max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:gap-6">
+        <Link
+          className="flex min-w-0 flex-none flex-col text-start no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-gold"
+          href={ROUTES.home}
+        >
+          <span
+            className="truncate text-lg font-bold leading-6 text-brand-navy sm:text-xl"
+            translate="no"
           >
-            <span className="text-xl font-bold text-brand-navy" translate="no">
-              {brand.name}
-            </span>
-            <span
-              className="urdu-text text-sm text-brand-muted"
-              dir="rtl"
-              lang="ur"
-            >
-              {brand.urduLine}
-            </span>
-          </Link>
-        </div>
+            {brand.name}
+          </span>
+          <span
+            className="urdu-text hidden text-xs text-brand-muted sm:block"
+            dir="rtl"
+            lang="ur"
+          >
+            {brand.urduLine}
+          </span>
+        </Link>
 
-        <nav aria-label="Primary navigation" className="xl:ms-auto">
-          <ul className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            {brand.navigation.primary.map((item) => {
-              const textProps = getNavTextProps(item.englishLabel);
-
-              return (
-                <li key={item.href}>
-                  <Link
-                    className="inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-semibold text-brand-navy no-underline hover:bg-brand-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
-                    href={item.href}
-                  >
-                    <span {...textProps}>{item.label}</span>
-                    <span className="sr-only"> {item.englishLabel}</span>
-                  </Link>
-                </li>
-              );
-            })}
+        <nav
+          aria-label="Primary navigation"
+          className="hidden min-w-0 flex-1 justify-center lg:flex"
+        >
+          <ul className="flex items-center gap-1 xl:gap-2">
+            {publicHeaderLinks.map((item) => (
+              <li key={item.href}>
+                <Link
+                  className="inline-flex min-h-11 items-center whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold text-brand-navy no-underline transition hover:bg-brand-background hover:text-brand-emerald focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center xl:min-w-fit">
-          <div
-            aria-label="Language support"
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-brand-background px-3 text-sm font-semibold text-brand-navy"
-            role="group"
-          >
-            <span className="urdu-text" dir="rtl" lang="ur">
-              اردو
-            </span>
-            <span className="mx-2 text-brand-muted">|</span>
-            <span lang="en">English</span>
-            <span className="mx-2 text-brand-muted">|</span>
-            <span lang="zh-CN">中文</span>
-          </div>
+        <div className="hidden flex-none lg:block">
           <PublicAuthStatus />
         </div>
+        <SiteMobileMenu links={publicHeaderLinks} />
       </div>
     </header>
   );
