@@ -227,12 +227,13 @@ function ManualPaymentForm({
 
   async function submitPayment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     setIsSubmitting(true);
     setError("");
     setMessage("");
 
     try {
-      const formData = new FormData(event.currentTarget);
       const input: ManualPaymentSubmissionInput = {
         amountPaid: String(formData.get("amountPaid") ?? ""),
         invoiceCode: String(formData.get("invoiceCode") ?? defaultInvoiceCode),
@@ -250,8 +251,8 @@ function ManualPaymentForm({
         return;
       }
 
+      form.reset();
       onSubmitted?.(result.data);
-      event.currentTarget.reset();
       setMessage(
         "Payment reference submitted. Admin will verify it before FMS sourcing can begin.",
       );
