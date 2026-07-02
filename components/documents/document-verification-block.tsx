@@ -1,4 +1,5 @@
 import type { DocumentVerification } from "@/app/documents/actions";
+import { QrCode } from "@/components/qr/qr-code";
 
 type DocumentVerificationBlockProps = {
   verification: DocumentVerification;
@@ -47,8 +48,15 @@ export function DocumentVerificationBlock({
             {verification.verificationUrl}
           </p>
         </div>
-        <div className="flex aspect-square items-center justify-center border border-dashed border-slate-400 bg-white p-4 text-center text-xs font-black uppercase tracking-wide text-brand-muted">
-          QR placeholder
+        <div className="grid justify-items-center gap-2">
+          <QrCode
+            label={`Scan to verify document reference ${verification.documentId}`}
+            size={132}
+            value={verification.verificationUrl}
+          />
+          <p className="max-w-32 text-center text-[11px] font-bold leading-4 text-brand-muted">
+            Scan to verify this document reference
+          </p>
         </div>
       </div>
     </section>

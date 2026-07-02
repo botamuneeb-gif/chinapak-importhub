@@ -865,6 +865,7 @@ export function LiveAdminProjectDetail({
             </div>
           </AdminSectionCard>
 
+          <div className="scroll-mt-24" id="report-release" />
           <AdminSectionCard id="factory-report" title="7. Importer Factory Report">
             <div className="rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
               <strong>{project.factoryReport.reportStatus}:</strong>{" "}

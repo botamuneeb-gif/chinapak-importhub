@@ -297,14 +297,16 @@ function documentVerification(input: {
   status: string;
 }): DocumentVerification {
   const siteUrl = getSiteUrl();
+  const reference = encodeURIComponent(input.documentId);
 
   return {
     documentId: input.documentId,
     generatedAt: formatDate(new Date().toISOString()),
     projectCode: input.projectCode,
     status: input.status,
-    verificationNote: "Document verification portal coming later.",
-    verificationUrl: `${siteUrl}/verify`,
+    verificationNote:
+      "Scan or open this reference link to contact ChinaPak ImportHub for document verification. The public page does not expose private document data.",
+    verificationUrl: `${siteUrl}/verify?ref=${reference}`,
   };
 }
 

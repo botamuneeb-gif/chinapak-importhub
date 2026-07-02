@@ -27,6 +27,7 @@ type ActionResult<T> =
 
 export type FactorySubmissionQueueItem = {
   adminReviewStatus: string;
+  adminReviewStatusRaw: AdminReviewStatus;
   assignmentCode: string;
   cityProvince: string;
   createdAt: string;
@@ -38,6 +39,7 @@ export type FactorySubmissionQueueItem = {
   riskFlags: string[];
   submissionCode: string;
   submissionStatus: string;
+  submissionStatusRaw: SubmissionStatus;
 };
 
 export type FactorySubmissionDetail = FactorySubmissionQueueItem & {
@@ -193,6 +195,7 @@ function mapSubmissionQueueItem(
     adminReviewStatus:
       ADMIN_REVIEW_LABELS[submission.admin_review_status] ??
       submission.admin_review_status,
+    adminReviewStatusRaw: submission.admin_review_status,
     assignmentCode: assignment?.assignment_code ?? "Assignment pending",
     cityProvince: submission.city_province ?? "Not provided",
     createdAt: formatDate(submission.created_at),
@@ -207,6 +210,7 @@ function mapSubmissionQueueItem(
     submissionStatus:
       SUBMISSION_STATUS_LABELS[submission.submission_status] ??
       submission.submission_status,
+    submissionStatusRaw: submission.submission_status,
   };
 }
 
@@ -724,7 +728,7 @@ export async function reviewFactorySubmissionAction(
     admin.supabase.from("import_project_timeline_events").insert({
       body:
         input.decision === "approve"
-          ? "Admin approved the FMS factory submission for internal workflow. Importer release is not connected yet."
+          ? "Admin approved the FMS factory submission for importer report preparation. Raw FMS notes and factory contact details remain admin-only until a sanitized report is released."
           : "Admin reviewed the FMS factory submission and kept it inside the admin/FMS workflow.",
       created_by: admin.authUserId,
       event_type: `phase_6_${input.decision}`,
@@ -732,6 +736,9 @@ export async function reviewFactorySubmissionAction(
         admin_note: adminNote,
         assignment_code: bundle.assignment.assignment_code,
         submission_code: bundle.submission.submission_code,
+        report_release_panel_url: bundle.project?.project_code
+          ? `/admin/projects/${bundle.project.project_code}#report-release`
+          : null,
         visible_to_importer: false,
       },
       project_id: bundle.assignment.project_id,

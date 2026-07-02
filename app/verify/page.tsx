@@ -1,13 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { TrustCard } from "@/components/verification/trust-card";
 import { VerifyHero } from "@/components/verification/verify-hero";
-import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/config/brand";
 import { trustCards, verificationOptions } from "@/config/agents";
+import { ROUTES } from "@/config/brand";
 import { getSiteUrl } from "@/config/site-url";
 
 const siteUrl = getSiteUrl();
+
+type VerifyPageProps = {
+  searchParams?: Promise<{
+    ref?: string | string[];
+  }>;
+};
+
+function getSingleParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
 
 export const metadata: Metadata = {
   title: "Verify ChinaPak ImportHub | ChinaPak ImportHub",
@@ -17,15 +31,18 @@ export const metadata: Metadata = {
     canonical: "/verify",
   },
   openGraph: {
-    title: "Verify ChinaPak ImportHub",
     description:
       "Verify the platform or a local representative before submitting an Import Project or payment.",
+    title: "Verify ChinaPak ImportHub",
     type: "website",
     url: `${siteUrl}/verify`,
   },
 };
 
-export default function VerifyPage() {
+export default async function VerifyPage({ searchParams }: VerifyPageProps) {
+  const params = searchParams ? await searchParams : {};
+  const reference = getSingleParam(params.ref).trim();
+
   return (
     <main>
       <VerifyHero
@@ -42,6 +59,30 @@ export default function VerifyPage() {
         englishSupport="Verify ChinaPak ImportHub before starting your Import Project."
         headline="پہلے ہمیں verify کریں، پھر order دیں"
       />
+
+      {reference ? (
+        <section className="bg-white" dir="ltr" lang="en">
+          <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+            <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 shadow-sm">
+              <p className="text-sm font-bold uppercase tracking-wide text-brand-emerald">
+                Document reference received
+              </p>
+              <h2
+                className="mt-2 break-all text-2xl font-bold text-brand-navy"
+                translate="no"
+              >
+                {reference}
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-brand-muted">
+                This public page confirms only that you scanned a ChinaPak
+                ImportHub verification reference. It does not reveal private
+                invoice, project, payment, refund, or report data. Contact
+                official support with this reference if you need verification.
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="bg-brand-background" dir="ltr" lang="en">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -85,8 +126,10 @@ export default function VerifyPage() {
       <section className="bg-brand-background" dir="rtl" lang="ur">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <div className="rounded-lg border border-brand-error bg-red-50 p-5 text-brand-navy shadow-sm">
-            <h2 className="text-2xl font-bold text-brand-error">Safety notice</h2>
-            <p className="mt-3 text-sm leading-7">
+            <h2 className="urdu-text text-2xl font-bold text-brand-error">
+              حفاظتی نوٹس
+            </h2>
+            <p className="urdu-text mt-3 text-sm leading-8">
               صرف approved ChinaPak ImportHub payment methods کے ذریعے payment
               کریں۔ Unofficial accounts یا personal numbers پر payment نہ کریں۔
             </p>

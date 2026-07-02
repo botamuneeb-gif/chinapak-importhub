@@ -75,6 +75,7 @@ export function LiveImporterProjectDetail({
   const [detail, setDetail] = useState<ImporterProjectDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [copyMessage, setCopyMessage] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -133,6 +134,19 @@ export function LiveImporterProjectDetail({
     };
   }, [projectCode]);
 
+  async function copyProjectId() {
+    if (!detail?.projectCode) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(detail.projectCode);
+      setCopyMessage(`Project ID copied: ${detail.projectCode}`);
+    } catch {
+      setCopyMessage(`Project ID: ${detail.projectCode}`);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-5 text-sm font-semibold text-brand-muted shadow-sm">
@@ -178,6 +192,23 @@ export function LiveImporterProjectDetail({
               Track payment, admin review, FMS assignment, report release,
               invoices, refunds, and safe files for this Import Project.
             </p>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+              <button
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-brand-navy bg-white px-4 py-2 text-sm font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
+                onClick={copyProjectId}
+                type="button"
+              >
+                Copy Project ID
+              </button>
+              <span className="text-xs font-semibold text-brand-muted">
+                Use this ID when contacting ChinaPak ImportHub support.
+              </span>
+            </div>
+            {copyMessage ? (
+              <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">
+                {copyMessage}
+              </p>
+            ) : null}
           </div>
           <span
             className={`w-fit rounded-lg border px-3 py-1 text-xs font-bold ${getToneClasses(

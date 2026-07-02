@@ -48,12 +48,15 @@ const filterLabels: Record<ProjectQueueFilter, string> = {
 export function LiveAdminProjectsTable() {
   const [projects, setProjects] = useState<AdminLiveProjectListItem[]>([]);
   const [activeFilter, setActiveFilter] = useState<ProjectQueueFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  const filteredProjects = useMemo(
-    () =>
-      projects.filter((project) => {
+  const filteredProjects = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    return projects.filter((project) => {
+      const statusMatches = (() => {
         if (activeFilter === "all") {
           return true;
         }
@@ -83,9 +86,33 @@ export function LiveAdminProjectsTable() {
         }
 
         return project.readinessStatus === "ready_for_fms_assignment";
-      }),
-    [activeFilter, projects],
-  );
+      })();
+
+      if (!statusMatches) {
+        return false;
+      }
+
+      if (!normalizedQuery) {
+        return true;
+      }
+
+      return [
+        project.projectCode,
+        project.id,
+        project.importerName,
+        project.city,
+        project.product,
+        project.packageName,
+        project.paymentStatus,
+        project.projectStatus,
+        project.adminReviewStatus,
+        project.readinessLabel,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery);
+    });
+  }, [activeFilter, projects, searchQuery]);
 
   const filterCounts = useMemo(
     () =>
@@ -166,6 +193,12 @@ export function LiveAdminProjectsTable() {
       }
     }
 
+    const urlQuery = new URLSearchParams(window.location.search).get("q");
+
+    if (urlQuery) {
+      setSearchQuery(urlQuery);
+    }
+
     void loadProjects();
 
     return () => {
@@ -191,6 +224,34 @@ export function LiveAdminProjectsTable() {
 
   return (
     <div className="min-w-0 space-y-4">
+      <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <label className="grid gap-2 text-sm font-semibold text-brand-navy">
+          Search projects
+          <input
+            className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-normal text-brand-text"
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Project ID, UUID, product, importer, payment status, or review status"
+            translate="no"
+            value={searchQuery}
+          />
+        </label>
+        {searchQuery ? (
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-semibold text-brand-muted">
+            <span>
+              Showing {filteredProjects.length} of {projects.length} projects
+              for this search/filter.
+            </span>
+            <button
+              className="rounded-lg border border-slate-300 px-3 py-1 font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
+              onClick={() => setSearchQuery("")}
+              type="button"
+            >
+              Clear Search
+            </button>
+          </div>
+        ) : null}
+      </div>
+
       <div className="flex flex-wrap gap-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
         {(Object.keys(filterLabels) as ProjectQueueFilter[]).map((filter) => (
           <button
@@ -218,7 +279,7 @@ export function LiveAdminProjectsTable() {
         ) : filteredProjects.length === 0 ? (
           <tr>
             <td className="px-4 py-8 text-center text-brand-muted" colSpan={columns.length}>
-              No projects match this filter.
+              No projects match this search or filter.
             </td>
           </tr>
         ) : (

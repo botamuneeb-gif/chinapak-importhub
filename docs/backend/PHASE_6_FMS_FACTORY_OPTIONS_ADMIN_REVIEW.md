@@ -2,7 +2,11 @@
 
 Status: FMS factory option submission and admin review queue are connected to Supabase.
 
-This phase does not release factory options to importers. It does not implement messaging, file uploads, real payments, invoices, refunds, FMS payouts, public factory signup, or direct importer/FMS/factory contact exchange.
+This phase does not directly release factory options to importers from the FMS
+submission review screen. Approved submissions feed the Phase 7 importer-safe
+report builder on the admin project detail page. It does not implement
+messaging, file uploads, real payments, invoices, refunds, FMS payouts, public
+factory signup, or direct importer/FMS/factory contact exchange.
 
 ## What Is Connected
 
@@ -13,6 +17,7 @@ This phase does not release factory options to importers. It does not implement 
 - Admin review detail at `/admin/factory-submissions/[submissionId]`.
 - Admin can approve, reject, or request revision.
 - Admin approval can create or update a private internal factory database record.
+- Admin approval now links to the Phase 7 importer-safe report release panel.
 - Factory sensitive contact details are stored only in admin-only factory contact records when admin approves factory database linkage.
 
 ## Tables Read
@@ -80,7 +85,10 @@ Admin rejection:
 - `fms_assignments.assignment_status = changes_requested`
 - `import_projects.project_status = fms_working`
 
-Importer-facing factory result release remains future work.
+Importer-facing factory result release is handled by Phase 7 from
+`/admin/projects/[projectId]#report-release`. Raw FMS submissions and private
+factory contact details remain admin-only until admin explicitly releases a
+sanitized report.
 
 ## Contact Firewall Rules
 
@@ -158,7 +166,6 @@ Factory database remains private/admin-only.
 
 ## Still Placeholder / Future
 
-- Importer-facing factory option release
 - Admin redaction workflow
 - Real file uploads and object storage
 - Factory evidence file review

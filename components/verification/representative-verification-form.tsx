@@ -9,6 +9,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/brand";
 
+type RepresentativeVerificationFormProps = {
+  initialCode?: string;
+};
+
 function ResultPanel({
   result,
 }: {
@@ -18,12 +22,12 @@ function ResultPanel({
 
   return (
     <section
+      aria-live="polite"
       className={
         isVerified
           ? "rounded-lg border border-emerald-200 bg-emerald-50 p-5 shadow-sm"
           : "rounded-lg border border-amber-200 bg-amber-50 p-5 shadow-sm"
       }
-      aria-live="polite"
     >
       <p
         className={
@@ -105,8 +109,10 @@ function ResultPanel({
   );
 }
 
-export function RepresentativeVerificationForm() {
-  const [code, setCode] = useState("");
+export function RepresentativeVerificationForm({
+  initialCode = "",
+}: RepresentativeVerificationFormProps) {
+  const [code, setCode] = useState(initialCode.toUpperCase());
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] =
@@ -147,8 +153,9 @@ export function RepresentativeVerificationForm() {
         <label className="grid gap-2 text-sm font-semibold text-brand-navy">
           Representative code
           <input
+            autoFocus
             className="min-h-12 rounded-lg border border-slate-300 px-4 py-3 text-base font-bold uppercase tracking-wide text-brand-text"
-            onChange={(event) => setCode(event.target.value)}
+            onChange={(event) => setCode(event.target.value.toUpperCase())}
             placeholder="CPIH-REP-XXXXX"
             required
             translate="no"
@@ -180,7 +187,11 @@ export function RepresentativeVerificationForm() {
       ) : null}
       {result ? <ResultPanel result={result} /> : null}
 
-      <div className="urdu-text rounded-lg border border-brand-gold bg-amber-50 p-5 text-brand-navy shadow-sm" dir="rtl" lang="ur">
+      <div
+        className="urdu-text rounded-lg border border-brand-gold bg-amber-50 p-5 text-brand-navy shadow-sm"
+        dir="rtl"
+        lang="ur"
+      >
         <h2 className="text-xl font-bold">نمائندہ کوڈ چیک کریں</h2>
         <p className="mt-3 text-sm leading-8">
           اگر کوڈ active نہ ہو یا representative کا status clear نہ ہو تو

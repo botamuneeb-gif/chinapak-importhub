@@ -1,7 +1,9 @@
 import { InvoiceLineItemTable } from "@/components/payments/invoice-line-item-table";
 import { PaymentStatusBadge } from "@/components/payments/payment-status-badge";
+import { QrCode } from "@/components/qr/qr-code";
 import { brand } from "@/config/brand";
 import type { InvoiceRecord } from "@/config/payments";
+import { getSiteUrl } from "@/config/site-url";
 
 type InvoiceDocumentProps = {
   invoice: InvoiceRecord;
@@ -18,6 +20,10 @@ function DetailList({ items }: { items: string[] }) {
 }
 
 export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
+  const verificationUrl = `${getSiteUrl()}/verify?ref=${encodeURIComponent(
+    invoice.documentId,
+  )}`;
+
   return (
     <article className="bg-white p-5 text-brand-text shadow-sm ring-1 ring-slate-200 print:shadow-none print:ring-0 sm:p-8">
       <header className="border-b-4 border-brand-gold pb-6">
@@ -109,8 +115,15 @@ export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
             <h2 className="text-sm font-bold uppercase tracking-wide text-brand-navy">
               QR verification
             </h2>
-            <div className="mt-3 flex aspect-square max-w-36 items-center justify-center border border-dashed border-slate-400 bg-slate-50 p-4 text-center text-xs font-bold text-brand-muted">
-              QR verification placeholder
+            <div className="mt-3 grid max-w-36 justify-items-center gap-2">
+              <QrCode
+                label={`Scan to verify invoice reference ${invoice.documentId}`}
+                size={144}
+                value={verificationUrl}
+              />
+              <p className="text-center text-[11px] font-bold leading-4 text-brand-muted">
+                Scan to verify this document reference.
+              </p>
             </div>
           </div>
         </div>
@@ -140,8 +153,9 @@ export function InvoiceDocument({ invoice }: InvoiceDocumentProps) {
       <footer className="mt-8 border-t border-slate-200 pt-5 text-xs leading-6 text-brand-muted">
         <p>{invoice.legalRefundNote}</p>
         <p className="mt-2">
-          This document is a frontend placeholder prepared for future verified
-          invoice generation, QR validation, and audit logging.
+          This document reference can be checked through official ChinaPak
+          ImportHub support. Public status lookup is reserved for a later
+          verification hardening phase.
         </p>
       </footer>
     </article>

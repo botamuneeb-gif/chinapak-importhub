@@ -2174,6 +2174,118 @@ export async function listAdminImportProjectsAction(
   }
 }
 
+export async function searchAdminImportProjectsAction(
+  accessToken: string,
+  query: string,
+): Promise<ActionResult<AdminLiveProjectListItem[]>> {
+  try {
+    const admin = await requireAdmin(accessToken);
+
+    if (!admin.ok) {
+      return admin;
+    }
+
+    const normalizedQuery = query.trim();
+
+    if (!normalizedQuery) {
+      return { ok: true, data: [] };
+    }
+
+    const supabase = createAdminSupabaseClient();
+    const uuidPattern =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const projectMap = new Map<string, TableRow<"import_projects">>();
+
+    if (uuidPattern.test(normalizedQuery)) {
+      const { data: projectById, error: idError } = await supabase
+        .from("import_projects")
+        .select("*")
+        .eq("id", normalizedQuery)
+        .maybeSingle();
+
+      if (idError) {
+        return { ok: false, message: idError.message };
+      }
+
+      if (projectById) {
+        projectMap.set(projectById.id, projectById);
+      }
+    }
+
+    const { data: codeProjects, error: codeError } = await supabase
+      .from("import_projects")
+      .select("*")
+      .ilike("project_code", `%${normalizedQuery}%`)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (codeError) {
+      return { ok: false, message: codeError.message };
+    }
+
+    (codeProjects ?? []).forEach((project) => {
+      projectMap.set(project.id, project);
+    });
+
+    const projectRows = Array.from(projectMap.values()).slice(0, 20);
+
+    if (projectRows.length === 0) {
+      return { ok: true, data: [] };
+    }
+
+    const projectIds = projectRows.map((project) => project.id);
+    const importerIds = Array.from(
+      new Set(projectRows.map((project) => project.importer_profile_id)),
+    );
+    const packageIds = Array.from(
+      new Set(projectRows.map((project) => project.package_id).filter(Boolean)),
+    ) as string[];
+
+    const importerResult = await getActiveImporterProfilesByIds(
+      supabase,
+      importerIds,
+    );
+
+    if (!importerResult.ok) {
+      return importerResult;
+    }
+
+    const { data: requirementRows } =
+      projectIds.length > 0
+        ? await supabase
+            .from("import_project_requirements")
+            .select("*")
+            .in("project_id", projectIds)
+        : { data: [] };
+
+    const { data: packageRows } =
+      packageIds.length > 0
+        ? await supabase.from("packages").select("*").in("id", packageIds)
+        : { data: [] };
+
+    const importerMap = byId(importerResult.rows);
+    const requirementMap = new Map(
+      (requirementRows ?? []).map((row) => [row.project_id, row]),
+    );
+    const packageMap = byId(packageRows ?? []);
+
+    return {
+      ok: true,
+      data: projectRows.map((project) =>
+        mapProjectListItem(project, importerMap, requirementMap, packageMap),
+      ),
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Admin project search could not be completed.",
+    };
+  }
+}
+
 export async function getAdminImportProjectAction(
   accessToken: string,
   projectCode: string,

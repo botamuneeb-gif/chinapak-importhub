@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdminProjectLookup } from "@/components/admin/admin-project-lookup";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
@@ -38,6 +39,10 @@ export default function AdminPage() {
             value={stat.value}
           />
         ))}
+      </div>
+
+      <div className="mt-8">
+        <AdminProjectLookup />
       </div>
 
       <div className="mt-8">

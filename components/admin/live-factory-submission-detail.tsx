@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   getFactorySubmissionDetailForAdminAction,
@@ -9,6 +10,7 @@ import {
 } from "@/app/admin/factory-submissions/actions";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { ROUTES } from "@/config/brand";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type LiveFactorySubmissionDetailProps = {
@@ -125,7 +127,7 @@ export function LiveFactorySubmissionDetail({
       setSubmission(result.data);
       setActionMessage(
         decision === "approve"
-          ? "Submission approved. Importer release remains a future workflow."
+          ? "Submission approved. Prepare an importer-safe report from the project detail page."
           : "Submission review updated and kept inside admin/FMS workflow.",
       );
     } catch (error) {
@@ -154,6 +156,12 @@ export function LiveFactorySubmissionDetail({
       </div>
     );
   }
+
+  const reportPanelHref = `${ROUTES.admin}/projects/${encodeURIComponent(
+    submission.projectCode,
+  )}#report-release`;
+  const isApprovedSubmission =
+    submission.submissionStatusRaw === "approved_by_admin";
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
@@ -196,6 +204,32 @@ export function LiveFactorySubmissionDetail({
             }}
           />
         </AdminSectionCard>
+
+        {isApprovedSubmission ? (
+          <AdminSectionCard title="Importer Report Release">
+            <div className="rounded-lg border border-brand-emerald bg-emerald-50 p-4 text-sm leading-7 text-brand-navy">
+              <p className="font-bold text-brand-emerald">
+                This FMS submission is approved for report preparation.
+              </p>
+              <p className="mt-2">
+                Use the project report panel to select approved submissions,
+                choose importer-safe fields, write admin recommendation notes,
+                and release the sanitized report to the importer.
+              </p>
+              <p className="mt-2 font-semibold">
+                Raw FMS notes, factory phone/email/WeChat/address, payment
+                details, admin-only notes, and private factory records remain
+                hidden from the importer.
+              </p>
+              <Link
+                className="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-emerald px-4 py-2 text-sm font-bold text-white no-underline transition hover:bg-brand-navy"
+                href={reportPanelHref}
+              >
+                Open Project Report Panel
+              </Link>
+            </div>
+          </AdminSectionCard>
+        ) : null}
 
         <AdminSectionCard title="Importer-Safe Summary">
           <DetailGrid

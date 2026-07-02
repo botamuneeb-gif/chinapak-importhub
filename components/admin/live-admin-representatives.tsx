@@ -12,11 +12,19 @@ import {
   type RepresentativeFormInput,
 } from "@/app/admin/representatives/actions";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { QrCode } from "@/components/qr/qr-code";
+import { getSiteUrl } from "@/config/site-url";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
 
 type RepresentativeStatus =
   Database["public"]["Enums"]["representative_status"];
+
+const siteUrl = getSiteUrl();
+
+function representativeVerificationUrl(code: string) {
+  return `${siteUrl}/verify/representative?code=${encodeURIComponent(code)}`;
+}
 
 async function getAccessToken() {
   const supabase = createBrowserSupabaseClient();
@@ -301,6 +309,17 @@ export function LiveAdminRepresentatives() {
     }
   }
 
+  async function copyVerificationUrl(code: string) {
+    const url = representativeVerificationUrl(code);
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setMessage("Representative verification URL copied.");
+    } catch {
+      setMessage(`Verification URL: ${url}`);
+    }
+  }
+
   if (isLoading) {
     return (
       <AdminRepresentativeNotice>
@@ -399,7 +418,15 @@ export function LiveAdminRepresentatives() {
         </AdminRepresentativeNotice>
       ) : (
         <div className="grid gap-4">
-          {filteredItems.map((item) => (
+          {filteredItems.map((item) => {
+            const verificationUrl = representativeVerificationUrl(
+              item.verificationCode,
+            );
+            const canShowQr =
+              item.representativeStatus === "active" &&
+              item.codeStatus === "active";
+
+            return (
             <article
               className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
               key={item.id}
@@ -428,7 +455,8 @@ export function LiveAdminRepresentatives() {
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+              <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_180px]">
+                <div className="grid gap-3 text-sm md:grid-cols-3">
                 <div className="rounded-lg border border-slate-200 bg-brand-background p-3">
                   <p className="font-bold text-brand-navy">Created</p>
                   <p className="mt-1 text-brand-muted">{item.createdAt}</p>
@@ -441,6 +469,26 @@ export function LiveAdminRepresentatives() {
                   <p className="font-bold text-brand-navy">Suspended</p>
                   <p className="mt-1 text-brand-muted">{item.suspendedAt}</p>
                 </div>
+                </div>
+                <div className="rounded-lg border border-slate-200 bg-brand-background p-3">
+                  {canShowQr ? (
+                    <div className="grid justify-items-center gap-2">
+                      <QrCode
+                        label={`Representative verification QR for ${item.verificationCode}`}
+                        size={132}
+                        value={verificationUrl}
+                      />
+                      <p className="break-all text-center text-[11px] font-bold leading-4 text-brand-muted">
+                        {verificationUrl}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-semibold leading-6 text-brand-muted">
+                      QR appears only when both representative and code status
+                      are active.
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -450,6 +498,13 @@ export function LiveAdminRepresentatives() {
                   type="button"
                 >
                   Copy Code
+                </button>
+                <button
+                  className="min-h-10 rounded-lg border border-brand-navy bg-white px-3 py-2 text-xs font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
+                  onClick={() => copyVerificationUrl(item.verificationCode)}
+                  type="button"
+                >
+                  Copy Verification URL
                 </button>
                 <button
                   className="min-h-10 rounded-lg bg-brand-emerald px-3 py-2 text-xs font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:bg-slate-400"
@@ -580,7 +635,8 @@ export function LiveAdminRepresentatives() {
                 </div>
               </details>
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -43,6 +43,7 @@ export function LiveImporterProjectsList({
   const [projects, setProjects] = useState<ImporterProjectListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [copyMessage, setCopyMessage] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -98,6 +99,15 @@ export function LiveImporterProjectsList({
     };
   }, []);
 
+  async function copyProjectId(projectCode: string) {
+    try {
+      await navigator.clipboard.writeText(projectCode);
+      setCopyMessage(`Project ID copied: ${projectCode}`);
+    } catch {
+      setCopyMessage(`Project ID: ${projectCode}`);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-5 text-sm font-semibold text-brand-muted shadow-sm">
@@ -134,6 +144,11 @@ export function LiveImporterProjectsList({
 
   return (
     <section className="space-y-4">
+      {copyMessage ? (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">
+          {copyMessage}
+        </p>
+      ) : null}
       <div className="grid gap-4">
         {visibleProjects.map((project) => (
           <article
@@ -203,14 +218,23 @@ export function LiveImporterProjectsList({
               {project.statusSummary.description}
             </p>
 
-            <Link
-              className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-emerald px-4 py-2 text-sm font-bold text-white no-underline transition hover:bg-brand-navy"
-              href={`${ROUTES.importerProjects}/${encodeURIComponent(
-                project.projectCode,
-              )}`}
-            >
-              View Details
-            </Link>
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+              <Link
+                className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-emerald px-4 py-2 text-sm font-bold text-white no-underline transition hover:bg-brand-navy"
+                href={`${ROUTES.importerProjects}/${encodeURIComponent(
+                  project.projectCode,
+                )}`}
+              >
+                View Details
+              </Link>
+              <button
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-brand-navy bg-white px-4 py-2 text-sm font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
+                onClick={() => copyProjectId(project.projectCode)}
+                type="button"
+              >
+                Copy Project ID
+              </button>
+            </div>
           </article>
         ))}
       </div>

@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
+import { Button } from "@/components/ui/button";
 import { RepresentativeVerificationForm } from "@/components/verification/representative-verification-form";
 import { VerifyHero } from "@/components/verification/verify-hero";
-import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/brand";
+
+type VerifyRepresentativePageProps = {
+  searchParams?: Promise<{
+    code?: string | string[];
+  }>;
+};
+
+function getSingleParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
 
 export const metadata: Metadata = {
   title: "Verify Representative | ChinaPak ImportHub",
@@ -12,12 +26,17 @@ export const metadata: Metadata = {
     canonical: "/verify/representative",
   },
   robots: {
-    index: true,
     follow: true,
+    index: true,
   },
 };
 
-export default function VerifyRepresentativePage() {
+export default async function VerifyRepresentativePage({
+  searchParams,
+}: VerifyRepresentativePageProps) {
+  const params = searchParams ? await searchParams : {};
+  const initialCode = getSingleParam(params.code).trim();
+
   return (
     <main>
       <VerifyHero
@@ -64,7 +83,7 @@ export default function VerifyRepresentativePage() {
             </div>
           </section>
 
-          <RepresentativeVerificationForm />
+          <RepresentativeVerificationForm initialCode={initialCode} />
         </div>
       </section>
     </main>
