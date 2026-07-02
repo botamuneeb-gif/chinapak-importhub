@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { brand } from "@/config/brand";
+import { getSiteUrl } from "@/config/site-url";
 
 const privateRoutes = [
   "/admin",
@@ -35,6 +35,8 @@ const privateRoutes = [
 ] satisfies string[];
 
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl = getSiteUrl();
+
   return {
     rules: [
       {
@@ -43,7 +45,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: privateRoutes,
       },
     ],
-    sitemap: `https://${brand.domain}/sitemap.xml`,
-    host: `https://${brand.domain}`,
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   };
 }

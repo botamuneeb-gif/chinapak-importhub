@@ -5,6 +5,9 @@ import { VerifyHero } from "@/components/verification/verify-hero";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/brand";
 import { trustCards, verificationOptions } from "@/config/agents";
+import { getSiteUrl } from "@/config/site-url";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "Verify ChinaPak ImportHub | ChinaPak ImportHub",
@@ -18,7 +21,7 @@ export const metadata: Metadata = {
     description:
       "Verify the platform or a local representative before submitting an Import Project or payment.",
     type: "website",
-    url: "https://chinapakimporthub.com/verify",
+    url: `${siteUrl}/verify`,
   },
 };
 

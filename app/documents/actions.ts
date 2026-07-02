@@ -7,6 +7,7 @@ import {
 } from "@/app/importer/reports/actions";
 import { USER_ROLES, hasAllowedRole } from "@/lib/auth/roles";
 import { getProfileForAccessToken } from "@/lib/auth/session";
+import { getSiteUrl } from "@/config/site-url";
 import { detectContactRiskInFields } from "@/lib/security/contact-firewall";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { Database, Json } from "@/lib/supabase/types";
@@ -295,13 +296,15 @@ function documentVerification(input: {
   projectCode: string;
   status: string;
 }): DocumentVerification {
+  const siteUrl = getSiteUrl();
+
   return {
     documentId: input.documentId,
     generatedAt: formatDate(new Date().toISOString()),
     projectCode: input.projectCode,
     status: input.status,
     verificationNote: "Document verification portal coming later.",
-    verificationUrl: "https://chinapakimporthub.com/verify",
+    verificationUrl: `${siteUrl}/verify`,
   };
 }
 

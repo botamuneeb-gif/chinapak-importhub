@@ -16,6 +16,9 @@ import {
   homepagePolish,
   publicFaqs,
 } from "@/config/public-site";
+import { getSiteUrl } from "@/config/site-url";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "ChinaPak ImportHub | چین جائے بغیر فیکٹری تک رسائی حاصل کریں",
@@ -30,7 +33,7 @@ export const metadata: Metadata = {
       "Admin-reviewed China factory sourcing support for Pakistani importers, shopkeepers, wholesalers, and first-time importers.",
     siteName: brand.name,
     type: "website",
-    url: `https://${brand.domain}`,
+    url: siteUrl,
   },
 };
 

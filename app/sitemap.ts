@@ -1,13 +1,14 @@
 import type { MetadataRoute } from "next";
-import { brand } from "@/config/brand";
 import { publicSitemapRoutes } from "@/config/public-site";
+import { getSiteUrl } from "@/config/site-url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const publicRoutes = Array.from(new Set(publicSitemapRoutes));
+  const siteUrl = getSiteUrl();
   const now = new Date();
 
   return publicRoutes.map((route) => ({
-    url: `https://${brand.domain}${route}`,
+    url: `${siteUrl}${route}`,
     lastModified: now,
     changeFrequency: route === "/" ? "weekly" : "monthly",
     priority:

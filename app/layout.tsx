@@ -4,10 +4,13 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { JsonLd } from "@/components/seo/json-ld";
 import { brand } from "@/config/brand";
+import { getSiteUrl } from "@/config/site-url";
 import "@/styles/globals.css";
 
+const siteUrl = getSiteUrl();
+
 export const metadata: Metadata = {
-  metadataBase: new URL(`https://${brand.domain}`),
+  metadataBase: new URL(siteUrl),
   title:
     "ChinaPak ImportHub | Direct China Factory Access for Pakistani Importers",
   description:
@@ -37,7 +40,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: brand.name,
-    url: `https://${brand.domain}`,
+    url: siteUrl,
     slogan: brand.tagline,
     description: brand.promise,
   };
@@ -45,7 +48,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: brand.name,
-    url: `https://${brand.domain}`,
+    url: siteUrl,
     inLanguage: ["en", "ur", "zh-CN"],
   };
 

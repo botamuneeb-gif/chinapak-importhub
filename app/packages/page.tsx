@@ -10,6 +10,9 @@ import {
   pricingPackages,
   refundProtectionRules,
 } from "@/config/pricing";
+import { getSiteUrl } from "@/config/site-url";
+
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   title: "China Factory Access Packages | ChinaPak ImportHub",
@@ -23,7 +26,7 @@ export const metadata: Metadata = {
     description:
       "Choose a factory access package with admin-reviewed factory options, add-ons, payment guidance, and refund rules.",
     type: "website",
-    url: "https://chinapakimporthub.com/packages",
+    url: `${siteUrl}/packages`,
   },
 };
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ROUTES, brand } from "@/config/brand";
+import { getSiteUrl } from "@/config/site-url";
 
 export type PublicFaqItem = {
   answer: string;
@@ -802,6 +803,7 @@ export type PublicSeoPageKey = keyof typeof publicSeoPages;
 
 export function getPublicPageMetadata(pageKey: PublicSeoPageKey): Metadata {
   const page = publicSeoPages[pageKey];
+  const siteUrl = getSiteUrl();
 
   return {
     title: page.title,
@@ -814,7 +816,7 @@ export function getPublicPageMetadata(pageKey: PublicSeoPageKey): Metadata {
       description: page.description,
       siteName: brand.name,
       type: "website",
-      url: `https://${brand.domain}${page.canonicalPath}`,
+      url: `${siteUrl}${page.canonicalPath}`,
     },
     twitter: {
       card: "summary_large_image",
@@ -825,6 +827,8 @@ export function getPublicPageMetadata(pageKey: PublicSeoPageKey): Metadata {
 }
 
 export function buildServiceJsonLd(page: PublicSeoPage) {
+  const siteUrl = getSiteUrl();
+
   return {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -833,14 +837,14 @@ export function buildServiceJsonLd(page: PublicSeoPage) {
     provider: {
       "@type": "Organization",
       name: brand.name,
-      url: `https://${brand.domain}`,
+      url: siteUrl,
     },
     areaServed: {
       "@type": "Country",
       name: "Pakistan",
     },
     serviceType: "China factory sourcing support for Pakistani importers",
-    url: `https://${brand.domain}${page.canonicalPath}`,
+    url: `${siteUrl}${page.canonicalPath}`,
   };
 }
 
