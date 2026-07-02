@@ -14,6 +14,7 @@ const privateRoutes = [
   "/importer/dashboard",
   "/importer/messages",
   "/importer/notifications",
+  "/importer/projects",
   "/importer/reports",
   "/importer/start",
   "/fms/dashboard",

@@ -35,6 +35,7 @@ This matrix documents the intended public/private boundary for ChinaPak ImportHu
 |---|---|---|
 | `/importer/dashboard` | Importer | Own project/report/payment summary only. |
 | `/importer/start` | Importer | Protected Import Project wizard. Not included in sitemap and marked noindex. |
+| `/importer/projects`, `/importer/projects/[projectId]` | Importer | Own submitted Import Projects only. Shows sanitized project status, timeline, billing links, released report links, and importer-safe files. Raw FMS submissions, FMS contacts, factory contacts, and admin-only notes are hidden. |
 | `/importer/reports`, `/importer/reports/[projectId]` | Importer | Own released reports only. Raw FMS submissions and factory contacts hidden. |
 | `/importer/reports/[projectId]/document` | Importer | Own released report document only; sanitized fields only. |
 | `/importer/messages/*` | Importer | Placeholder controlled messaging; no direct importer-FMS communication. |

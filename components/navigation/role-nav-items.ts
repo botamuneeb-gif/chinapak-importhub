@@ -48,16 +48,17 @@ export const portalRoleConfigs: Record<
     navItems: [
       { href: ROUTES.importerDashboard, label: "Dashboard" },
       { href: ROUTES.importerStart, label: "Start New Project" },
-      { href: ROUTES.importerReports, label: "My Reports" },
+      { href: ROUTES.importerProjects, label: "My Projects" },
+      { href: ROUTES.importerReports, label: "Reports" },
+      { href: ROUTES.invoices, label: "Invoices" },
+      { href: ROUTES.payments, label: "Payments" },
+      { href: ROUTES.refunds, label: "Refunds" },
       { href: ROUTES.importerNotifications, label: "Notifications" },
       ...maybeNavItem(launchFlags.enableMessages, {
         href: ROUTES.importerMessages,
         label: "Messages",
         supportLabel: "Admin-approved communication",
       }),
-      { href: ROUTES.payments, label: "Payments" },
-      { href: ROUTES.invoices, label: "Invoices" },
-      { href: ROUTES.refunds, label: "Refunds" },
       ...maybeNavItem(launchFlags.enableProfilePages, {
         href: "#profile",
         label: "Profile",
@@ -68,6 +69,11 @@ export const portalRoleConfigs: Record<
         description: "Create a new Import Project and choose a package.",
         href: ROUTES.importerStart,
         label: "Start New Project",
+      },
+      {
+        description: "Track submitted projects, payment gates, and next steps.",
+        href: ROUTES.importerProjects,
+        label: "View Projects",
       },
       {
         description: "Review admin-released factory reports and evidence.",

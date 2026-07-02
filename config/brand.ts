@@ -68,6 +68,7 @@ export const ROUTES = {
   importerMessages: "/importer/messages",
   importerDashboard: "/importer/dashboard",
   importerNotifications: "/importer/notifications",
+  importerProjects: "/importer/projects",
   importerReports: "/importer/reports",
 } as const;
 
@@ -78,6 +79,7 @@ export const RESERVED_ROUTES = [
   ROUTES.factory,
   ROUTES.fmsDashboard,
   ROUTES.importerDashboard,
+  ROUTES.importerProjects,
   ROUTES.importerReports,
 ] as const;
 

@@ -682,13 +682,21 @@ export function StartProjectWizard() {
                   . Payment is still required before sourcing can begin.
                 </p>
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                  {createdProjectCode ? (
+                    <Button
+                      href={`${ROUTES.importerProjects}/${createdProjectCode}`}
+                      variant="secondary"
+                    >
+                      Track Project
+                    </Button>
+                  ) : null}
                   <Button
                     href={
                       createdInvoiceCode
                         ? `${ROUTES.invoices}/${createdInvoiceCode}`
                         : ROUTES.invoices
                     }
-                    variant="secondary"
+                    variant="outline"
                   >
                     Invoice دیکھیں
                   </Button>
