@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-navy: #0b1f3a;
+  --color-brand-emerald: #138a4a;
+  --color-brand-gold: #c99a2e;
+  --color-brand-background: #f7f9fc;
+  --color-brand-text: #111827;
+  --color-brand-muted: #6b7280;
+  --color-brand-warning: #f59e0b;
+  --color-brand-error: #dc2626;
+  --font-sans: Arial, "Segoe UI", sans-serif;
+  --font-urdu: "Noto Nastaliq Urdu", "Nafees Nastaleeq",
+    "Jameel Noori Nastaleeq", "Alvi Nastaleeq", Arial, sans-serif;
+  --font-chinese: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", Arial,
+    sans-serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-brand-background);
+    color: var(--color-brand-text);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  :lang(ur),
+  .font-urdu,
+  .urdu-text {
+    direction: rtl;
+    font-family: var(--font-urdu);
+    line-height: 2;
+    text-align: right;
+    text-rendering: optimizeLegibility;
+    word-spacing: 0.02em;
+  }
+
+  :lang(zh),
+  :lang(zh-CN),
+  .font-chinese {
+    direction: ltr;
+    font-family: var(--font-chinese);
+    line-height: 1.75;
+  }
+
+  [translate="no"],
+  .notranslate,
+  code,
+  kbd,
+  samp {
+    font-family: var(--font-sans);
+    letter-spacing: normal;
+  }
+
+  [dir="rtl"],
+  .rtl {
+    direction: rtl;
+  }
+
+  [dir="ltr"],
+  .ltr {
+    direction: ltr;
+  }
+
+  .mixed-language {
+    unicode-bidi: plaintext;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+  }
+}
+
+@layer utilities {
+  :lang(ur),
+  .font-urdu,
+  .urdu-text {
+    direction: rtl;
+    font-family: var(--font-urdu);
+    line-height: 2;
+    text-align: right;
+    text-rendering: optimizeLegibility;
+    word-spacing: 0.02em;
+  }
+
+  .rtl {
+    direction: rtl;
+  }
+
+  .ltr {
+    direction: ltr;
+  }
+
+  .mixed-language {
+    unicode-bidi: plaintext;
+  }
+
+  .document-page {
+    color-adjust: exact;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .document-avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+    size: A4;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  table {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  tr,
+  img,
+  svg {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
