@@ -165,22 +165,21 @@ export function LiveAdminRepresentatives() {
 
   async function createRepresentative(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
+    const input = formInputFromForm(form);
     setError("");
     setMessage("");
 
     try {
       const accessToken = await getAccessToken();
-      const result = await createRepresentativeAction(
-        accessToken,
-        formInputFromForm(event.currentTarget),
-      );
+      const result = await createRepresentativeAction(accessToken, input);
 
       if (!result.ok) {
         setError(result.message);
         return;
       }
 
-      event.currentTarget.reset();
+      form.reset();
       setItems(result.data);
       setMessage("Representative created with a unique verification code.");
     } catch (createError) {
@@ -197,6 +196,8 @@ export function LiveAdminRepresentatives() {
     representativeId: string,
   ) {
     event.preventDefault();
+    const form = event.currentTarget;
+    const input = formInputFromForm(form);
     setMutatingId(representativeId);
     setError("");
     setMessage("");
@@ -206,7 +207,7 @@ export function LiveAdminRepresentatives() {
       const result = await updateRepresentativeAction(
         accessToken,
         representativeId,
-        formInputFromForm(event.currentTarget),
+        input,
       );
 
       if (!result.ok) {
