@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { AgentComplianceNotice } from "@/components/agent/agent-compliance-notice";
 import { AgentShell } from "@/components/agent/agent-shell";
 import { AgentStatusBadge } from "@/components/agent/agent-status-badge";
-import { Button } from "@/components/ui/button";
 import {
   agentLeads,
   agentRestrictions,
@@ -80,62 +79,25 @@ export default async function AgentLeadDetailPage({
 
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-xl font-bold text-brand-navy">2. Contact Plan</h2>
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <Button type="button" variant="outline">
-                Call/WhatsApp placeholder
-              </Button>
-              <div>
-                <label
-                  className="block text-sm font-semibold text-brand-navy"
-                  htmlFor="follow-up-status"
+            <div className="mt-5 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
+              Use the approved ChinaPak ImportHub follow-up script and official
+              payment instructions only. Lead status updates remain controlled
+              by admin operations for launch.
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {[
+                "Confirm the importer understands package terms.",
+                "Explain payment must be verified before FMS assignment.",
+                "Do not collect unofficial payments.",
+                "Request admin help for payment or refund questions.",
+              ].map((item) => (
+                <div
+                  className="rounded-lg border border-slate-200 bg-brand-background p-4 text-sm font-semibold leading-7 text-brand-muted"
+                  key={item}
                 >
-                  Follow-up status selector placeholder
-                </label>
-                <select
-                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-brand-text"
-                  id="follow-up-status"
-                >
-                  {[
-                    "New Lead",
-                    "Contact Attempted",
-                    "Interested",
-                    "Payment Help Needed",
-                    "Payment Link Sent",
-                    "Payment Completed",
-                    "Not Interested",
-                    "Closed",
-                  ].map((status) => (
-                    <option key={status}>{status}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-semibold text-brand-navy"
-                  htmlFor="next-follow-up"
-                >
-                  Next follow-up date placeholder
-                </label>
-                <input
-                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-brand-text"
-                  id="next-follow-up"
-                  type="date"
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-semibold text-brand-navy"
-                  htmlFor="agent-notes"
-                >
-                  Notes textarea placeholder
-                </label>
-                <textarea
-                  className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-brand-text"
-                  id="agent-notes"
-                  rows={4}
-                  placeholder="Add follow-up notes for future backend storage."
-                />
-              </div>
+                  {item}
+                </div>
+              ))}
             </div>
           </section>
 
@@ -156,24 +118,26 @@ export default async function AgentLeadDetailPage({
 
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-xl font-bold text-brand-navy">
-              5. Conversion Actions
+              5. Conversion Guidance
             </h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {[
-                "Mark Contact Attempted Placeholder",
-                "Send Payment Help Placeholder",
-                "Request Admin Support Placeholder",
-                "Mark Converted Placeholder",
-                "Close Lead Placeholder",
+                "Guide importer to official payment support.",
+                "Ask admin before promising any timeline or outcome.",
+                "Keep lead separate from FMS sourcing until payment is verified.",
+                "Commission credit follows verified payment and admin rules.",
               ].map((action) => (
-                <Button key={action} type="button" variant="outline">
+                <div
+                  className="rounded-lg border border-slate-200 bg-brand-background p-4 text-sm font-semibold leading-7 text-brand-muted"
+                  key={action}
+                >
                   {action}
-                </Button>
+                </div>
               ))}
             </div>
             <p className="mt-4 text-sm leading-7 text-brand-muted">
-              Placeholder only: these actions do not send messages, update lead
-              status, create payment links, or trigger commissions yet.
+              Lead conversion is completed only after verified payment and
+              admin review. Agents must never create unofficial payment paths.
             </p>
           </section>
         </div>

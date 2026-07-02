@@ -436,7 +436,7 @@ export async function getFmsDashboardAction(
           value: String(dueSoon),
         },
         {
-          detail: "Factory option submissions are future phase",
+          detail: "Submitted factory options awaiting admin review",
           label: "Pending Admin Review",
           value: String(
             assignments.filter(
@@ -552,7 +552,7 @@ export async function getFmsAssignmentDetailAction(
           requirement?.product_name ??
           "Product details pending",
         productImagesPlaceholder:
-          "Product files are not connected yet. FMS sees only approved text requirements in this phase.",
+          "FMS sees only admin-approved product reference files and text requirements.",
         productLinks:
           requirement?.product_links.join(", ") || "No product link provided",
         qualityLevel: requirement?.quality_level ?? "Not provided",
@@ -933,7 +933,7 @@ export async function updateFmsAssignmentProgressAction(
       body:
         intent === "accept"
           ? "FMS reviewed the assignment brief. Importer contact details remain hidden."
-          : "FMS started factory research. Factory option submission is still a future phase.",
+          : "FMS started factory research. Factory options must be submitted for admin review.",
       created_by: fms.authUserId,
       event_type: intent === "accept" ? "fms_assignment_accepted" : "fms_research_started",
       metadata: {

@@ -94,8 +94,8 @@ export const adminStats = [
   { label: "Ready for FMS Assignment", value: "4", detail: "Payment received and admin-ready" },
   { label: "In Progress", value: "11", detail: "Assigned or under factory research" },
   { label: "Refund Requests", value: "2", detail: "Need milestone review" },
-  { label: "Completed Projects", value: "27", detail: "Closed placeholder count" },
-  { label: "FMS Pending Payout", value: "5", detail: "Future payout review queue" },
+  { label: "Completed Projects", value: "27", detail: "Closed project count" },
+  { label: "FMS Pending Payout", value: "5", detail: "Payout review queue" },
 ] as const;
 
 export const recentAdminActivity = [

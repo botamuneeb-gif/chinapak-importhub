@@ -43,8 +43,8 @@ export default function FactoryPartnershipPage() {
           <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-brand-navy shadow-sm">
             <h2 className="text-2xl font-bold">Factory signup status</h2>
             <p className="mt-3 text-sm leading-7">
-              Factory accounts are not publicly active in Phase 1. This form is
-              a partnership inquiry placeholder only.
+              Factory accounts are invitation-only for MVP launch. Public
+              factory signup is not active.
             </p>
           </div>
         </div>

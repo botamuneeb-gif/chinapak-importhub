@@ -117,6 +117,11 @@
     -webkit-print-color-adjust: exact;
   }
 
+  body:has(.document-standalone) > header,
+  body:has(.document-standalone) > footer {
+    display: none;
+  }
+
   .document-avoid-break {
     break-inside: avoid;
     page-break-inside: avoid;

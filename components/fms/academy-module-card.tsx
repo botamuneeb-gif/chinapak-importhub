@@ -20,12 +20,9 @@ export function AcademyModuleCard({ module }: AcademyModuleCardProps) {
       <p className="mt-4 text-sm leading-7 text-brand-muted">
         {module.description}
       </p>
-      <button
-        className="mt-5 min-h-11 rounded-lg border border-brand-navy bg-brand-background px-4 py-2 text-sm font-semibold text-brand-navy"
-        type="button"
-      >
-        Open module placeholder
-      </button>
+      <p className="mt-5 rounded-lg border border-brand-gold bg-amber-50 px-4 py-3 text-sm font-semibold text-brand-navy">
+        Review this module with ChinaPak admin before certification.
+      </p>
     </article>
   );
 }

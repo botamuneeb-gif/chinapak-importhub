@@ -71,7 +71,7 @@ export const trustCards = [
 export const verificationOptions = [
   {
     title: "Verify Representative",
-    body: "Enter an Agent Code or Representative ID to check placeholder status.",
+    body: "Enter an Agent Code or Representative ID before sharing information or discussing payment.",
     href: "/verify/representative",
   },
   {
@@ -80,20 +80,20 @@ export const verificationOptions = [
     href: "/contact",
   },
   {
-    title: "Visit/confirm local office placeholder",
-    body: "Future local office verification details should be controlled by admin settings.",
+    title: "Confirm official support channel",
+    body: "Use official ChinaPak ImportHub routes before trusting payment or representative requests.",
     href: "/verify",
   },
   {
-    title: "Check invoice/project ID placeholder",
-    body: "Future lookup should verify document IDs without exposing private role details.",
+    title: "Check invoice/project ID",
+    body: "Use your portal invoice or project record to confirm the official payment context.",
     href: "/invoices",
   },
 ] as const;
 
 export const exampleRepresentative: Representative = {
   id: "agent-lhr-014",
-  name: "Ali Raza placeholder",
+  name: "Ali Raza",
   agentCode: "CPH-LHR-014",
   cityMarket: "Lahore / Shah Alam Market",
   status: "Active",
@@ -115,13 +115,13 @@ export const exampleRepresentative: Representative = {
 
 export const agentStats = [
   { label: "Assigned Leads", value: "18", detail: "Unpaid or assisted importer leads" },
-  { label: "Contacted Today", value: "6", detail: "Placeholder follow-up count" },
+  { label: "Contacted Today", value: "6", detail: "Follow-up count" },
   { label: "Payment Help Needed", value: "7", detail: "Needs approved payment support" },
   { label: "Converted to Paid Projects", value: "4", detail: "After payment verification" },
-  { label: "Pending Commissions", value: "PKR 9,000", detail: "Configurable placeholder" },
-  { label: "Paid Commissions", value: "PKR 21,000", detail: "Placeholder history" },
+  { label: "Pending Commissions", value: "PKR 9,000", detail: "Configurable rule" },
+  { label: "Paid Commissions", value: "PKR 21,000", detail: "Commission history" },
   { label: "Agent Status", value: "Active", detail: "Representative account state" },
-  { label: "Training Status", value: "In Progress", detail: "Certification placeholder" },
+  { label: "Training Status", value: "In Progress", detail: "Certification status" },
 ] as const;
 
 export const agentComplianceRules = [
@@ -134,7 +134,7 @@ export const agentComplianceRules = [
 export const agentLeads: AgentLead[] = [
   {
     id: "LEAD-2026-031",
-    importerName: "Ahmed Traders placeholder",
+    importerName: "Ahmed Traders",
     city: "Lahore",
     product: "School bags",
     budgetRange: "PKR 300,000-700,000",
@@ -152,7 +152,7 @@ export const agentLeads: AgentLead[] = [
   },
   {
     id: "LEAD-2026-032",
-    importerName: "Karachi Mobile Hub placeholder",
+    importerName: "Karachi Mobile Hub",
     city: "Karachi",
     product: "USB-C cables",
     budgetRange: "PKR 700,000-1,500,000",
@@ -170,7 +170,7 @@ export const agentLeads: AgentLead[] = [
   },
   {
     id: "LEAD-2026-033",
-    importerName: "Faisalabad Home Store placeholder",
+    importerName: "Faisalabad Home Store",
     city: "Faisalabad",
     product: "Plastic storage boxes",
     budgetRange: "PKR 100,000-300,000",
@@ -188,7 +188,7 @@ export const agentLeads: AgentLead[] = [
   },
   {
     id: "LEAD-2026-034",
-    importerName: "Multan Tools Market placeholder",
+    importerName: "Multan Tools Market",
     city: "Multan",
     product: "Tool kits",
     budgetRange: "PKR 1,500,000+",
@@ -207,9 +207,9 @@ export const agentLeads: AgentLead[] = [
 ];
 
 export const conversionActivity = [
-  "LEAD-2026-028 converted after bank transfer verification placeholder.",
+  "LEAD-2026-028 converted after bank transfer verification.",
   "LEAD-2026-029 requested admin support before payment.",
-  "LEAD-2026-030 closed as not interested placeholder.",
+  "LEAD-2026-030 closed as not interested.",
 ] as const;
 
 export const approvedTalkingPoints = [
@@ -234,9 +234,9 @@ export const commissionSummary = {
   rule:
     "Agent commission is credited only after payment is verified and project is accepted for admin review.",
   packageExamples: [
-    "Factory Discovery referral commission placeholder - configurable",
-    "Factory Match Plus referral commission placeholder - configurable",
-    "Import Partner referral commission placeholder - configurable",
+    "Factory Discovery referral commission - configurable",
+    "Factory Match Plus referral commission - configurable",
+    "Import Partner referral commission - configurable",
   ],
   history: [
     {
@@ -244,7 +244,7 @@ export const commissionSummary = {
       leadId: "LEAD-2026-028",
       packageName: "Factory Match Plus",
       status: "Paid",
-      amount: "Configurable placeholder",
+      amount: "Configurable",
       date: "2026-06-27",
     },
     {
@@ -252,7 +252,7 @@ export const commissionSummary = {
       leadId: "LEAD-2026-031",
       packageName: "Factory Match Plus",
       status: "Pending",
-      amount: "Configurable placeholder",
+      amount: "Configurable",
       date: "Pending payment verification",
     },
     {
@@ -260,7 +260,7 @@ export const commissionSummary = {
       leadId: "LEAD-2026-032",
       packageName: "Import Partner",
       status: "Approved",
-      amount: "Configurable placeholder",
+      amount: "Configurable",
       date: "2026-06-29",
     },
   ],

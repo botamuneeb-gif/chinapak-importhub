@@ -29,7 +29,7 @@ export default function FmsOpportunitiesPage() {
             href: ROUTES.fmsOpportunityPakistaniImporters,
             label: "Work with Pakistani importers",
           },
-          { href: ROUTES.authInvite, label: "Invitation access placeholder" },
+          { href: ROUTES.authInvite, label: "Invitation access" },
         ]}
       />
 

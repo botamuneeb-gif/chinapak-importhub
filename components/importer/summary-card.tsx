@@ -45,8 +45,8 @@ export function SummaryCard({
   const productSummary = [
     productDetails || "Details not typed",
     productLink ? `Link: ${productLink}` : "",
-    usedPhotoPlaceholder ? "Photo method selected" : "",
-    usedVoicePlaceholder ? "Voice note method selected" : "",
+    usedPhotoPlaceholder ? "Product photo selected" : "",
+    usedVoicePlaceholder ? "Voice note selected" : "",
   ]
     .filter(Boolean)
     .join(" | ");
@@ -78,7 +78,7 @@ export function SummaryCard({
         />
         <SummaryRow
           label="Estimated service fee"
-          value={`${packagePlan.price} base service fee. Add-ons are selected for UI preview and final pricing review later.`}
+          value={`${packagePlan.price} base service fee. Selected add-ons are confirmed during admin payment review.`}
         />
         <SummaryRow label="Delivery timeframe" value={packagePlan.delivery} />
         {specialNotes ? (

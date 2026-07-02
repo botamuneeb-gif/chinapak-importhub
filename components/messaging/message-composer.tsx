@@ -33,7 +33,8 @@ export function MessageComposer({
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {actions.map((action) => (
           <button
-            className="min-h-11 rounded-lg border border-slate-300 bg-brand-background px-4 py-2 text-sm font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
+            className="min-h-11 rounded-lg border border-slate-300 bg-slate-50 px-4 py-2 text-sm font-bold text-brand-muted"
+            disabled
             key={action}
             type="button"
           >
@@ -42,8 +43,8 @@ export function MessageComposer({
         ))}
       </div>
       <p className="mt-4 rounded-lg bg-brand-background p-3 text-xs font-semibold leading-6 text-brand-muted">
-        Placeholder only: this composer does not send messages, upload files, or
-        trigger notifications yet.
+        Message sending is disabled unless the launch messaging flag is enabled.
+        Use active project, feedback, evidence, and notification workflows.
       </p>
     </section>
   );

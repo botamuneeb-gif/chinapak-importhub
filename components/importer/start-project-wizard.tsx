@@ -16,6 +16,7 @@ import { WizardStep } from "@/components/importer/wizard-step";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/brand";
 import { importProjectFlow } from "@/config/import-project";
+import { launchFlags } from "@/config/launch-flags";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -142,10 +143,10 @@ export function StartProjectWizard() {
       step === 1 &&
       !draft.productDetails.trim() &&
       !draft.productLink.trim() &&
-      !draft.usedPhotoPlaceholder &&
-      !draft.usedVoicePlaceholder
+      !(launchFlags.enablePhotoUploadInWizard && draft.usedPhotoPlaceholder) &&
+      !(launchFlags.enableVoiceNotes && draft.usedVoicePlaceholder)
     ) {
-      return "کم از کم product details، link، photo placeholder یا voice note placeholder منتخب کریں۔";
+      return "کم از کم product details یا product link درج کریں۔";
     }
 
     if (step === 2 && !draft.budgetId) {
@@ -328,27 +329,29 @@ export function StartProjectWizard() {
             stepLabel="Step 1 — Product Input"
           >
             <div className="grid gap-4 md:grid-cols-2">
-              <MethodCard
-                body={photoMethod.body}
-                icon="photo"
-                isActive={draft.usedPhotoPlaceholder}
-                title={photoMethod.title}
-              >
-                <button
-                  aria-pressed={draft.usedPhotoPlaceholder}
-                  className="min-h-12 w-full rounded-lg border border-brand-navy px-4 py-3 font-semibold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
-                  onClick={() =>
-                    updateDraft({
-                      usedPhotoPlaceholder: !draft.usedPhotoPlaceholder,
-                    })
-                  }
-                  type="button"
+              {launchFlags.enablePhotoUploadInWizard ? (
+                <MethodCard
+                  body={photoMethod.body}
+                  icon="photo"
+                  isActive={draft.usedPhotoPlaceholder}
+                  title={photoMethod.title}
                 >
-                  {draft.usedPhotoPlaceholder
-                    ? "Photo method selected"
-                    : "Photo method select کریں"}
-                </button>
-              </MethodCard>
+                  <button
+                    aria-pressed={draft.usedPhotoPlaceholder}
+                    className="min-h-12 w-full rounded-lg border border-brand-navy px-4 py-3 font-semibold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                    onClick={() =>
+                      updateDraft({
+                        usedPhotoPlaceholder: !draft.usedPhotoPlaceholder,
+                      })
+                    }
+                    type="button"
+                  >
+                    {draft.usedPhotoPlaceholder
+                      ? "Photo method selected"
+                      : "Photo method select کریں"}
+                  </button>
+                </MethodCard>
+              ) : null}
 
               <MethodCard
                 body={detailsMethod.body}
@@ -392,27 +395,29 @@ export function StartProjectWizard() {
                 />
               </MethodCard>
 
-              <MethodCard
-                body={voiceMethod.body}
-                icon="mic"
-                isActive={draft.usedVoicePlaceholder}
-                title={voiceMethod.title}
-              >
-                <button
-                  aria-pressed={draft.usedVoicePlaceholder}
-                  className="min-h-12 w-full rounded-lg border border-brand-navy px-4 py-3 font-semibold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
-                  onClick={() =>
-                    updateDraft({
-                      usedVoicePlaceholder: !draft.usedVoicePlaceholder,
-                    })
-                  }
-                  type="button"
+              {launchFlags.enableVoiceNotes ? (
+                <MethodCard
+                  body={voiceMethod.body}
+                  icon="mic"
+                  isActive={draft.usedVoicePlaceholder}
+                  title={voiceMethod.title}
                 >
-                  {draft.usedVoicePlaceholder
-                    ? "Voice note method selected"
-                    : "Voice note method select کریں"}
-                </button>
-              </MethodCard>
+                  <button
+                    aria-pressed={draft.usedVoicePlaceholder}
+                    className="min-h-12 w-full rounded-lg border border-brand-navy px-4 py-3 font-semibold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                    onClick={() =>
+                      updateDraft({
+                        usedVoicePlaceholder: !draft.usedVoicePlaceholder,
+                      })
+                    }
+                    type="button"
+                  >
+                    {draft.usedVoicePlaceholder
+                      ? "Voice note method selected"
+                      : "Voice note method select کریں"}
+                  </button>
+                </MethodCard>
+              ) : null}
             </div>
           </WizardStep>
         ) : null}
@@ -539,7 +544,7 @@ export function StartProjectWizard() {
 
         {currentStep === 6 ? (
           <WizardStep
-            copy="Add-ons optional ہیں۔ ابھی یہ صرف UI selection ہے؛ final pricing/payment logic backend میں review ہوتی رہے گی۔"
+            copy="Add-ons optional ہیں۔ Selected add-ons کو admin payment review کے دوران confirm کیا جائے گا۔"
             heading="Optional Add-ons"
             stepLabel="Step 6 — Add-ons"
           >
@@ -563,7 +568,7 @@ export function StartProjectWizard() {
 
         {currentStep === 7 ? (
           <WizardStep
-            copy="یہ summary Supabase میں Import Project یا unpaid lead save کرنے سے پہلے final review ہے۔"
+            copy="Import Project submit کرنے سے پہلے اپنی details final review کر لیں۔"
             heading="Order Summary"
             stepLabel="Step 7 — Order Summary"
           >
@@ -663,7 +668,7 @@ export function StartProjectWizard() {
             {finalStatus === "project-created" ? (
               <div className="mt-6 rounded-lg border border-brand-gold bg-brand-background p-5 text-brand-navy">
                 <h2 className="text-xl font-bold">
-                  Import Project saved in Supabase.
+                  Import Project saved.
                 </h2>
                 <p className="mt-2 text-sm leading-8">
                   Project ID:{" "}
@@ -739,12 +744,6 @@ export function StartProjectWizard() {
             </Button>
           ) : null}
         </div>
-
-        <aside className="mt-6 rounded-lg border border-slate-200 bg-white p-4 text-sm leading-8 text-brand-muted shadow-sm">
-          Supabase persistence is connected for Import Projects, unpaid leads,
-          and invoice creation. This wizard still does not upload files, process
-          real gateway payments, send messages, or assign an FMS.
-        </aside>
       </div>
     </div>
   );

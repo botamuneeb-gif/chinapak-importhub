@@ -87,7 +87,7 @@ export function ImporterLoginForm() {
           disabled
           type="button"
         >
-          Continue with OTP - future SMS setup
+          Phone OTP unavailable during launch
         </button>
       </div>
 
@@ -124,8 +124,7 @@ export function ImporterLoginForm() {
         <Link className="font-bold text-brand-emerald" href={ROUTES.signup}>
           Create an account
         </Link>
-        . Login/signup will become automatic through phone OTP when SMS is
-        active.
+        . Phone OTP will be enabled after SMS provider activation.
       </p>
     </div>
   );

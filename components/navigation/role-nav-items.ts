@@ -1,4 +1,5 @@
 import { ROUTES } from "@/config/brand";
+import { launchFlags } from "@/config/launch-flags";
 import { USER_ROLES, type UserRole } from "@/lib/auth/roles";
 
 export type PortalNavItem = {
@@ -25,6 +26,16 @@ export type PortalRoleConfig = {
   supportLabel: string;
 };
 
+const maybeNavItem = (
+  condition: boolean,
+  item: PortalNavItem,
+): PortalNavItem[] => (condition ? [item] : []);
+
+const maybeQuickAction = (
+  condition: boolean,
+  item: PortalQuickAction,
+): PortalQuickAction[] => (condition ? [item] : []);
+
 export const portalRoleConfigs: Record<
   Exclude<UserRole, "factory_future">,
   PortalRoleConfig
@@ -39,20 +50,18 @@ export const portalRoleConfigs: Record<
       { href: ROUTES.importerStart, label: "Start New Project" },
       { href: ROUTES.importerReports, label: "My Reports" },
       { href: ROUTES.importerNotifications, label: "Notifications" },
-      {
+      ...maybeNavItem(launchFlags.enableMessages, {
         href: ROUTES.importerMessages,
-        label: "Messages / Feedback",
+        label: "Messages",
         supportLabel: "Admin-approved communication",
-      },
+      }),
       { href: ROUTES.payments, label: "Payments" },
       { href: ROUTES.invoices, label: "Invoices" },
       { href: ROUTES.refunds, label: "Refunds" },
-      {
-        disabled: true,
-        href: "#profile-placeholder",
+      ...maybeNavItem(launchFlags.enableProfilePages, {
+        href: "#profile",
         label: "Profile",
-        badge: "Future",
-      },
+      }),
     ],
     quickActions: [
       {
@@ -65,11 +74,11 @@ export const portalRoleConfigs: Record<
         href: ROUTES.importerReports,
         label: "View Reports",
       },
-      {
+      ...maybeQuickAction(launchFlags.enableMessages, {
         description: "Ask report questions through platform-controlled feedback.",
         href: ROUTES.importerMessages,
         label: "Ask Feedback",
-      },
+      }),
     ],
   },
   [USER_ROLES.fms]: {
@@ -86,15 +95,19 @@ export const portalRoleConfigs: Record<
         label: "Factory Submissions / Evidence",
         supportLabel: "Admin review first",
       },
-      { href: ROUTES.fmsMessages, label: "Messages", badge: "Placeholder" },
+      ...maybeNavItem(launchFlags.enableMessages, {
+        href: ROUTES.fmsMessages,
+        label: "Messages",
+      }),
       { href: ROUTES.fmsAcademy, label: "Academy" },
-      { href: ROUTES.fmsEarnings, label: "Earnings" },
-      {
-        disabled: true,
-        href: "#profile-placeholder",
+      ...maybeNavItem(launchFlags.showFutureNavItems, {
+        href: ROUTES.fmsEarnings,
+        label: "Earnings",
+      }),
+      ...maybeNavItem(launchFlags.enableProfilePages, {
+        href: "#profile",
         label: "Profile",
-        badge: "Future",
-      },
+      }),
     ],
     quickActions: [
       {
@@ -124,12 +137,10 @@ export const portalRoleConfigs: Record<
       { href: ROUTES.agentLeads, label: "Leads" },
       { href: ROUTES.agentCommissions, label: "Commissions" },
       { href: ROUTES.agentTraining, label: "Training" },
-      {
-        disabled: true,
-        href: "#profile-placeholder",
+      ...maybeNavItem(launchFlags.enableProfilePages, {
+        href: "#profile",
         label: "Profile",
-        badge: "Future",
-      },
+      }),
     ],
     quickActions: [
       {
@@ -143,7 +154,7 @@ export const portalRoleConfigs: Record<
         label: "Training",
       },
       {
-        description: "Track pending and paid commission placeholders.",
+        description: "Track pending and paid commission records.",
         href: ROUTES.agentCommissions,
         label: "Commissions",
       },
@@ -165,8 +176,14 @@ export const portalRoleConfigs: Record<
       { href: ROUTES.adminEvidence, label: "Evidence Review" },
       { href: ROUTES.adminReportFeedback, label: "Report Feedback" },
       { href: ROUTES.adminNotifications, label: "Notifications" },
-      { href: ROUTES.adminFactories, label: "Factories" },
-      { href: ROUTES.adminMessages, label: "Messages", badge: "Placeholder" },
+      ...maybeNavItem(launchFlags.enableFactoryDatabaseAdmin, {
+        href: ROUTES.adminFactories,
+        label: "Factories",
+      }),
+      ...maybeNavItem(launchFlags.enableMessages, {
+        href: ROUTES.adminMessages,
+        label: "Messages",
+      }),
     ],
     quickActions: [
       {
@@ -215,18 +232,14 @@ export const portalRoleConfigs: Record<
         label: "Role Controls",
         supportLabel: "Inside user management",
       },
-      {
-        disabled: true,
-        href: "#system-settings-placeholder",
+      ...maybeNavItem(launchFlags.showFutureNavItems, {
+        href: "#system-settings",
         label: "System Settings",
-        badge: "Future",
-      },
-      {
-        disabled: true,
-        href: "#audit-security-placeholder",
+      }),
+      ...maybeNavItem(launchFlags.showFutureNavItems, {
+        href: "#audit-security",
         label: "Audit / Security",
-        badge: "Future",
-      },
+      }),
     ],
     quickActions: [
       {
@@ -239,12 +252,11 @@ export const portalRoleConfigs: Record<
         href: ROUTES.superAdminUsers,
         label: "Role Controls",
       },
-      {
-        description: "Audit/security center remains a future protected module.",
-        disabled: true,
-        href: "#audit-security-placeholder",
+      ...maybeQuickAction(launchFlags.showFutureNavItems, {
+        description: "Review audit and security events from the protected module.",
+        href: "#audit-security",
         label: "Security",
-      },
+      }),
     ],
   },
 };

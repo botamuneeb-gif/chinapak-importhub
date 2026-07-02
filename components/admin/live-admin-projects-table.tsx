@@ -6,7 +6,6 @@ import {
   listAdminImportProjectsAction,
   type AdminLiveProjectListItem,
 } from "@/app/admin/projects/actions";
-import { AdminActionPanel } from "@/components/admin/admin-action-panel";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { AdminTable } from "@/components/admin/admin-table";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -191,108 +190,89 @@ export function LiveAdminProjectsTable() {
   }
 
   return (
-    <div className="grid min-w-0 gap-5 2xl:grid-cols-[minmax(0,1fr)_300px]">
-      <div className="min-w-0 space-y-4">
-        <div className="flex flex-wrap gap-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
-          {(Object.keys(filterLabels) as ProjectQueueFilter[]).map((filter) => (
-            <button
-              className={`rounded-lg border px-3 py-2 text-xs font-bold transition ${
-                activeFilter === filter
-                  ? "border-brand-emerald bg-emerald-50 text-brand-emerald"
-                  : "border-slate-300 bg-white text-brand-navy hover:border-brand-gold"
-              }`}
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              type="button"
-            >
-              {filterLabels[filter]} ({filterCounts[filter]})
-            </button>
-          ))}
-        </div>
-
-        <AdminTable columns={columns} label="Live Import projects">
-          {projects.length === 0 ? (
-            <tr>
-              <td className="px-4 py-8 text-center text-brand-muted" colSpan={columns.length}>
-                No live Import Projects have been submitted yet.
-              </td>
-            </tr>
-          ) : filteredProjects.length === 0 ? (
-            <tr>
-              <td className="px-4 py-8 text-center text-brand-muted" colSpan={columns.length}>
-                No projects match this filter.
-              </td>
-            </tr>
-          ) : (
-            filteredProjects.map((project) => (
-              <tr className="align-top hover:bg-brand-background" key={project.id}>
-                <td className="whitespace-nowrap px-4 py-4 font-bold text-brand-navy">
-                  {project.projectCode}
-                </td>
-                <td className="whitespace-nowrap px-4 py-4 text-brand-text">
-                  {project.importerName}
-                </td>
-                <td className="whitespace-nowrap px-4 py-4 text-brand-muted">
-                  {project.city}
-                </td>
-                <td className="min-w-48 px-4 py-4 text-brand-text">
-                  <span className="block">{project.product}</span>
-                  <span className="mt-1 block text-xs text-brand-muted">
-                    Budget: {project.budgetRange}
-                  </span>
-                </td>
-                <td className="whitespace-nowrap px-4 py-4 text-brand-muted">
-                  <span className="block">{project.packageName}</span>
-                  <span className="text-xs">{project.packagePrice}</span>
-                </td>
-                <td className="px-4 py-4">
-                  <AdminStatusBadge status={project.paymentStatus} />
-                </td>
-                <td className="px-4 py-4">
-                  <AdminStatusBadge status={project.projectStatus} />
-                </td>
-                <td className="px-4 py-4">
-                  <AdminStatusBadge status={project.adminReviewStatus} />
-                </td>
-                <td className="min-w-48 px-4 py-4">
-                  <AdminStatusBadge status={project.readinessLabel} />
-                  <span className="mt-2 block text-xs leading-5 text-brand-muted">
-                    {project.readinessDescription}
-                  </span>
-                </td>
-                <td className="whitespace-nowrap px-4 py-4 text-brand-muted">
-                  {project.createdDate}
-                </td>
-                <td className="min-w-56 px-4 py-4">
-                  <div className="flex flex-wrap gap-2">
-                    <Link
-                      className="rounded-lg bg-brand-navy px-3 py-2 text-xs font-bold text-white no-underline hover:bg-brand-emerald"
-                      href={`/admin/projects/${project.projectCode}`}
-                    >
-                      Review Project
-                    </Link>
-                    <button
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-brand-navy opacity-70"
-                      disabled
-                      type="button"
-                    >
-                      Prepare Assignment Placeholder
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          )}
-        </AdminTable>
+    <div className="min-w-0 space-y-4">
+      <div className="flex flex-wrap gap-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+        {(Object.keys(filterLabels) as ProjectQueueFilter[]).map((filter) => (
+          <button
+            className={`rounded-lg border px-3 py-2 text-xs font-bold transition ${
+              activeFilter === filter
+                ? "border-brand-emerald bg-emerald-50 text-brand-emerald"
+                : "border-slate-300 bg-white text-brand-navy hover:border-brand-gold"
+            }`}
+            key={filter}
+            onClick={() => setActiveFilter(filter)}
+            type="button"
+          >
+            {filterLabels[filter]} ({filterCounts[filter]})
+          </button>
+        ))}
       </div>
 
-      <div className="min-w-0">
-        <AdminActionPanel
-          actions={["Mark Needs Info", "Prepare Assignment", "View Timeline"]}
-          note="Use each project detail page for live payment and admin review actions. Bulk actions and FMS assignment remain placeholders."
-          title="Bulk Action Placeholder"
-        />
-      </div>
+      <AdminTable columns={columns} label="Live Import projects">
+        {projects.length === 0 ? (
+          <tr>
+            <td className="px-4 py-8 text-center text-brand-muted" colSpan={columns.length}>
+              No live Import Projects have been submitted yet.
+            </td>
+          </tr>
+        ) : filteredProjects.length === 0 ? (
+          <tr>
+            <td className="px-4 py-8 text-center text-brand-muted" colSpan={columns.length}>
+              No projects match this filter.
+            </td>
+          </tr>
+        ) : (
+          filteredProjects.map((project) => (
+            <tr className="align-top hover:bg-brand-background" key={project.id}>
+              <td className="whitespace-nowrap px-4 py-4 font-bold text-brand-navy">
+                {project.projectCode}
+              </td>
+              <td className="whitespace-nowrap px-4 py-4 text-brand-text">
+                {project.importerName}
+              </td>
+              <td className="whitespace-nowrap px-4 py-4 text-brand-muted">
+                {project.city}
+              </td>
+              <td className="min-w-48 px-4 py-4 text-brand-text">
+                <span className="block">{project.product}</span>
+                <span className="mt-1 block text-xs text-brand-muted">
+                  Budget: {project.budgetRange}
+                </span>
+              </td>
+              <td className="whitespace-nowrap px-4 py-4 text-brand-muted">
+                <span className="block">{project.packageName}</span>
+                <span className="text-xs">{project.packagePrice}</span>
+              </td>
+              <td className="px-4 py-4">
+                <AdminStatusBadge status={project.paymentStatus} />
+              </td>
+              <td className="px-4 py-4">
+                <AdminStatusBadge status={project.projectStatus} />
+              </td>
+              <td className="px-4 py-4">
+                <AdminStatusBadge status={project.adminReviewStatus} />
+              </td>
+              <td className="min-w-48 px-4 py-4">
+                <AdminStatusBadge status={project.readinessLabel} />
+                <span className="mt-2 block text-xs leading-5 text-brand-muted">
+                  {project.readinessDescription}
+                </span>
+              </td>
+              <td className="whitespace-nowrap px-4 py-4 text-brand-muted">
+                {project.createdDate}
+              </td>
+              <td className="min-w-40 px-4 py-4">
+                <Link
+                  className="rounded-lg bg-brand-navy px-3 py-2 text-xs font-bold text-white no-underline hover:bg-brand-emerald"
+                  href={`/admin/projects/${project.projectCode}`}
+                >
+                  Review Project
+                </Link>
+              </td>
+            </tr>
+          ))
+        )}
+      </AdminTable>
     </div>
   );
 }

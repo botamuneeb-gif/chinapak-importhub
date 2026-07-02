@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { RepresentativeCard } from "@/components/verification/representative-card";
 import { VerifyHero } from "@/components/verification/verify-hero";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/brand";
-import { exampleRepresentative } from "@/config/agents";
 
 export const metadata: Metadata = {
   title: "Verify Representative | ChinaPak ImportHub",
@@ -26,63 +24,45 @@ export default function VerifyRepresentativePage() {
 
       <section className="bg-brand-background" dir="ltr" lang="en">
         <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <form
-            aria-label="Representative verification placeholder"
-            className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
-          >
+          <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="text-2xl font-bold text-brand-navy">
-              Verify Representative Placeholder
+              How to verify a representative
             </h2>
-            <div className="mt-5 grid gap-4">
-              <div>
-                <label
-                  className="block text-sm font-semibold text-brand-navy"
-                  htmlFor="agent-code"
+            <p className="mt-3 text-sm leading-7 text-brand-muted">
+              Before sharing payment details, ask the representative for their
+              ChinaPak ImportHub Agent Code and confirm it through official
+              support. Do not pay personal accounts or unofficial numbers.
+            </p>
+            <div className="mt-5 grid gap-3">
+              {[
+                "Ask for Representative ID / Agent Code.",
+                "Confirm the city or market they claim to serve.",
+                "Use official ChinaPak ImportHub payment routes only.",
+                "Contact support if status is inactive or unclear.",
+              ].map((item) => (
+                <div
+                  className="rounded-lg border border-slate-200 bg-brand-background p-4 text-sm font-semibold text-brand-navy"
+                  key={item}
                 >
-                  Representative ID / Agent Code
-                </label>
-                <input
-                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-brand-text"
-                  id="agent-code"
-                  placeholder="CPH-LHR-014"
-                  type="text"
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-semibold text-brand-navy"
-                  htmlFor="representative-phone"
-                >
-                  Phone number optional
-                </label>
-                <input
-                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-brand-text"
-                  id="representative-phone"
-                  placeholder="+92 3XX XXXXXXX"
-                  type="tel"
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-semibold text-brand-navy"
-                  htmlFor="representative-city"
-                >
-                  City optional
-                </label>
-                <input
-                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-brand-text"
-                  id="representative-city"
-                  placeholder="Lahore"
-                  type="text"
-                />
-              </div>
-              <Button type="button" variant="secondary">
-                Verify Representative Placeholder
+                  {item}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-brand-navy shadow-sm">
+            <h2 className="text-2xl font-bold">Launch verification route</h2>
+            <p className="mt-3 text-sm leading-7">
+              Automated representative lookup is not active for MVP launch.
+              Use Contact Support with the Agent Code, phone number, and city
+              shown by the representative.
+            </p>
+            <div className="mt-5">
+              <Button href={ROUTES.contact} variant="secondary">
+                Contact Support
               </Button>
             </div>
-          </form>
-
-          <RepresentativeCard representative={exampleRepresentative} />
+          </section>
         </div>
       </section>
 

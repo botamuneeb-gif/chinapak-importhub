@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { AuthActionButton } from "@/components/auth/auth-action-button";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -20,7 +19,7 @@ export default function InvitePage() {
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <AuthCard title="Invitation details">
-          <form aria-label="Invitation-only access placeholder" className="grid gap-4">
+          <form aria-label="Invitation-only access request" className="grid gap-4">
             <AuthInput
               id="invite-code"
               label="Invitation code"
@@ -50,10 +49,10 @@ export default function InvitePage() {
                 ))}
               </select>
             </div>
-
-            <AuthActionButton disabled variant="secondary">
-              Continue button placeholder
-            </AuthActionButton>
+            <div className="rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
+              Invitation verification is handled by ChinaPak ImportHub admin
+              before launch account access is activated.
+            </div>
           </form>
         </AuthCard>
 

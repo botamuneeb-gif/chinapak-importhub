@@ -5,7 +5,6 @@ import {
   listAdminUnpaidLeadsAction,
   type AdminLiveLeadListItem,
 } from "@/app/admin/projects/actions";
-import { AdminActionPanel } from "@/components/admin/admin-action-panel";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { AdminTable } from "@/components/admin/admin-table";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -20,7 +19,6 @@ const columns = [
   "Reason Payment Was Not Completed",
   "Created Date",
   "Lead Status",
-  "Action",
 ];
 
 export function LiveAdminLeadsTable() {
@@ -99,7 +97,7 @@ export function LiveAdminLeadsTable() {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+    <div className="min-w-0 space-y-4">
       <AdminTable columns={columns} label="Live unpaid leads">
         {leads.length === 0 ? (
           <tr>
@@ -140,41 +138,15 @@ export function LiveAdminLeadsTable() {
                   Unpaid lead - not assignable to FMS
                 </span>
               </td>
-              <td className="min-w-64 px-4 py-4">
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "Mark Contact Attempted",
-                    "Send Payment Help Placeholder",
-                    "Assign Local Agent Placeholder",
-                    "Close Lead",
-                  ].map((action) => (
-                    <button
-                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-brand-navy opacity-70"
-                      disabled
-                      key={action}
-                      type="button"
-                    >
-                      {action}
-                    </button>
-                  ))}
-                </div>
-              </td>
             </tr>
           ))
         )}
       </AdminTable>
 
-      <AdminActionPanel
-        actions={[
-          "Mark Contact Attempted",
-          "Send Payment Help Placeholder",
-          "Assign Local Agent Placeholder",
-          "Convert to Paid Project Placeholder",
-          "Close Lead",
-        ]}
-        note="Lead actions remain placeholders. Conversion can only happen later after verified payment and admin review."
-        title="Lead Detail Actions"
-      />
+      <div className="rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy shadow-sm">
+        Lead conversion workflow will be added after launch. For MVP launch,
+        unpaid leads remain admin follow-up records and are not assignable to FMS.
+      </div>
     </div>
   );
 }

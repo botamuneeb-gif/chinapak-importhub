@@ -5,6 +5,7 @@ import { MessageComposer } from "@/components/messaging/message-composer";
 import { MessageShell } from "@/components/messaging/message-shell";
 import { ThreadStatusBadge } from "@/components/messaging/thread-status-badge";
 import { TranslationAddOnPanel } from "@/components/messaging/translation-add-on-panel";
+import { launchFlags } from "@/config/launch-flags";
 import {
   getThreadForView,
   getThreadsForView,
@@ -35,6 +36,24 @@ export default async function ImporterMessageThreadPage({
   params,
 }: ImporterMessageThreadPageProps) {
   const { threadId } = await params;
+
+  if (!launchFlags.enableMessages) {
+    return (
+      <MessageShell
+        description="Report feedback and project notifications are active for launch."
+        dir="rtl"
+        eyebrow="ChinaPak ImportHub"
+        lang="ur"
+        title="Project Communication"
+      >
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-sm leading-8 text-brand-navy shadow-sm">
+          Launch phase میں project questions کے لیے report feedback اور
+          notifications استعمال کریں۔ Direct message composer فعال نہیں ہے۔
+        </div>
+      </MessageShell>
+    );
+  }
+
   const thread = getThreadForView(threadId, "importer");
 
   if (!thread) {
@@ -90,9 +109,9 @@ export default async function ImporterMessageThreadPage({
 
           <MessageComposer
             actions={[
-              "Attach photo/document placeholder",
-              "Voice note placeholder",
-              "Send to ChinaPak Team placeholder",
+              "Attach photo/document",
+              "Voice note",
+              "Send to ChinaPak Team",
             ]}
             dir="rtl"
             helperText="یہ message ChinaPak team کو جائے گا۔ FMS یا factory کو direct message نہیں کیا جاتا۔"

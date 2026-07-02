@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MessageShell } from "@/components/messaging/message-shell";
 import { ThreadList } from "@/components/messaging/thread-list";
+import { launchFlags } from "@/config/launch-flags";
 import { getThreadsForView } from "@/config/messaging";
 
 export const metadata: Metadata = {
@@ -9,6 +10,24 @@ export const metadata: Metadata = {
 };
 
 export default function ImporterMessagesPage() {
+  if (!launchFlags.enableMessages) {
+    return (
+      <MessageShell
+        description="Report feedback and project notifications are active for launch."
+        dir="rtl"
+        eyebrow="ChinaPak ImportHub"
+        lang="ur"
+        title="Project Communication"
+      >
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-sm leading-8 text-brand-navy shadow-sm">
+          Launch phase میں project questions کے لیے released report feedback،
+          notifications، payments، refunds، اور admin-reviewed project status
+          استعمال کریں۔
+        </div>
+      </MessageShell>
+    );
+  }
+
   const threads = getThreadsForView("importer");
 
   return (

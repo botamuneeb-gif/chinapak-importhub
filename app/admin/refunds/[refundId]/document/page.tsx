@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { LiveRefundDecisionDocument } from "@/components/documents/live-document-pages";
 import { ROUTES } from "@/config/brand";
 
@@ -23,7 +23,7 @@ export default async function AdminRefundDocumentPage({
   const { refundId } = await params;
 
   return (
-    <main className="min-h-screen bg-brand-background px-4 py-8 print:bg-white print:p-0 sm:px-6 lg:px-8">
+    <main className="document-standalone min-h-screen bg-brand-background px-4 py-8 print:bg-white print:p-0 sm:px-6 lg:px-8">
       <LiveRefundDecisionDocument
         backHref={ROUTES.adminRefunds}
         backLabel="Back to admin refunds"

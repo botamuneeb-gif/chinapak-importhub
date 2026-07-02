@@ -275,7 +275,7 @@ export const publicSeoPages = {
       "ChinaPak ImportHub terms overview for Import Projects, packages, admin review, FMS workflow, factory evidence, refund handling, and platform-controlled communication.",
     h1: "Terms of Service",
     supportUrdu:
-      "یہ page ایک plain-language terms overview ہے؛ detailed legal terms future hardening میں finalize ہوں گی۔",
+      "یہ page plain-language terms overview ہے؛ commercial launch سے پہلے formal legal review ضروری ہے۔",
     intro:
       "These terms explain the current platform workflow and boundaries. They are written for clarity and should later be reviewed as formal legal terms before full commercial launch.",
     sections: [
@@ -292,8 +292,8 @@ export const publicSeoPages = {
         body: "ChinaPak ImportHub helps with sourcing visibility and reviewed factory options. It does not guarantee that every factory will accept every order, price, sample request, shipping route, or payment term.",
       },
       {
-        title: "Placeholder notice",
-        body: "This page is a frontend policy foundation and should be reviewed by counsel before production launch. Payment gateways, automated notifications, and public factory signup are not active here.",
+        title: "Legal review notice",
+        body: "This plain-language policy overview should be reviewed by qualified counsel before full commercial launch. Payment gateways, automated notifications, and public factory signup are not active for MVP launch.",
       },
     ],
     faq: standardFaq,
@@ -409,8 +409,8 @@ export const publicSeoPages = {
         body: "Files are private by default. Importer-visible evidence is released only after admin review through controlled access rules.",
       },
       {
-        title: "Future legal review",
-        body: "Before launch, this policy should be reviewed for Pakistani business law, data protection expectations, and payment-provider requirements.",
+        title: "Legal review note",
+        body: "This policy should be reviewed for Pakistani business law, data protection expectations, and payment-provider requirements before full commercial rollout.",
       },
     ],
   },

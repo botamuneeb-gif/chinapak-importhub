@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { FmsShell } from "@/components/fms/fms-shell";
 import { ThreadList } from "@/components/messaging/thread-list";
+import { launchFlags } from "@/config/launch-flags";
 import { getThreadsForView } from "@/config/messaging";
 
 export const metadata: Metadata = {
@@ -9,6 +10,21 @@ export const metadata: Metadata = {
 };
 
 export default function FmsMessagesPage() {
+  if (!launchFlags.enableMessages) {
+    return (
+      <FmsShell
+        description="Use assignment notes, factory submissions, evidence uploads, and notifications for launch operations."
+        title="Messaging Disabled for Launch"
+      >
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-sm leading-7 text-brand-navy shadow-sm">
+          Direct admin messaging is not enabled in the MVP launch. FMS users
+          should use the assigned project workspace, factory submission form,
+          evidence upload panels, and notifications.
+        </div>
+      </FmsShell>
+    );
+  }
+
   const threads = getThreadsForView("fms");
 
   return (

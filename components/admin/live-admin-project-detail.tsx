@@ -15,7 +15,6 @@ import {
   type AdminLiveProjectDetail,
   type SaveFactoryReportInput,
 } from "@/app/admin/projects/actions";
-import { AdminActionPanel } from "@/components/admin/admin-action-panel";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
@@ -455,7 +454,7 @@ export function LiveAdminProjectDetail({
                 value={project.requirements.productLinks}
               />
               <DetailRow
-                label="Uploaded input method placeholder"
+                label="Input method"
                 value={project.requirements.inputMethod}
               />
               <DetailRow label="Import budget" value={project.requirements.budget} />
@@ -506,7 +505,7 @@ export function LiveAdminProjectDetail({
                 value={project.importer.verificationStatus}
               />
               <DetailRow
-                label="Past project count placeholder"
+                label="Past project count"
                 value={project.importer.pastProjectCount}
               />
             </dl>
@@ -823,7 +822,7 @@ export function LiveAdminProjectDetail({
                   >
                     <option value="normal">Normal</option>
                     <option value="priority">Priority</option>
-                    <option value="urgent">Urgent placeholder</option>
+                    <option value="urgent">Urgent</option>
                   </select>
                 </div>
                 <div className="md:col-span-2">
@@ -1214,19 +1213,12 @@ export function LiveAdminProjectDetail({
           </AdminSectionCard>
 
           <AdminSectionCard id="notes" title="9. Internal Notes">
-            <label
-              className="block text-sm font-semibold text-brand-navy"
-              htmlFor="admin-notes"
-            >
-              Admin-only notes textarea
-            </label>
-            <textarea
-              className="mt-2 w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-brand-muted"
-              disabled
-              id="admin-notes"
-              placeholder="Future internal note editor"
-              rows={4}
-            />
+            <div className="rounded-lg border border-slate-200 bg-brand-background p-4 text-sm leading-7 text-brand-muted">
+              Admin notes are recorded through payment verification, project
+              review, FMS assignment, report release, feedback, evidence, and
+              refund actions. Keep sensitive importer contact details out of
+              FMS-facing notes.
+            </div>
           </AdminSectionCard>
 
           <AdminSectionCard id="timeline" title="10. Project Timeline">
@@ -1235,15 +1227,6 @@ export function LiveAdminProjectDetail({
         </div>
 
         <div className="space-y-6">
-          <AdminActionPanel
-            actions={[
-              "Importer Message Placeholder",
-              "Open Refund Review Placeholder",
-            ]}
-            note="Live payment, admin review, and FMS assignment controls are in the panels on this page. Messaging and refund actions remain placeholders for later phases."
-            title="Admin Action Panel"
-          />
-
           <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-sm leading-7 text-brand-navy shadow-sm">
             <h2 className="text-lg font-bold">Confidentiality rule</h2>
             <p className="mt-2">

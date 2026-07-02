@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/config/brand";
 
 export const metadata: Metadata = {
-  title: "Payment Success Placeholder | ChinaPak ImportHub",
+  title: "Payment Success | ChinaPak ImportHub",
   robots: { index: false, follow: false },
 };
 
@@ -14,7 +14,7 @@ export default function PaymentSuccessPage() {
     <main>
       <PageHero
         eyebrow="Payment status"
-        intro="This is a frontend-only success state prepared for future payment gateway callbacks."
+        intro="Payment success is shown after admin-verified payment records. Online gateway callbacks are not active for launch."
         title="Payment Successful"
       />
 
@@ -28,8 +28,8 @@ export default function PaymentSuccessPage() {
                 <dd className="mt-1 text-brand-muted">CPH-2026-0010</dd>
               </div>
               <div>
-                <dt className="font-bold text-brand-navy">Payment reference placeholder</dt>
-                <dd className="mt-1 text-brand-muted">PAY-PLACEHOLDER-0010</dd>
+                <dt className="font-bold text-brand-navy">Payment reference</dt>
+                <dd className="mt-1 text-brand-muted">Manual reference recorded by admin</dd>
               </div>
             </dl>
 
@@ -37,12 +37,12 @@ export default function PaymentSuccessPage() {
             <ol className="mt-4 grid gap-3 text-sm leading-7 text-brand-muted">
               <li>1. Admin review will verify the paid Import Project.</li>
               <li>2. FMS assignment happens after admin review.</li>
-              <li>3. Project tracking will show future milestones and updates.</li>
+              <li>3. Project tracking shows approved project milestones.</li>
             </ol>
 
             <div className="mt-6">
               <Button href={ROUTES.importerDashboard} variant="secondary">
-                View Project Placeholder
+                View Dashboard
               </Button>
             </div>
           </article>

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function AgentCommissionsPage() {
   return (
     <AgentShell
-      description="Review placeholder commission status and package-based examples. Commission rules must remain configurable in future admin settings."
+      description="Review commission status and package-based examples. Commission rules remain configurable by admin policy."
       title="Agent Commissions"
     >
       <CommissionSummary />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
 import { ThreadList } from "@/components/messaging/thread-list";
+import { launchFlags } from "@/config/launch-flags";
 import { messageStats, getThreadsForView } from "@/config/messaging";
 
 export const metadata: Metadata = {
@@ -10,6 +11,22 @@ export const metadata: Metadata = {
 };
 
 export default function AdminMessagesPage() {
+  if (!launchFlags.enableMessages) {
+    return (
+      <AdminShell
+        description="Use project review, report feedback, evidence review, and notifications for launch operations."
+        eyebrow="Integrated Messaging System"
+        title="Messaging Disabled for Launch"
+      >
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-sm leading-7 text-brand-navy shadow-sm">
+          Direct platform messaging is not enabled in the MVP launch. Admin
+          communication stays inside the active project review, report feedback,
+          evidence, payment, refund, and notification workflows.
+        </div>
+      </AdminShell>
+    );
+  }
+
   const threads = getThreadsForView("admin");
 
   return (

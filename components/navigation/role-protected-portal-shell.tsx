@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { RoleProtectedShell } from "@/components/auth/role-protected-shell";
 import { PortalShell } from "@/components/navigation/portal-shell";
+import { launchFlags } from "@/config/launch-flags";
 import type { UserRole } from "@/lib/auth/roles";
 
 type RoleProtectedPortalShellProps = {
@@ -28,6 +29,16 @@ export function RoleProtectedPortalShell({
 }: RoleProtectedPortalShellProps) {
   const pathname = usePathname();
   const showPortalChrome = useMemo(() => {
+    const isDocumentRoute =
+      pathname.endsWith("/document") || pathname.includes("/document/");
+
+    if (
+      isDocumentRoute &&
+      !launchFlags.showPortalChromeOnDocumentRoutes
+    ) {
+      return false;
+    }
+
     if (publicPrefixes.some((prefix) => pathname.startsWith(prefix))) {
       return false;
     }

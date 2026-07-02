@@ -5,6 +5,7 @@ import { FmsShell } from "@/components/fms/fms-shell";
 import { MessageBubble } from "@/components/messaging/message-bubble";
 import { MessageComposer } from "@/components/messaging/message-composer";
 import { ThreadStatusBadge } from "@/components/messaging/thread-status-badge";
+import { launchFlags } from "@/config/launch-flags";
 import {
   getThreadForView,
   getThreadsForView,
@@ -35,6 +36,22 @@ export default async function FmsMessageThreadPage({
   params,
 }: FmsMessageThreadPageProps) {
   const { threadId } = await params;
+
+  if (!launchFlags.enableMessages) {
+    return (
+      <FmsShell
+        description="Use assignment notes, factory submissions, evidence uploads, and notifications for launch operations."
+        title="Messaging Disabled for Launch"
+      >
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-sm leading-7 text-brand-navy shadow-sm">
+          Direct admin messaging is not enabled in the MVP launch. FMS users
+          should use the assignment workspace, factory submission form, evidence
+          upload panels, and notifications.
+        </div>
+      </FmsShell>
+    );
+  }
+
   const thread = getThreadForView(threadId, "fms");
 
   if (!thread) {
@@ -93,11 +110,11 @@ export default async function FmsMessageThreadPage({
 
           <MessageComposer
             actions={[
-              "Attach photos/documents placeholder",
-              "Attach voice note placeholder",
-              "Send to Admin Placeholder",
+              "Attach photos/documents",
+              "Attach voice note",
+              "Send to Admin",
             ]}
-            helperText="Use this placeholder composer for admin-only replies about sourcing evidence, factory options, quotations, and clarification requests."
+            helperText="Use the enabled assignment workspace for sourcing evidence, factory options, quotations, and clarification requests."
             placeholder="Write a message to ChinaPak Admin. Do not include importer contact requests or direct contact exchange."
             title="FMS reply to admin"
           />
@@ -121,7 +138,7 @@ export default async function FmsMessageThreadPage({
             </p>
           </div>
 
-          <FmsSectionCard id="attachments" title="Attachment placeholders">
+          <FmsSectionCard id="attachments" title="Attachments">
             <div className="grid gap-3">
               {[
                 "Factory photos",

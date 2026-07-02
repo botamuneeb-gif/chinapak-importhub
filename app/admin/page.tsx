@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AdminActionPanel } from "@/components/admin/admin-action-panel";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
-import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import {
   adminProjects,
   adminStats,
@@ -42,7 +40,7 @@ export default function AdminPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="mt-8">
         <AdminSectionCard title="Operations Snapshot">
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-lg bg-brand-background p-4">
@@ -76,12 +74,6 @@ export default function AdminPage() {
             admin review marks the Import Project ready for assignment.
           </div>
         </AdminSectionCard>
-
-        <AdminActionPanel
-          actions={["Review paid projects", "Open unpaid leads", "Review refund queue"]}
-          note="Buttons are placeholders. Future role-protected admin actions should connect to Supabase, audit logs, and workflow settings."
-          title="Admin Actions Placeholder"
-        />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
@@ -107,21 +99,21 @@ export default function AdminPage() {
             </Link>
             <Link
               className="rounded-lg border border-slate-200 bg-brand-background px-4 py-3 font-semibold text-brand-navy no-underline transition hover:border-brand-emerald hover:text-brand-emerald"
-              href={ROUTES.adminFactories}
+              href={ROUTES.adminPayments}
             >
-              Open factory database
+              Open manual payments
             </Link>
             <Link
               className="rounded-lg border border-slate-200 bg-brand-background px-4 py-3 font-semibold text-brand-navy no-underline transition hover:border-brand-emerald hover:text-brand-emerald"
-              href={ROUTES.adminFactoryReviewQueue}
+              href={ROUTES.adminRefunds}
             >
-              Open factory review queue
+              Open refund review
             </Link>
             <Link
               className="rounded-lg border border-slate-200 bg-brand-background px-4 py-3 font-semibold text-brand-navy no-underline transition hover:border-brand-emerald hover:text-brand-emerald"
-              href={ROUTES.adminMessages}
+              href={ROUTES.adminFactorySubmissions}
             >
-              Open unified messages
+              Open factory submissions
             </Link>
           </div>
         </AdminSectionCard>
@@ -145,7 +137,7 @@ export default function AdminPage() {
         </AdminSectionCard>
       </div>
 
-      <div className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="hidden">
         <h2 className="text-xl font-bold text-brand-navy">
           Current Review Highlights
         </h2>
@@ -158,7 +150,9 @@ export default function AdminPage() {
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="font-bold text-brand-navy">{project.id}</p>
-                <AdminStatusBadge status={project.projectStatus} />
+                <span className="text-sm font-semibold text-brand-muted">
+                  {project.projectStatus}
+                </span>
               </div>
               <p className="mt-2 text-sm text-brand-muted">
                 {project.importer.name} · {project.product.name}

@@ -421,7 +421,7 @@ export const fmsOpportunityPages = {
     ],
     cta: {
       title: "Apply through invitation workflow",
-      body: "Use the invite placeholder to register interest as an FMS candidate. Approval and dashboard access will connect later.",
+      body: "Use the invitation access page for admin-approved FMS candidate review. Dashboard access is available only after approval.",
       primaryLabel: "Open invite page",
       primaryHref: ROUTES.authInvite,
       secondaryLabel: "View FMS Academy",
@@ -519,7 +519,7 @@ export const fmsOpportunityPages = {
         ],
       },
       {
-        heading: "Translation support future",
+        heading: "Translation support roadmap",
         body: [
           "The platform is designed for Urdu, English, and Simplified Chinese support. AI Trade Translation, voice note translation, document translation, and live call translation are planned as controlled add-ons.",
         ],
@@ -533,7 +533,7 @@ export const fmsOpportunityPages = {
     ],
     cta: {
       title: "Join the approved FMS pathway",
-      body: "Use the invite placeholder to begin the future review path for FMS or sourcing specialist access.",
+      body: "Use the invitation access page to begin admin-reviewed FMS or sourcing specialist access.",
       primaryLabel: "Open invite page",
       primaryHref: ROUTES.authInvite,
       secondaryLabel: "FMS opportunities hub",
@@ -632,14 +632,14 @@ export const factorySeoPages = {
       {
         heading: "当前不是公开注册",
         body: [
-          "No public factory signup is active yet. Partnership interest pages are placeholders for future admin invitation and factory profile activation.",
+          "No public factory signup is active for MVP launch. Factory participation is invitation-only and admin-reviewed.",
         ],
       },
     ],
     cta: {
       title: "了解未来工厂合作流程",
       body: "查看合作意向页面。当前不会创建真实账号，也不会提交到数据库。",
-      primaryLabel: "合作意向占位页面",
+      primaryLabel: "合作意向页面",
       primaryHref: ROUTES.factoriesPartnership,
       secondaryLabel: "出口到巴基斯坦",
       secondaryHref: ROUTES.factoriesExportToPakistan,
@@ -649,11 +649,11 @@ export const factorySeoPages = {
     title: "工厂合作申请",
     metadataTitle: "Factory Partnership Inquiry | ChinaPak ImportHub",
     metadataDescription:
-      "Future factory partnership inquiry placeholder for Chinese factories interested in Pakistan buyer demand through ChinaPak ImportHub.",
+      "Invitation-only factory partnership information for Chinese factories interested in Pakistan buyer demand through ChinaPak ImportHub.",
     eyebrow: "未来合作意向",
     supportLine: "Factory accounts are not publicly active in Phase 1.",
     intro:
-      "此页面只是未来工厂合作和邀请流程的前端占位。ChinaPak ImportHub 第一阶段会保持工厂数据库为内部私有资产，工厂账号和公开注册暂不开放。",
+      "此页面说明工厂合作和邀请流程。ChinaPak ImportHub MVP 阶段会保持工厂数据库为内部私有资产，工厂账号和公开注册暂不开放。",
     languageNote:
       "请不要把此页面理解为已启用的工厂注册系统。表单不会提交真实数据。",
     sections: [

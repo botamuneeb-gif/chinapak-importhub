@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AuthActionButton } from "@/components/auth/auth-action-button";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { OtpInputPlaceholder } from "@/components/auth/otp-input-placeholder";
@@ -15,22 +14,18 @@ export const metadata: Metadata = {
 export default function OtpPage() {
   return (
     <AuthShell
-      description="Future OTP verification for phone and WhatsApp account access. This screen is prepared for Supabase or another secure OTP provider later."
+      description="Phone/WhatsApp OTP is not active for launch. Use email/password login while SMS provider setup is completed."
       eyebrow="OTP verification"
       title="Verify Your Code"
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <AuthCard title="Enter OTP">
-          <form aria-label="OTP verification placeholder" className="grid gap-5">
+        <AuthCard title="Phone OTP status">
+          <div aria-label="OTP verification status" className="grid gap-5">
             <OtpInputPlaceholder />
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <AuthActionButton variant="secondary">
-                Verify button
-              </AuthActionButton>
-              <AuthActionButton variant="outline">
-                Resend code placeholder
-              </AuthActionButton>
+            <div className="rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
+              OTP sending is disabled until SMS/WhatsApp provider activation.
+              Please use email/password login for launch access.
             </div>
 
             <Link
@@ -39,7 +34,7 @@ export default function OtpPage() {
             >
               Change number
             </Link>
-          </form>
+          </div>
         </AuthCard>
 
         <SecurityNotice title="Security note">

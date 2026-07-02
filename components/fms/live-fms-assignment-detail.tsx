@@ -413,7 +413,7 @@ export function LiveFmsAssignmentDetail({
                 value={assignment.brief.productDescription}
               />
               <DetailRow
-                label="Product images placeholder"
+                label="Product reference images"
                 value={assignment.brief.productImagesPlaceholder}
               />
               <DetailRow label="Budget range" value={assignment.brief.budgetRange} />

@@ -23,7 +23,7 @@ export default function ChinaSourcingJobsPage() {
           href: ROUTES.fmsOpportunityPakistaniImporters,
           label: "Work with Pakistani importers",
         },
-        { href: ROUTES.fmsAcademy, label: "FMS Academy placeholder" },
+        { href: ROUTES.fmsAcademy, label: "FMS Academy" },
       ]}
     />
   );

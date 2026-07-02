@@ -11,6 +11,7 @@ import { MessageComposer } from "@/components/messaging/message-composer";
 import { RiskFlagBadge } from "@/components/messaging/risk-flag-badge";
 import { ThreadStatusBadge } from "@/components/messaging/thread-status-badge";
 import { TranslationAddOnPanel } from "@/components/messaging/translation-add-on-panel";
+import { launchFlags } from "@/config/launch-flags";
 import {
   getMessageThreadById,
   messageThreads,
@@ -81,6 +82,23 @@ export default async function AdminMessageThreadPage({
   params,
 }: AdminMessageThreadPageProps) {
   const { threadId } = await params;
+
+  if (!launchFlags.enableMessages) {
+    return (
+      <AdminShell
+        description="Use project review, report feedback, evidence review, and notifications for launch operations."
+        eyebrow="Integrated Messaging System"
+        title="Messaging Disabled for Launch"
+      >
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-5 text-sm leading-7 text-brand-navy shadow-sm">
+          Message thread review is not enabled in the MVP launch. Admins should
+          use the active review workflows for customer, FMS, and evidence
+          coordination.
+        </div>
+      </AdminShell>
+    );
+  }
+
   const thread = getMessageThreadById(threadId);
 
   if (!thread) {
@@ -137,13 +155,13 @@ export default async function AdminMessageThreadPage({
             <MessageComposer
               actions={[
                 "Admin internal note",
-                "Send message to importer placeholder",
-                "Send message to FMS placeholder",
-                "Add translation placeholder",
-                "Attach file placeholder",
+                "Send message to importer",
+                "Send message to FMS",
+                "Add translation",
+                "Attach file",
               ]}
-              helperText="Use this placeholder surface for admin notes, importer updates, FMS instructions, translation requests, and file attachments."
-              placeholder="Draft an admin-controlled message. Future backend rules must decide visibility before delivery."
+              helperText="Use the enabled project workflows for admin notes, importer updates, FMS instructions, translation requests, and file attachments."
+              placeholder="Draft an admin-controlled message."
               title="4. Message Composer"
             />
           </div>

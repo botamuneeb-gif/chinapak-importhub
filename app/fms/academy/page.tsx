@@ -27,7 +27,7 @@ export default function FmsAcademyPage() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-brand-muted">
-              Certification status placeholder
+              Certification status
             </p>
             <h2 className="mt-2 text-2xl font-bold text-brand-navy">
               In Progress

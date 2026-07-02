@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/page-hero";
 import { Button } from "@/components/ui/button";
-import { PlaceholderNotice } from "@/components/ui/placeholder-notice";
+import { ROUTES } from "@/config/brand";
 import {
   getPublicPageMetadata,
   publicSeoPages,
@@ -13,7 +13,7 @@ const contactReasons = [
   "Importer project question",
   "FMS candidate interest",
   "Pakistani local agent partnership",
-  "Factory onboarding for future activation",
+  "Factory partnership inquiry",
 ];
 
 export default function ContactPage() {
@@ -55,33 +55,35 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <PlaceholderNotice
-              title="Contact form placeholder"
-              body="No message is submitted from this page yet. A future backend should route inquiries to admin queues without exposing private role contact details."
-            />
-            <form
-              aria-label="Contact placeholder form"
-              className="mt-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <label
-                className="block text-sm font-semibold text-brand-navy"
-                htmlFor="contact-reason"
-              >
-                Inquiry type
-              </label>
-              <select
-                className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-slate-50 px-4 text-brand-muted"
-                disabled
-                id="contact-reason"
-              >
+            <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="text-2xl font-bold text-brand-navy">
+                Choose the right next step
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-brand-muted">
+                ChinaPak ImportHub keeps importer, FMS, and factory
+                communication inside approved platform workflows. For launch,
+                the fastest route is to start an Import Project or verify a
+                representative before sharing payment details.
+              </p>
+              <div className="mt-5 grid gap-3">
                 {contactReasons.map((reason) => (
-                  <option key={reason}>{reason}</option>
+                  <div
+                    className="rounded-lg border border-slate-200 bg-brand-background px-4 py-3 text-sm font-semibold text-brand-navy"
+                    key={reason}
+                  >
+                    {reason}
+                  </div>
                 ))}
-              </select>
-              <Button className="mt-4 w-full" disabled type="submit">
-                Contact routing will connect later
-              </Button>
-            </form>
+              </div>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                <Button href={ROUTES.importerStart}>
+                  Start Import Project
+                </Button>
+                <Button href={ROUTES.verify} variant="outline">
+                  Verify first
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

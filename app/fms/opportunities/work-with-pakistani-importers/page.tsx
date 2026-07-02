@@ -23,7 +23,7 @@ export default function WorkWithPakistaniImportersPage() {
           href: ROUTES.fmsOpportunityChinaSourcingJobs,
           label: "China sourcing jobs",
         },
-        { href: ROUTES.authInvite, label: "Invitation access placeholder" },
+        { href: ROUTES.authInvite, label: "Invitation access" },
       ]}
     />
   );

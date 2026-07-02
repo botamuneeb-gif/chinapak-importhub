@@ -569,7 +569,7 @@ function getReadiness(
 
   return {
     description:
-      "Payment is verified and admin review is approved. FMS assignment is still a next-phase placeholder.",
+      "Payment is verified and admin review is approved. Admin can assign an active FMS from the project detail page.",
     label: "Ready for FMS Assignment",
     status: "ready_for_fms_assignment" as const,
   };

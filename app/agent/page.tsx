@@ -17,7 +17,7 @@ export default function AgentPage() {
         actions={
           <>
             <Button href={ROUTES.authInvite} variant="secondary">
-              Agent Invite/Login Placeholder
+              Agent invitation access
             </Button>
             <Button href={ROUTES.agentDashboard} variant="outline">
               View Agent Dashboard

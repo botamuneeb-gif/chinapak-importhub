@@ -6,7 +6,7 @@ import { ROUTES } from "@/config/brand";
 import { failedPaymentReasons } from "@/config/payments";
 
 export const metadata: Metadata = {
-  title: "Payment Failed Placeholder | ChinaPak ImportHub",
+  title: "Payment Failed | ChinaPak ImportHub",
   robots: { index: false, follow: false },
 };
 
@@ -15,7 +15,7 @@ export default function PaymentFailedPage() {
     <main>
       <PageHero
         eyebrow="Payment status"
-        intro="This placeholder explains what may happen when a future gateway or manual payment attempt fails."
+        intro="If a manual payment record cannot be verified, admin will keep the project awaiting payment and may request more information."
         title="Payment Failed"
       />
 

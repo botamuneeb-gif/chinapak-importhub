@@ -7,7 +7,7 @@ import { ROUTES } from "@/config/brand";
 import { checkoutSummary, paymentMethods } from "@/config/payments";
 
 export const metadata: Metadata = {
-  title: "Checkout Placeholder | ChinaPak ImportHub",
+  title: "Checkout | ChinaPak ImportHub",
   robots: { index: false, follow: false },
 };
 
@@ -15,8 +15,8 @@ export default function PaymentCheckoutPage() {
   return (
     <main>
       <PageHero
-        eyebrow="Checkout placeholder"
-        intro="Review your selected package and payment options. This screen is ready for a future gateway, but no payment is processed yet."
+        eyebrow="Payment review"
+        intro="Review your selected package and use manual payment support for launch. Online gateway payment is not active yet."
         title="Complete Payment to Start Admin Review"
       />
 
@@ -40,9 +40,6 @@ export default function PaymentCheckoutPage() {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button href={ROUTES.paymentsSuccess} variant="secondary">
-                Pay Now Placeholder
-              </Button>
               <Button href={ROUTES.paymentsManual} variant="outline">
                 Save Project & Get Payment Help
               </Button>
