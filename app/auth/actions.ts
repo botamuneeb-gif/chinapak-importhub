@@ -21,6 +21,20 @@ export type AuthActionResult =
       message: string;
     };
 
+export type PublicAuthSessionSummary =
+  | {
+      loggedIn: false;
+    }
+  | {
+      dashboardHref: string;
+      displayName: string | null;
+      email: string | null;
+      loggedIn: true;
+      role: UserRole | null;
+      roleLabel: string;
+      showMyProjects: boolean;
+    };
+
 export type ImporterSignupInput = {
   businessType: string;
   city: string;
@@ -32,6 +46,29 @@ export type ImporterSignupInput = {
 
 function cleanText(value: string | undefined) {
   return value?.trim() ?? "";
+}
+
+function getPublicRoleLabel(role: UserRole | null, roleCount: number) {
+  if (roleCount > 1) {
+    return "Multiple roles";
+  }
+
+  switch (role) {
+    case "importer":
+      return "Importer";
+    case "fms":
+      return "FMS";
+    case "agent":
+      return "Agent";
+    case "admin":
+      return "Admin";
+    case "super_admin":
+      return "Super Admin";
+    case "factory_future":
+      return "Factory Future";
+    default:
+      return "Role pending";
+  }
 }
 
 export async function signupImporterAction(
@@ -187,5 +224,32 @@ export async function resolveAuthRedirectAction(
   return {
     ok: true,
     redirectTo: getDefaultRedirectForRoles(result.profile.roles),
+  };
+}
+
+export async function getPublicAuthSessionSummaryAction(
+  accessToken: string,
+): Promise<PublicAuthSessionSummary> {
+  const result = await getProfileForAccessToken(accessToken);
+
+  if (!result.ok) {
+    return { loggedIn: false };
+  }
+
+  const roles = result.profile.roles;
+  const singleRole = roles.length === 1 ? roles[0] : null;
+  const dashboardHref =
+    singleRole === null
+      ? "/auth/role-select"
+      : getDefaultRedirectForRoles([singleRole], "/auth/role-select");
+
+  return {
+    dashboardHref,
+    displayName: result.profile.displayName,
+    email: result.profile.email,
+    loggedIn: true,
+    role: singleRole,
+    roleLabel: getPublicRoleLabel(singleRole, roles.length),
+    showMyProjects: singleRole === PUBLIC_SIGNUP_ROLE,
   };
 }

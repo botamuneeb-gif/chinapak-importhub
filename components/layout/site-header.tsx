@@ -1,6 +1,22 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { PublicAuthStatus } from "@/components/auth/public-auth-status";
 import { brand, ROUTES } from "@/config/brand";
+
+function getNavTextProps(englishLabel: string) {
+  if (englishLabel === "Packages") {
+    return {
+      className: "urdu-text",
+      dir: "rtl" as const,
+      lang: "ur",
+    };
+  }
+
+  return {
+    className: "",
+    dir: "ltr" as const,
+    lang: "en",
+  };
+}
 
 export function SiteHeader() {
   return (
@@ -26,29 +42,27 @@ export function SiteHeader() {
 
         <nav aria-label="Primary navigation" className="xl:ms-auto">
           <ul className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            {brand.navigation.primary.map((item) => (
-              <li key={item.href}>
-                <Link
-                  className="inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-semibold text-brand-navy no-underline hover:bg-brand-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
-                  href={item.href}
-                >
-                  <span
-                    className={item.englishLabel === "Packages" ? "urdu-text" : ""}
-                    dir={item.englishLabel === "Packages" ? "rtl" : "ltr"}
-                    lang={item.englishLabel === "Packages" ? "ur" : "en"}
+            {brand.navigation.primary.map((item) => {
+              const textProps = getNavTextProps(item.englishLabel);
+
+              return (
+                <li key={item.href}>
+                  <Link
+                    className="inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-semibold text-brand-navy no-underline hover:bg-brand-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                    href={item.href}
                   >
-                    {item.label}
-                  </span>
-                  <span className="sr-only"> {item.englishLabel}</span>
-                </Link>
-              </li>
-            ))}
+                    <span {...textProps}>{item.label}</span>
+                    <span className="sr-only"> {item.englishLabel}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center xl:min-w-fit">
           <div
-            aria-label="Language selector placeholder"
+            aria-label="Language support"
             className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-brand-background px-3 text-sm font-semibold text-brand-navy"
             role="group"
           >
@@ -60,18 +74,9 @@ export function SiteHeader() {
             <span className="mx-2 text-brand-muted">|</span>
             <span lang="zh-CN">中文</span>
           </div>
-          <Button
-            className="min-h-11 px-4 py-2 text-sm"
-            href={ROUTES.importerStart}
-            variant="secondary"
-          >
-            <span className="mixed-language" dir="rtl" lang="ur">
-              Import Project شروع کریں
-            </span>
-          </Button>
+          <PublicAuthStatus />
         </div>
       </div>
     </header>
   );
 }
-

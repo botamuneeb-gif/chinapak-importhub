@@ -116,6 +116,7 @@ export const brand = {
         href: "/how-it-works",
       },
       { label: "پیکجز", englishLabel: "Packages", href: ROUTES.packages },
+      { label: "Learn", englishLabel: "Learn", href: ROUTES.learn },
       { label: "Verify Us", englishLabel: "Verify Us", href: ROUTES.verify },
       { label: "FMS", englishLabel: "FMS", href: ROUTES.fms },
       { label: "Contact", englishLabel: "Contact", href: ROUTES.contact },

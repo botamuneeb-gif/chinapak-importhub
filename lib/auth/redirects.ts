@@ -25,7 +25,7 @@ export function getRoleHomePath(role: UserRole) {
 
 export function getDefaultRedirectForRoles(
   roles: readonly UserRole[],
-  fallback = ROUTES.login,
+  fallback: string = ROUTES.login,
 ) {
   const highestRole = ROLE_PRIORITY.find((role) => roles.includes(role));
 
