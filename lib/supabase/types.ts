@@ -243,6 +243,114 @@ export type Database = {
         };
         Relationships: [];
       };
+      representatives: {
+        Row: {
+          id: string;
+          full_name: string;
+          display_name: string;
+          verification_code: string;
+          code_status: Database["public"]["Enums"]["representative_code_status"];
+          representative_status: Database["public"]["Enums"]["representative_status"];
+          province: string | null;
+          city: string | null;
+          service_area: string | null;
+          role_title: string;
+          linked_user_id: string | null;
+          agent_profile_id: string | null;
+          public_notes: string | null;
+          internal_notes: string | null;
+          activated_at: string | null;
+          suspended_at: string | null;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+          updated_by: string | null;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          display_name: string;
+          verification_code: string;
+          code_status?: Database["public"]["Enums"]["representative_code_status"];
+          representative_status?: Database["public"]["Enums"]["representative_status"];
+          province?: string | null;
+          city?: string | null;
+          service_area?: string | null;
+          role_title?: string;
+          linked_user_id?: string | null;
+          agent_profile_id?: string | null;
+          public_notes?: string | null;
+          internal_notes?: string | null;
+          activated_at?: string | null;
+          suspended_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+          metadata?: Json;
+        };
+        Update: {
+          id?: string;
+          full_name?: string;
+          display_name?: string;
+          verification_code?: string;
+          code_status?: Database["public"]["Enums"]["representative_code_status"];
+          representative_status?: Database["public"]["Enums"]["representative_status"];
+          province?: string | null;
+          city?: string | null;
+          service_area?: string | null;
+          role_title?: string;
+          linked_user_id?: string | null;
+          agent_profile_id?: string | null;
+          public_notes?: string | null;
+          internal_notes?: string | null;
+          activated_at?: string | null;
+          suspended_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+          metadata?: Json;
+        };
+        Relationships: [];
+      };
+      representative_verification_attempts: {
+        Row: {
+          id: string;
+          verification_code_entered: string;
+          normalized_code: string;
+          matched_representative_id: string | null;
+          result: Database["public"]["Enums"]["representative_verification_result"];
+          requester_ip_hash: string | null;
+          user_agent: string | null;
+          created_at: string;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          verification_code_entered: string;
+          normalized_code: string;
+          matched_representative_id?: string | null;
+          result: Database["public"]["Enums"]["representative_verification_result"];
+          requester_ip_hash?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+          metadata?: Json;
+        };
+        Update: {
+          id?: string;
+          verification_code_entered?: string;
+          normalized_code?: string;
+          matched_representative_id?: string | null;
+          result?: Database["public"]["Enums"]["representative_verification_result"];
+          requester_ip_hash?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+          metadata?: Json;
+        };
+        Relationships: [];
+      };
       packages: {
         Row: {
           id: string;
@@ -2108,6 +2216,13 @@ export type Database = {
         | "suspended"
         | "revoked"
         | "hidden_future";
+      representative_code_status: "active" | "suspended" | "revoked";
+      representative_status: "active" | "pending" | "suspended" | "archived";
+      representative_verification_result:
+        | "verified"
+        | "invalid"
+        | "suspended"
+        | "revoked";
       fms_tier: "bronze" | "silver" | "gold";
       training_status: "not_started" | "in_progress" | "certified" | "suspended";
       project_status:

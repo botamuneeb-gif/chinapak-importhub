@@ -171,6 +171,7 @@ export const portalRoleConfigs: Record<
       { href: `${ROUTES.admin}/leads`, label: "Leads" },
       { href: ROUTES.adminPayments, label: "Payments" },
       { href: ROUTES.adminRefunds, label: "Refunds" },
+      { href: ROUTES.adminRepresentatives, label: "Representatives" },
       { href: ROUTES.adminFms, label: "FMS Directory" },
       { href: ROUTES.adminFactorySubmissions, label: "Factory Submissions" },
       { href: ROUTES.adminEvidence, label: "Evidence Review" },
@@ -200,6 +201,11 @@ export const portalRoleConfigs: Record<
         description: "Verify manual payment records and unblock paid projects.",
         href: ROUTES.adminPayments,
         label: "Payments",
+      },
+      {
+        description: "Create and manage public-safe representative codes.",
+        href: ROUTES.adminRepresentatives,
+        label: "Representatives",
       },
       {
         description: "Review full or partial refund requests.",

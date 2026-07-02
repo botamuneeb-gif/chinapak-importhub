@@ -57,6 +57,7 @@ This matrix documents the intended public/private boundary for ChinaPak ImportHu
 | `/admin` | Admin, Super Admin | Operational dashboard. |
 | `/admin/projects/*` | Admin, Super Admin | Project review, payment verification, assignment, report release, admin documents. |
 | `/admin/leads` | Admin, Super Admin | Unpaid leads only; not assignable to FMS. |
+| `/admin/representatives` | Admin, Super Admin | Manual representative records, verification code management, and attempt review. Public lookup uses sanitized server-side verification only. |
 | `/admin/fms` | Admin, Super Admin | FMS directory. Public users cannot create FMS roles. |
 | `/admin/factory-submissions/*` | Admin, Super Admin | Raw FMS submissions and factory contact/admin-only fields. |
 | `/admin/evidence` | Admin, Super Admin | Evidence review and release controls. |

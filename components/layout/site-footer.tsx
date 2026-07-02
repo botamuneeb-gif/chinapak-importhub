@@ -6,6 +6,7 @@ export function SiteFooter() {
     { href: "/how-it-works", label: "How It Works" },
     { href: ROUTES.packages, label: "Packages" },
     { href: "/trust-safety", label: "Trust & Safety" },
+    { href: ROUTES.verifyRepresentative, label: "Verify Representative" },
     { href: "/faq", label: "FAQ" },
     { href: "/about", label: "About" },
   ];

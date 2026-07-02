@@ -33,7 +33,7 @@ The launch navigation keeps working surfaces visible:
 
 - Importer: dashboard, start project, reports, invoices, payments, refunds, notifications, logout.
 - FMS: dashboard, assignments, factory submissions/evidence through assignments, academy, notifications, logout.
-- Admin: dashboard, projects, leads, payments, refunds, FMS directory, factory submissions, evidence review, report feedback, notifications, logout.
+- Admin: dashboard, projects, leads, payments, refunds, representatives, FMS directory, factory submissions, evidence review, report feedback, notifications, logout.
 - Super Admin: dashboard, users/role controls, notifications, logout.
 - Agent: dashboard, leads, commissions, training, logout.
 

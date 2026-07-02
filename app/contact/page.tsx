@@ -82,6 +82,9 @@ export default function ContactPage() {
                 <Button href={ROUTES.verify} variant="outline">
                   Verify first
                 </Button>
+                <Button href={ROUTES.verifyRepresentative} variant="secondary">
+                  Representative Code Check
+                </Button>
               </div>
             </div>
           </div>

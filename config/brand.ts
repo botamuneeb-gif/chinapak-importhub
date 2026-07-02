@@ -38,6 +38,7 @@ export const ROUTES = {
   adminFactoryReviewQueue: "/admin/factories/review-queue",
   adminMessages: "/admin/messages",
   adminNotifications: "/admin/notifications",
+  adminRepresentatives: "/admin/representatives",
   superAdmin: "/super-admin",
   superAdminLogin: "/super-admin/login",
   superAdminNotifications: "/super-admin/notifications",

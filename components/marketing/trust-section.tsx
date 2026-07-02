@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { SectionHeading } from "@/components/ui/section-heading";
+import { ROUTES } from "@/config/brand";
 import { homeContent } from "@/config/home";
 
 export function TrustSection() {
@@ -30,9 +32,19 @@ export function TrustSection() {
               {item}
             </li>
           ))}
+          <li className="rounded-lg border border-brand-emerald bg-emerald-50 p-4 text-sm font-semibold text-brand-navy shadow-sm sm:col-span-2">
+            <Link
+              className="inline-flex text-brand-emerald underline-offset-4 hover:underline"
+              href={ROUTES.verifyRepresentative}
+            >
+              Representative Code Check
+            </Link>
+            <span className="ms-2 text-brand-muted">
+              Verify a local representative before sharing payment details.
+            </span>
+          </li>
         </ul>
       </div>
     </section>
   );
 }
-
