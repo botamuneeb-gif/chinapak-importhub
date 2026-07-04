@@ -32,8 +32,10 @@ export type ManagedFileAsset = {
   createdAt: string;
   fileName: string;
   fileSize: string;
+  kind: string;
   id: string;
   mimeType: string;
+  purpose: string;
   projectCode: string;
   reviewStatus: string;
   reviewStatusRaw: FileReviewStatus;
@@ -62,13 +64,26 @@ const FILE_BUCKETS = {
 } as const satisfies Record<string, FileBucket>;
 
 const MAX_FILE_BYTES = {
+  audio: 20 * 1024 * 1024,
   document: 10 * 1024 * 1024,
-  image: 8 * 1024 * 1024,
+  image: 10 * 1024 * 1024,
   video: 25 * 1024 * 1024,
 } as const;
 
 const ALLOWED_MIME_TYPES: Record<string, { group: keyof typeof MAX_FILE_BYTES; label: string }> = {
+  "application/msword": { group: "document", label: "Word document" },
   "application/pdf": { group: "document", label: "PDF document" },
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+    group: "document",
+    label: "Word document",
+  },
+  "audio/mpeg": { group: "audio", label: "MP3 audio" },
+  "audio/mp4": { group: "audio", label: "M4A audio" },
+  "audio/ogg": { group: "audio", label: "OGG audio" },
+  "audio/wav": { group: "audio", label: "WAV audio" },
+  "audio/webm": { group: "audio", label: "WebM audio" },
+  "audio/x-m4a": { group: "audio", label: "M4A audio" },
+  "audio/x-wav": { group: "audio", label: "WAV audio" },
   "image/jpeg": { group: "image", label: "JPEG image" },
   "image/png": { group: "image", label: "PNG image" },
   "image/webp": { group: "image", label: "WebP image" },
@@ -152,7 +167,7 @@ function validateUploadFile(file: File) {
     return {
       ok: false as const,
       message:
-        "Unsupported file type. Allowed files: JPG, JPEG, PNG, WebP, PDF, MP4, or WebM.",
+        "Unsupported file type. Allowed files: JPG, JPEG, PNG, WebP, PDF, DOC, DOCX, MP3, M4A, WAV, WebM, OGG, MP4, or WebM video.",
     };
   }
 
@@ -305,7 +320,9 @@ function mapFileAsset(
     fileName: file.original_filename,
     fileSize: formatFileSize(file.size_bytes),
     id: file.id,
+    kind: readString(metadata.kind, "file"),
     mimeType: file.mime_type ?? "Unknown",
+    purpose: readString(metadata.purpose, "Project file"),
     projectCode: file.project_id
       ? projectMap.get(file.project_id)?.project_code ?? "Project"
       : "Not linked",
@@ -483,16 +500,19 @@ export async function uploadImporterProjectFileAction(
 
   const assetId = crypto.randomUUID();
   const safeName = sanitizeFileName(fileResult.file.name);
-  const storagePath = `projects/${project.project_code}/importer/${assetId}-${safeName}`;
+  const storagePath = `projects/${project.project_code}/importer/requirements/${assetId}-${safeName}`;
   const purpose = String(formData.get("purpose") ?? "product_reference");
+  const kind = String(formData.get("kind") ?? "product_reference");
   const upload = await uploadPrivateFile({
     authUserId: importer.authUserId,
     bucket: FILE_BUCKETS.importerProject,
     file: fileResult.file,
     metadata: {
       file_group: validation.typeLabel,
+      kind,
       phase: "phase_9_file_evidence_upload",
       purpose,
+      source: "importer_project_submission",
       visibility_scope: "importer_uploaded",
     },
     projectId: project.id,
@@ -537,6 +557,44 @@ export async function uploadImporterProjectFileAction(
   );
 
   return listImporterProjectFilesAction(accessToken, project.project_code);
+}
+
+export async function listAdminProjectFilesAction(
+  accessToken: string,
+  projectCodeOrId: string,
+): Promise<ActionResult<ManagedFileAsset[]>> {
+  const admin = await getAdminContext(accessToken);
+
+  if (!admin.ok) {
+    return admin;
+  }
+
+  const { project, error: projectError } = await getProjectByCodeOrId(
+    admin.supabase,
+    projectCodeOrId,
+  );
+
+  if (projectError || !project) {
+    return {
+      ok: false,
+      message: projectError?.message ?? "Import project was not found.",
+    };
+  }
+
+  const { data: fileRows, error: fileError } = await admin.supabase
+    .from("file_assets")
+    .select("*")
+    .eq("project_id", project.id)
+    .order("created_at", { ascending: false });
+
+  if (fileError) {
+    return { ok: false, message: fileError.message };
+  }
+
+  return {
+    ok: true,
+    data: await mapFiles(admin.supabase, fileRows ?? []),
+  };
 }
 
 export async function uploadFmsEvidenceFileAction(

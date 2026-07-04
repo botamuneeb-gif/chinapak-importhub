@@ -14,8 +14,8 @@ Current launch-disabled surfaces:
 
 - `enableMessages = false`
 - `enableBulkActions = false`
-- `enableVoiceNotes = false`
-- `enablePhotoUploadInWizard = false`
+- `enableVoiceNotes = true` after importer voice note upload was connected to private project files.
+- `enablePhotoUploadInWizard = true` after importer product photo/catalog upload was connected to private project files.
 - `enableProfilePages = false`
 - `enableFactoryPortal = false`
 - `enableFactoryDatabaseAdmin = false`
@@ -46,7 +46,7 @@ The following are hidden from launch navigation or converted into clear launch n
 - FMS earnings navigation.
 - Static factory database admin navigation.
 - Super Admin settings/audit placeholders.
-- Product photo upload and voice note options in the importer wizard.
+- OCR/transcription/AI interpretation for product files and voice notes. Upload itself is now connected.
 - Public contact form placeholder.
 - Public FMS self-service onboarding placeholder.
 - Online gateway payment button.

@@ -5,10 +5,10 @@ export const launchFlags = {
   enableGatewayPayments: false,
   enableMessages: false,
   enablePdfServerExport: false,
-  enablePhotoUploadInWizard: false,
+  enablePhotoUploadInWizard: true,
   enableProfilePages: false,
   enablePublicFmsSignup: false,
-  enableVoiceNotes: false,
+  enableVoiceNotes: true,
   showFutureNavItems: false,
   showPortalChromeOnDocumentRoutes: false,
 } as const;

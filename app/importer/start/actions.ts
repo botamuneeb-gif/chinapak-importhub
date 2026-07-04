@@ -15,11 +15,13 @@ export type StartProjectDraftInput = {
   productDetails: string;
   productLink: string;
   quantity: string;
+  requirementFileCount: number;
   qualityLevelId: string;
   selectedLeadReasonId: string;
   specialNotes: string;
-  usedPhotoPlaceholder: boolean;
-  usedVoicePlaceholder: boolean;
+  usedPhotoPlaceholder?: boolean;
+  usedVoicePlaceholder?: boolean;
+  voiceNoteFileName: string;
 };
 
 export type StartProjectActionResult =
@@ -103,8 +105,8 @@ function getProductSummary(draft: StartProjectDraftInput) {
 function getInputMethods(draft: StartProjectDraftInput) {
   const methods: string[] = [];
 
-  if (draft.usedPhotoPlaceholder) {
-    methods.push("photo_placeholder");
+  if (draft.requirementFileCount > 0) {
+    methods.push("file_upload");
   }
 
   if (cleanText(draft.productDetails)) {
@@ -115,8 +117,8 @@ function getInputMethods(draft: StartProjectDraftInput) {
     methods.push("product_link");
   }
 
-  if (draft.usedVoicePlaceholder) {
-    methods.push("voice_note_placeholder");
+  if (cleanText(draft.voiceNoteFileName)) {
+    methods.push("voice_note");
   }
 
   return methods;
@@ -140,10 +142,10 @@ function validateDraft(draft: StartProjectDraftInput) {
   if (
     !cleanText(draft.productDetails) &&
     !cleanText(draft.productLink) &&
-    !draft.usedPhotoPlaceholder &&
-    !draft.usedVoicePlaceholder
+    draft.requirementFileCount === 0 &&
+    !cleanText(draft.voiceNoteFileName)
   ) {
-    return "Please provide product details, a product link, or mark a photo/voice input method.";
+    return "Please provide product details, a product link, a product file, or a voice note.";
   }
 
   if (!draft.budgetId || !draft.packageId || !draft.quantity || !draft.qualityLevelId) {
@@ -263,6 +265,26 @@ function buildDraftMetadata(draft: StartProjectDraftInput) {
     draft.experienceId,
   );
   const selectedAddOnCodes = getSelectedAddonCodes(draft.addOnIds);
+  const hasManualDescription = Boolean(cleanText(draft.productDetails));
+  const hasProductUrl = Boolean(cleanText(draft.productLink));
+  const hasUploadedFiles = draft.requirementFileCount > 0;
+  const hasVoiceNote = Boolean(cleanText(draft.voiceNoteFileName));
+  const methodCount = [
+    hasManualDescription,
+    hasProductUrl,
+    hasUploadedFiles,
+    hasVoiceNote,
+  ].filter(Boolean).length;
+  const submissionMethod =
+    methodCount > 1
+      ? "mixed"
+      : hasUploadedFiles
+        ? "file_upload"
+        : hasVoiceNote
+          ? "voice_note"
+          : hasProductUrl
+            ? "product_url"
+            : "manual_details";
 
   return {
     budget_id: draft.budgetId,
@@ -273,6 +295,12 @@ function buildDraftMetadata(draft: StartProjectDraftInput) {
     experience_label: selectedExperience,
     selected_addon_ids: draft.addOnIds,
     selected_addon_codes: selectedAddOnCodes,
+    has_manual_description: hasManualDescription,
+    has_product_url: hasProductUrl,
+    has_voice_note: hasVoiceNote,
+    uploaded_requirement_file_count: draft.requirementFileCount,
+    voice_note_file_name: cleanText(draft.voiceNoteFileName) || null,
+    submission_method: submissionMethod,
     source: "importer_start_wizard",
   };
 }

@@ -9,9 +9,9 @@ type SummaryCardProps = {
   productLink: string;
   quantity: string;
   qualityLevel: string;
+  requirementFileCount: number;
   specialNotes: string;
-  usedPhotoPlaceholder: boolean;
-  usedVoicePlaceholder: boolean;
+  voiceNoteFileName: string;
 };
 
 function SummaryRow({
@@ -38,15 +38,17 @@ export function SummaryCard({
   productLink,
   quantity,
   qualityLevel,
+  requirementFileCount,
   specialNotes,
-  usedPhotoPlaceholder,
-  usedVoicePlaceholder,
+  voiceNoteFileName,
 }: SummaryCardProps) {
   const productSummary = [
     productDetails || "Details not typed",
     productLink ? `Link: ${productLink}` : "",
-    usedPhotoPlaceholder ? "Product photo selected" : "",
-    usedVoicePlaceholder ? "Voice note selected" : "",
+    requirementFileCount > 0
+      ? `${requirementFileCount} product file${requirementFileCount === 1 ? "" : "s"} selected`
+      : "",
+    voiceNoteFileName ? `Voice note: ${voiceNoteFileName}` : "",
   ]
     .filter(Boolean)
     .join(" | ");

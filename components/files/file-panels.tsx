@@ -4,6 +4,7 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 import {
   createFileSignedUrlAction,
+  listAdminProjectFilesAction,
   listEvidenceForAdminAction,
   listFmsAssignmentFilesAction,
   listImporterProjectFilesAction,
@@ -74,6 +75,9 @@ function FileRows({
               <h3 className="font-bold text-brand-navy">{file.fileName}</h3>
               <p className="mt-1 text-sm leading-6 text-brand-muted">
                 {file.fileSize} · {file.mimeType} · {file.sourceRole}
+              </p>
+              <p className="mt-1 text-sm leading-6 text-brand-muted">
+                Purpose: {file.purpose} | Type: {file.kind}
               </p>
               <p className="mt-1 text-xs font-semibold text-brand-muted">
                 {file.projectCode} · {file.assignmentCode} · {file.createdAt}
@@ -174,6 +178,10 @@ export function ImporterProjectFilesPanel({
       const formData = new FormData();
       formData.set("file", file);
       formData.set("purpose", purpose);
+      formData.set(
+        "kind",
+        purpose === "voice_note" ? "voice_note" : "product_requirement",
+      );
       const result = await uploadImporterProjectFileAction(
         accessToken,
         projectCode,
@@ -243,7 +251,7 @@ export function ImporterProjectFilesPanel({
         <label className="block">
           <span className="text-sm font-semibold text-brand-navy">File</span>
           <input
-            accept=".jpg,.jpeg,.png,.webp,.pdf,.mp4,.webm,image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/webm"
+            accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.mp3,.m4a,.wav,.webm,.ogg,image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,audio/webm,audio/ogg,video/mp4,video/webm"
             className="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-brand-text"
             onChange={updateFile}
             type="file"
@@ -261,6 +269,7 @@ export function ImporterProjectFilesPanel({
             <option value="specification_document">Specification document</option>
             <option value="packaging_sample">Packaging sample</option>
             <option value="catalog_screenshot">Catalog screenshot</option>
+            <option value="voice_note">Voice note / audio requirement</option>
           </select>
         </label>
         <button
@@ -292,6 +301,116 @@ export function ImporterProjectFilesPanel({
         ) : (
           <FileRows
             emptyMessage="No project files uploaded yet."
+            files={files}
+            onPreview={(fileId) => void previewFile(fileId)}
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+export function AdminProjectFilesPanel({ projectCode }: { projectCode: string }) {
+  const [files, setFiles] = useState<ManagedFileAsset[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadFiles = useCallback(async () => {
+    const accessToken = await getAccessToken();
+    const result = await listAdminProjectFilesAction(accessToken, projectCode);
+
+    if (!result.ok) {
+      throw new Error(result.message);
+    }
+
+    setFiles(result.data);
+  }, [projectCode]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function run() {
+      setIsLoading(true);
+      setError("");
+
+      try {
+        await loadFiles();
+      } catch (loadError) {
+        if (isMounted) {
+          setError(
+            loadError instanceof Error
+              ? loadError.message
+              : "Project files could not be loaded.",
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void run();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [loadFiles]);
+
+  async function previewFile(fileId: string) {
+    setError("");
+
+    try {
+      const accessToken = await getAccessToken();
+      const result = await createFileSignedUrlAction(accessToken, fileId);
+
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
+
+      window.open(result.data.signedUrl, "_blank", "noopener,noreferrer");
+    } catch (previewError) {
+      setError(
+        previewError instanceof Error
+          ? previewError.message
+          : "File preview could not be opened.",
+      );
+    }
+  }
+
+  return (
+    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-brand-navy">
+            Importer requirement files
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-brand-muted">
+            Product photos, catalogs, specification documents, and voice notes
+            uploaded by the importer. These files remain private and
+            admin-reviewed.
+          </p>
+        </div>
+        <span className="w-fit rounded-lg border border-brand-gold bg-amber-50 px-3 py-1 text-xs font-bold text-brand-navy">
+          Admin only
+        </span>
+      </div>
+
+      {error ? (
+        <div className="mt-4 rounded-lg border border-brand-error bg-red-50 p-4 text-sm font-semibold text-brand-error">
+          {error}
+        </div>
+      ) : null}
+
+      <div className="mt-5">
+        {isLoading ? (
+          <div className="rounded-lg border border-slate-200 bg-white p-4 text-sm font-semibold text-brand-muted">
+            Loading importer requirement files...
+          </div>
+        ) : (
+          <FileRows
+            emptyMessage="No importer requirement files are linked to this project yet."
             files={files}
             onPreview={(fileId) => void previewFile(fileId)}
           />

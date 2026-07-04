@@ -70,8 +70,9 @@ The app creates signed URLs with a short expiration after role and visibility ch
 
 Server-side validation currently allows:
 
-- Images: JPG/JPEG, PNG, WebP up to 8 MB
-- Documents: PDF up to 10 MB
+- Images: JPG/JPEG, PNG, WebP up to 10 MB
+- Documents: PDF, DOC, DOCX up to 10 MB
+- Audio: MP3, M4A, WAV, WebM, OGG up to 20 MB for importer voice notes
 - Videos: MP4/WebM up to 25 MB
 
 Executable/script files are rejected. Filenames are sanitized before storage paths are created.

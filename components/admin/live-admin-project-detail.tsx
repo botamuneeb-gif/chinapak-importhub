@@ -19,6 +19,7 @@ import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { AdminTabs } from "@/components/admin/admin-tabs";
+import { AdminProjectFilesPanel } from "@/components/files/file-panels";
 import { LiveProjectReportFeedbackPanel } from "@/components/admin/live-project-report-feedback-panel";
 import { ProjectTimeline } from "@/components/admin/project-timeline";
 import { ReviewChecklist } from "@/components/admin/review-checklist";
@@ -34,6 +35,7 @@ const tabs = [
   { href: "#payment", label: "Payment & Refund" },
   { href: "#checklist", label: "Checklist" },
   { href: "#review", label: "Admin Review" },
+  { href: "#files", label: "Files" },
   { href: "#assignment", label: "Assignment" },
   { href: "#factory-report", label: "Report" },
   { href: "#report-feedback", label: "Feedback" },
@@ -512,6 +514,15 @@ export function LiveAdminProjectDetail({
             <div className="mt-5 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
               Contact details shown here are for admin operations only and must
               never be exposed to FMS users.
+            </div>
+          </AdminSectionCard>
+
+          <AdminSectionCard id="files" title="Importer Requirement Files">
+            <AdminProjectFilesPanel projectCode={project.project.projectCode} />
+            <div className="mt-4 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
+              Product photos, catalog files, spec documents, and voice notes
+              are private by default. FMS users should see importer-uploaded
+              files only through approved file access/release rules.
             </div>
           </AdminSectionCard>
 

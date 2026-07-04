@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import type { ChangeEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
+import { uploadImporterProjectFileAction } from "@/app/files/actions";
 import {
   saveUnpaidLeadAction,
   submitImportProjectAction,
@@ -31,10 +33,10 @@ const initialDraft: StartProjectDraftInput = {
   productLink: "",
   quantity: "",
   qualityLevelId: "",
+  requirementFileCount: 0,
   selectedLeadReasonId: "",
   specialNotes: "",
-  usedPhotoPlaceholder: false,
-  usedVoicePlaceholder: false,
+  voiceNoteFileName: "",
 };
 
 const stepTitles = [
@@ -56,7 +58,7 @@ function MethodCard({
   title,
 }: {
   body: string;
-  children: React.ReactNode;
+  children: ReactNode;
   icon: "photo" | "text" | "link" | "mic";
   isActive: boolean;
   title: string;
@@ -91,8 +93,63 @@ function MethodCard({
   );
 }
 
+const PRODUCT_FILE_LIMIT = 5;
+const PRODUCT_FILE_MAX_BYTES = 10 * 1024 * 1024;
+const VOICE_NOTE_MAX_BYTES = 20 * 1024 * 1024;
+
+const PRODUCT_FILE_TYPES = new Set([
+  "application/msword",
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
+const PRODUCT_FILE_EXTENSIONS = new Set([
+  "doc",
+  "docx",
+  "jpeg",
+  "jpg",
+  "pdf",
+  "png",
+  "webp",
+]);
+
+const VOICE_NOTE_TYPES = new Set([
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/ogg",
+  "audio/wav",
+  "audio/webm",
+  "audio/x-m4a",
+  "audio/x-wav",
+]);
+
+const VOICE_NOTE_EXTENSIONS = new Set(["m4a", "mp3", "ogg", "wav", "webm"]);
+
 function fieldClasses() {
   return "mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-brand-text shadow-sm focus:border-brand-emerald focus:outline-none focus:ring-2 focus:ring-brand-emerald/20 disabled:bg-slate-50";
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function getExtension(fileName: string) {
+  return fileName.split(".").pop()?.toLowerCase() ?? "";
+}
+
+function isAllowedFile(
+  file: File,
+  allowedTypes: Set<string>,
+  allowedExtensions: Set<string>,
+) {
+  return allowedTypes.has(file.type) || allowedExtensions.has(getExtension(file.name));
 }
 
 export function StartProjectWizard() {
@@ -107,6 +164,9 @@ export function StartProjectWizard() {
   const [createdInvoiceCode, setCreatedInvoiceCode] = useState("");
   const [createdLeadCode, setCreatedLeadCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [requirementFiles, setRequirementFiles] = useState<File[]>([]);
+  const [voiceNoteFile, setVoiceNoteFile] = useState<File | null>(null);
+  const [uploadWarning, setUploadWarning] = useState("");
 
   const selectedBudget = importProjectFlow.budgets.find(
     (budget) => budget.id === draft.budgetId,
@@ -143,8 +203,8 @@ export function StartProjectWizard() {
       step === 1 &&
       !draft.productDetails.trim() &&
       !draft.productLink.trim() &&
-      !(launchFlags.enablePhotoUploadInWizard && draft.usedPhotoPlaceholder) &&
-      !(launchFlags.enableVoiceNotes && draft.usedVoicePlaceholder)
+      requirementFiles.length === 0 &&
+      !voiceNoteFile
     ) {
       return "کم از کم product details یا product link درج کریں۔";
     }
@@ -202,6 +262,129 @@ export function StartProjectWizard() {
     });
   }
 
+  function handleRequirementFiles(event: ChangeEvent<HTMLInputElement>) {
+    const selectedFiles = Array.from(event.target.files ?? []);
+    event.target.value = "";
+
+    if (selectedFiles.length === 0) {
+      return;
+    }
+
+    const nextFiles = [...requirementFiles, ...selectedFiles];
+
+    if (nextFiles.length > PRODUCT_FILE_LIMIT) {
+      setValidationMessage(
+        `You can upload up to ${PRODUCT_FILE_LIMIT} product photos, screenshots, or catalog files.`,
+      );
+      return;
+    }
+
+    const invalidFile = selectedFiles.find(
+      (file) =>
+        !isAllowedFile(file, PRODUCT_FILE_TYPES, PRODUCT_FILE_EXTENSIONS) ||
+        file.size > PRODUCT_FILE_MAX_BYTES,
+    );
+
+    if (invalidFile) {
+      setValidationMessage(
+        `${invalidFile.name} is not allowed or is larger than ${formatBytes(
+          PRODUCT_FILE_MAX_BYTES,
+        )}. Use JPG, PNG, WebP, PDF, DOC, or DOCX files.`,
+      );
+      return;
+    }
+
+    setRequirementFiles(nextFiles);
+    updateDraft({ requirementFileCount: nextFiles.length });
+  }
+
+  function removeRequirementFile(index: number) {
+    const nextFiles = requirementFiles.filter((_, fileIndex) => fileIndex !== index);
+    setRequirementFiles(nextFiles);
+    updateDraft({ requirementFileCount: nextFiles.length });
+  }
+
+  function handleVoiceNote(event: ChangeEvent<HTMLInputElement>) {
+    const selectedFile = event.target.files?.[0] ?? null;
+    event.target.value = "";
+
+    if (!selectedFile) {
+      return;
+    }
+
+    if (
+      !isAllowedFile(selectedFile, VOICE_NOTE_TYPES, VOICE_NOTE_EXTENSIONS) ||
+      selectedFile.size > VOICE_NOTE_MAX_BYTES
+    ) {
+      setValidationMessage(
+        `${selectedFile.name} is not a supported voice note or is larger than ${formatBytes(
+          VOICE_NOTE_MAX_BYTES,
+        )}. Use MP3, M4A, WAV, WebM, or OGG.`,
+      );
+      return;
+    }
+
+    setVoiceNoteFile(selectedFile);
+    updateDraft({ voiceNoteFileName: selectedFile.name });
+  }
+
+  function removeVoiceNote() {
+    setVoiceNoteFile(null);
+    updateDraft({ voiceNoteFileName: "" });
+  }
+
+  async function uploadStagedProjectFiles(
+    accessToken: string,
+    projectCode: string,
+  ) {
+    const uploadErrors: string[] = [];
+
+    for (const file of requirementFiles) {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("purpose", "initial_requirement_file");
+      formData.set("kind", "product_requirement");
+
+      const result = await uploadImporterProjectFileAction(
+        accessToken,
+        projectCode,
+        formData,
+      );
+
+      if (!result.ok) {
+        uploadErrors.push(`${file.name}: ${result.message}`);
+      }
+    }
+
+    if (voiceNoteFile) {
+      const formData = new FormData();
+      formData.set("file", voiceNoteFile);
+      formData.set("purpose", "voice_note");
+      formData.set("kind", "voice_note");
+
+      const result = await uploadImporterProjectFileAction(
+        accessToken,
+        projectCode,
+        formData,
+      );
+
+      if (!result.ok) {
+        uploadErrors.push(`${voiceNoteFile.name}: ${result.message}`);
+      }
+    }
+
+    if (uploadErrors.length > 0) {
+      setUploadWarning(
+        `Project was created, but some files could not upload: ${uploadErrors.join(
+          " | ",
+        )}. You can upload files again from the project detail page.`,
+      );
+      return;
+    }
+
+    setUploadWarning("");
+  }
+
   async function getAccessTokenOrRedirect() {
     try {
       const supabase = createBrowserSupabaseClient();
@@ -231,6 +414,7 @@ export function StartProjectWizard() {
   async function submitPaidIntentProject() {
     setLeadReasonVisible(false);
     setSubmissionError("");
+    setUploadWarning("");
     setFinalStatus("idle");
     setIsSubmitting(true);
 
@@ -241,16 +425,27 @@ export function StartProjectWizard() {
       return;
     }
 
-    const result = await submitImportProjectAction(accessToken, draft);
-    setIsSubmitting(false);
+    const submissionDraft: StartProjectDraftInput = {
+      ...draft,
+      requirementFileCount: requirementFiles.length,
+      voiceNoteFileName: voiceNoteFile?.name ?? "",
+    };
+    const result = await submitImportProjectAction(accessToken, submissionDraft);
 
     if (!result.ok) {
+      setIsSubmitting(false);
       setSubmissionError(result.message);
       return;
     }
 
     setCreatedProjectCode(result.projectCode ?? "");
     setCreatedInvoiceCode(result.invoiceCode ?? "");
+
+    if (result.projectCode) {
+      await uploadStagedProjectFiles(accessToken, result.projectCode);
+    }
+
+    setIsSubmitting(false);
     setFinalStatus("project-created");
   }
 
@@ -262,6 +457,7 @@ export function StartProjectWizard() {
 
     setLeadReasonVisible(true);
     setSubmissionError("");
+    setUploadWarning("");
     setFinalStatus("idle");
     setIsSubmitting(true);
 
@@ -272,7 +468,12 @@ export function StartProjectWizard() {
       return;
     }
 
-    const result = await saveUnpaidLeadAction(accessToken, draft);
+    const leadDraft: StartProjectDraftInput = {
+      ...draft,
+      requirementFileCount: requirementFiles.length,
+      voiceNoteFileName: voiceNoteFile?.name ?? "",
+    };
+    const result = await saveUnpaidLeadAction(accessToken, leadDraft);
     setIsSubmitting(false);
 
     if (!result.ok) {
@@ -333,12 +534,44 @@ export function StartProjectWizard() {
                 <MethodCard
                   body={photoMethod.body}
                   icon="photo"
-                  isActive={draft.usedPhotoPlaceholder}
+                  isActive={requirementFiles.length > 0}
                   title={photoMethod.title}
                 >
+                  <input
+                    accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    className="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-brand-text"
+                    multiple
+                    onChange={handleRequirementFiles}
+                    type="file"
+                  />
+                  <p className="mt-2 text-xs font-semibold leading-6 text-brand-muted">
+                    Up to 5 files. Max 10 MB each. JPG, PNG, WebP, PDF, DOC,
+                    or DOCX.
+                  </p>
+                  {requirementFiles.length > 0 ? (
+                    <ul className="mt-3 grid gap-2">
+                      {requirementFiles.map((file, index) => (
+                        <li
+                          className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-brand-background px-3 py-2 text-sm"
+                          key={`${file.name}-${file.size}-${index}`}
+                        >
+                          <span className="min-w-0 truncate text-brand-navy">
+                            {file.name} ({formatBytes(file.size)})
+                          </span>
+                          <button
+                            className="shrink-0 font-bold text-brand-error"
+                            onClick={() => removeRequirementFile(index)}
+                            type="button"
+                          >
+                            Remove
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                   <button
                     aria-pressed={draft.usedPhotoPlaceholder}
-                    className="min-h-12 w-full rounded-lg border border-brand-navy px-4 py-3 font-semibold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                    className="hidden"
                     onClick={() =>
                       updateDraft({
                         usedPhotoPlaceholder: !draft.usedPhotoPlaceholder,
@@ -399,12 +632,37 @@ export function StartProjectWizard() {
                 <MethodCard
                   body={voiceMethod.body}
                   icon="mic"
-                  isActive={draft.usedVoicePlaceholder}
+                  isActive={Boolean(voiceNoteFile)}
                   title={voiceMethod.title}
                 >
+                  <input
+                    accept=".mp3,.m4a,.wav,.webm,.ogg,audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/x-wav,audio/webm,audio/ogg"
+                    className="block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-brand-text"
+                    onChange={handleVoiceNote}
+                    type="file"
+                  />
+                  <p className="mt-2 text-xs font-semibold leading-6 text-brand-muted">
+                    One audio file. Max 20 MB. MP3, M4A, WAV, WebM, or OGG.
+                    Voice notes are reviewed manually; automatic transcription
+                    is not enabled yet.
+                  </p>
+                  {voiceNoteFile ? (
+                    <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-brand-background px-3 py-2 text-sm">
+                      <span className="min-w-0 truncate text-brand-navy">
+                        {voiceNoteFile.name} ({formatBytes(voiceNoteFile.size)})
+                      </span>
+                      <button
+                        className="shrink-0 font-bold text-brand-error"
+                        onClick={removeVoiceNote}
+                        type="button"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : null}
                   <button
                     aria-pressed={draft.usedVoicePlaceholder}
-                    className="min-h-12 w-full rounded-lg border border-brand-navy px-4 py-3 font-semibold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                    className="hidden"
                     onClick={() =>
                       updateDraft({
                         usedVoicePlaceholder: !draft.usedVoicePlaceholder,
@@ -581,9 +839,9 @@ export function StartProjectWizard() {
               productLink={draft.productLink}
               quantity={draft.quantity}
               qualityLevel={selectedQuality?.label ?? "Not selected"}
+              requirementFileCount={requirementFiles.length}
               specialNotes={draft.specialNotes}
-              usedPhotoPlaceholder={draft.usedPhotoPlaceholder}
-              usedVoicePlaceholder={draft.usedVoicePlaceholder}
+              voiceNoteFileName={voiceNoteFile?.name ?? ""}
             />
           </WizardStep>
         ) : null}
@@ -681,6 +939,16 @@ export function StartProjectWizard() {
                   </span>
                   . Payment is still required before sourcing can begin.
                 </p>
+                {uploadWarning ? (
+                  <div className="mt-4 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm font-semibold leading-7 text-brand-navy">
+                    {uploadWarning}
+                  </div>
+                ) : requirementFiles.length > 0 || voiceNoteFile ? (
+                  <div className="mt-4 rounded-lg border border-brand-emerald bg-emerald-50 p-4 text-sm font-semibold leading-7 text-brand-emerald">
+                    Requirement files and voice notes that passed validation
+                    were uploaded privately for admin review.
+                  </div>
+                ) : null}
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                   {createdProjectCode ? (
                     <Button

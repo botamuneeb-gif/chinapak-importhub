@@ -4,8 +4,8 @@ export const importProjectFlow = {
     {
       id: "photo",
       icon: "photo",
-      title: "Product photo upload placeholder",
-      body: "تصویر upload backend بعد میں connect ہوگا۔ ابھی صرف طریقہ منتخب کریں۔",
+      title: "Upload Product Photos / Catalog",
+      body: "Upload product photos, WhatsApp screenshots, catalog pages, supplier screenshots, or a simple spec document.",
     },
     {
       id: "details",
@@ -22,8 +22,8 @@ export const importProjectFlow = {
     {
       id: "voice",
       icon: "mic",
-      title: "Voice note placeholder",
-      body: "Voice note backend بعد میں آئے گا۔ ابھی اسے input method کے طور پر mark کریں۔",
+      title: "Upload Voice Note",
+      body: "Upload a short voice note explaining the product you want to import. Our team will review it manually.",
     },
   ],
   budgets: [
@@ -145,4 +145,3 @@ export const importProjectFlow = {
 
 export type ImportPackage = (typeof importProjectFlow.packages)[number];
 export type ImportAddOn = (typeof importProjectFlow.addOns)[number];
-
