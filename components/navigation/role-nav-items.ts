@@ -239,6 +239,7 @@ export const portalRoleConfigs: Record<
     navItems: [
       { href: ROUTES.superAdmin, label: "Dashboard" },
       { href: ROUTES.superAdminUsers, label: "User Management" },
+      { href: ROUTES.superAdminFmsApplications, label: "FMS Applications" },
       {
         href: ROUTES.superAdminRoleControls,
         label: "Role Controls",
@@ -264,6 +265,11 @@ export const portalRoleConfigs: Record<
         description: "Add, revoke, or convert active role assignments.",
         href: ROUTES.superAdminRoleControls,
         label: "Role Controls",
+      },
+      {
+        description: "Final-approve or decline FMS applications forwarded by Admin.",
+        href: ROUTES.superAdminFmsApplications,
+        label: "FMS Applications",
       },
       ...maybeQuickAction(launchFlags.showFutureNavItems, {
         description: "Review audit and security events from the protected module.",

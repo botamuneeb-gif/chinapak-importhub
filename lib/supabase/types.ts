@@ -2019,6 +2019,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      lead_followups: {
+        Row: {
+          id: string;
+          lead_id: string;
+          actor_user_id: string | null;
+          channel: string | null;
+          outcome: string | null;
+          notes: string | null;
+          next_follow_up_at: string | null;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+          updated_by: string | null;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          lead_id: string;
+          actor_user_id?: string | null;
+          channel?: string | null;
+          outcome?: string | null;
+          notes?: string | null;
+          next_follow_up_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+          metadata?: Json;
+        };
+        Update: {
+          id?: string;
+          lead_id?: string;
+          actor_user_id?: string | null;
+          channel?: string | null;
+          outcome?: string | null;
+          notes?: string | null;
+          next_follow_up_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+          metadata?: Json;
+        };
+        Relationships: [];
+      };
       notifications: {
         Row: {
           id: string;

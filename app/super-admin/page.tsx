@@ -42,6 +42,22 @@ export default function SuperAdminPage() {
         </article>
         <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-xl font-bold text-brand-navy">
+            FMS Applications
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-brand-muted">
+            Final-review FMS applications forwarded by Admin. Approval uses
+            invite-based setup when possible and never creates default
+            passwords.
+          </p>
+          <Link
+            className="mt-4 inline-flex min-h-12 items-center rounded-lg bg-brand-gold px-5 py-3 text-sm font-bold text-brand-navy no-underline transition hover:bg-brand-navy hover:text-white"
+            href={ROUTES.superAdminFmsApplications}
+          >
+            Open FMS Applications
+          </Link>
+        </article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-xl font-bold text-brand-navy">
             Future Platform Settings
           </h2>
           <p className="mt-2 text-sm leading-7 text-brand-muted">

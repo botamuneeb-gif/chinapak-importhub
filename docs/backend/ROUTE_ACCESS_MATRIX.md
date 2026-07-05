@@ -78,6 +78,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 |---|---|---|
 | `/super-admin` | Super Admin | Highest-privilege dashboard. |
 | `/super-admin/users` | Super Admin | User directory, account review, password reset, suspension, soft deletion. |
+| `/super-admin/fms-applications` | Super Admin | Final approval/decline queue for FMS applications forwarded by Admin. May create secure invite-based FMS onboarding or mark manual setup needed. |
 | `/super-admin/role-controls` | Super Admin | Dedicated role assignment, revocation, single-role conversion, primary-role repair, and FMS profile setup. |
 | `/super-admin/notifications` | Super Admin | Security/user-management notifications. |
 

@@ -47,6 +47,7 @@ export const ROUTES = {
   adminNotifications: "/admin/notifications",
   adminRepresentatives: "/admin/representatives",
   superAdmin: "/super-admin",
+  superAdminFmsApplications: "/super-admin/fms-applications",
   superAdminLogin: "/super-admin/login",
   superAdminNotifications: "/super-admin/notifications",
   superAdminRoleControls: "/super-admin/role-controls",

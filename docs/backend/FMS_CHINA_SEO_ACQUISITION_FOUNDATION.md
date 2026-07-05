@@ -66,15 +66,27 @@ Submissions are saved in `unpaid_leads` with metadata:
 
 Admin can review these records in `/admin/leads`, where they are labeled as FMS applications.
 
+Admin can pre-screen, request more information, decline at admin screening, or forward suitable applications to Super Admin. Normal Admin cannot final-approve FMS users.
+
 ## Admin Review Behavior
 
-FMS application leads remain admin-review records until a real admin/super-admin manually creates or repairs:
+FMS application leads remain admin-review records until Super Admin final review.
+
+When Admin forwards a suitable application, Super Admin reviews it in:
+
+- `/super-admin/fms-applications`
+
+After Super Admin approval, the system attempts secure Supabase invite-based onboarding when an email is available and not already tied to a conflicting role. If invite setup is unavailable, the lead is marked approved pending manual account setup.
+
+Final onboarding creates or repairs:
 
 - `user_profiles`
 - active `role_assignments` role `fms`
 - active/approved `fms_profiles`
 
 The application lead itself is never assignable to FMS work.
+
+The workflow never creates a default weak password and never enables public FMS signup.
 
 ## Sitemap And Robots Behavior
 

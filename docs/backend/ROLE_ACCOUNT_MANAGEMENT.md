@@ -93,6 +93,8 @@ Super Admin role controls at `/super-admin/role-controls` can ensure an active r
 
 No automatic database trigger is used for privileged role creation. This is intentional: a trigger that converts any `primary_role` edit into an active role assignment could make a mistaken Table Editor edit grant access. Role creation should remain in controlled server actions, with one idempotent backfill migration for existing rows.
 
+Public FMS applications from `/fms/apply` do not create roles. They create lead records only. Admin can pre-screen and forward suitable FMS applications, but only Super Admin can final-approve them through `/super-admin/fms-applications`. Approval uses Supabase invite-based setup when possible, creates/repairs `user_profiles`, active `role_assignments.role = fms`, and `fms_profiles`, and never creates a default weak password.
+
 ## Role Changes And Revocation
 
 Super Admin role controls support controlled role changes:
