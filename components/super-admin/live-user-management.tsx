@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   assignUserRoleBySuperAdminAction,
   changePrimaryRoleBySuperAdminAction,
@@ -13,6 +15,7 @@ import {
   type SuperAdminUserDirectoryItem,
   upsertFmsProfileBySuperAdminAction,
 } from "@/app/super-admin/users/actions";
+import { ROUTES } from "@/config/brand";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 const roleFilters = [
@@ -59,7 +62,14 @@ function getPasswordHint(password: string) {
   return `${passed}/4 strength checks passed.`;
 }
 
-export function LiveUserManagement() {
+type LiveUserManagementProps = {
+  mode?: "directory" | "role-controls";
+};
+
+export function LiveUserManagement({
+  mode = "directory",
+}: LiveUserManagementProps) {
+  const searchParams = useSearchParams();
   const [users, setUsers] = useState<SuperAdminUserDirectoryItem[]>([]);
   const [selectedUser, setSelectedUser] =
     useState<SuperAdminUserDirectoryItem | null>(null);
@@ -94,6 +104,43 @@ export function LiveUserManagement() {
   const [isResetting, setIsResetting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const requestedUserId =
+    mode === "role-controls" ? searchParams.get("user") ?? "" : "";
+
+  const selectUser = useCallback((user: SuperAdminUserDirectoryItem) => {
+    setSelectedUser(user);
+    setMessage("");
+    setError("");
+    setTemporaryPassword("");
+    setConfirmed(false);
+    setConfirmedPrivilegedRole(false);
+    setPrimaryRoleToSet(user.primaryRoleRaw ?? "importer");
+    setRoleToAssign(user.primaryRoleRaw ?? "importer");
+    setRoleToRevoke(user.activeRoles[0] ?? "importer");
+    setSingleRoleToKeep(user.activeRoles[0] ?? "importer");
+    setFmsCode(user.fmsCode !== "Not set" ? user.fmsCode : "");
+    setFmsTier(user.fmsTier !== "Not set" ? user.fmsTier : "bronze");
+    setFmsCityProvince(
+      user.fmsCityProvince !== "Not set" ? user.fmsCityProvince : "",
+    );
+    setFmsCategories(
+      user.fmsCategories.length > 0
+        ? user.fmsCategories.join(", ")
+        : "general sourcing, consumer products, packaging",
+    );
+    setFmsAcademyStatus(
+      user.fmsAcademyStatus !== "Not set"
+        ? user.fmsAcademyStatus
+        : "not_started",
+    );
+    setFmsQualityScore(
+      user.qualityScore !== "Not set" ? user.qualityScore : "80",
+    );
+    setFmsProfileStatus(user.fmsStatusRaw ?? "active");
+    setConfirmSelfDelete(false);
+    setConfirmSelfLockout(false);
+    setDeleteConfirmation("");
+  }, []);
 
   async function getAccessToken() {
     const supabase = createBrowserSupabaseClient();
@@ -128,7 +175,15 @@ export function LiveUserManagement() {
         }
 
         setUsers(result.data);
-        setSelectedUser(result.data[0] ?? null);
+        const initialUser =
+          result.data.find((user) => user.userProfileId === requestedUserId) ??
+          result.data[0] ??
+          null;
+        if (initialUser) {
+          selectUser(initialUser);
+        } else {
+          setSelectedUser(null);
+        }
         setIsLoading(false);
       } catch (loadError) {
         if (!isMounted) {
@@ -149,7 +204,7 @@ export function LiveUserManagement() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [requestedUserId, selectUser]);
 
   useEffect(() => {
     if (!selectedUser) {
@@ -427,8 +482,16 @@ export function LiveUserManagement() {
     );
   }
 
+  const isRoleControlsMode = mode === "role-controls";
+
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
+    <div
+      className={`grid gap-6 ${
+        isRoleControlsMode
+          ? "xl:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)]"
+          : "xl:grid-cols-[minmax(0,1fr)_380px]"
+      }`}
+    >
       <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <div className="grid gap-4 lg:grid-cols-[1fr_160px_160px]">
           <div>
@@ -502,6 +565,7 @@ export function LiveUserManagement() {
                     "FMS",
                     "Importer/Agent",
                     "Updated",
+                    "Actions",
                   ].map((heading) => (
                     <th className="px-4 py-3 font-semibold" key={heading}>
                       {heading}
@@ -518,48 +582,7 @@ export function LiveUserManagement() {
                         : "bg-white"
                     }`}
                     key={user.userProfileId}
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setMessage("");
-                      setError("");
-                      setTemporaryPassword("");
-                      setConfirmed(false);
-                      setConfirmedPrivilegedRole(false);
-                      setPrimaryRoleToSet(user.primaryRoleRaw ?? "importer");
-                      setRoleToAssign(user.primaryRoleRaw ?? "importer");
-                      setRoleToRevoke(user.activeRoles[0] ?? "importer");
-                      setSingleRoleToKeep(user.activeRoles[0] ?? "importer");
-                      setFmsCode(
-                        user.fmsCode !== "Not set" ? user.fmsCode : "",
-                      );
-                      setFmsTier(
-                        user.fmsTier !== "Not set" ? user.fmsTier : "bronze",
-                      );
-                      setFmsCityProvince(
-                        user.fmsCityProvince !== "Not set"
-                          ? user.fmsCityProvince
-                          : "",
-                      );
-                      setFmsCategories(
-                        user.fmsCategories.length > 0
-                          ? user.fmsCategories.join(", ")
-                          : "general sourcing, consumer products, packaging",
-                      );
-                      setFmsAcademyStatus(
-                        user.fmsAcademyStatus !== "Not set"
-                          ? user.fmsAcademyStatus
-                          : "not_started",
-                      );
-                      setFmsQualityScore(
-                        user.qualityScore !== "Not set"
-                          ? user.qualityScore
-                          : "80",
-                      );
-                      setFmsProfileStatus(user.fmsStatusRaw ?? "active");
-                      setConfirmSelfDelete(false);
-                      setConfirmSelfLockout(false);
-                      setDeleteConfirmation("");
-                    }}
+                    onClick={() => selectUser(user)}
                   >
                     <td className="px-4 py-4">
                       <div className="font-bold text-brand-navy">
@@ -599,6 +622,27 @@ export function LiveUserManagement() {
                     <td className="px-4 py-4 text-brand-muted">
                       {user.updatedAt}
                     </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col gap-2">
+                        <button
+                          className="rounded-lg border border-brand-navy bg-white px-3 py-2 text-xs font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            selectUser(user);
+                          }}
+                          type="button"
+                        >
+                          View/Edit
+                        </button>
+                        <Link
+                          className="rounded-lg bg-brand-emerald px-3 py-2 text-center text-xs font-bold text-white no-underline transition hover:bg-brand-navy"
+                          href={`${ROUTES.superAdminRoleControls}?user=${user.userProfileId}`}
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          Manage Roles
+                        </Link>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -614,6 +658,13 @@ export function LiveUserManagement() {
 
       <aside className="space-y-5">
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+          {isRoleControlsMode ? (
+            <div className="mb-4 rounded-lg border border-brand-gold bg-amber-50 p-3 text-sm font-semibold leading-6 text-brand-navy">
+              Role changes are high-risk operations. Server actions still
+              enforce active super_admin access, privileged-role confirmation,
+              audit logging, and last-super-admin protection.
+            </div>
+          ) : null}
           <h2 className="text-xl font-bold text-brand-navy">
             Selected account
           </h2>
@@ -707,6 +758,8 @@ export function LiveUserManagement() {
           )}
         </section>
 
+        {isRoleControlsMode ? (
+          <>
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-xl font-bold text-brand-navy">
             Change primary role
@@ -1068,7 +1121,11 @@ export function LiveUserManagement() {
               : "Create / Activate FMS Profile"}
           </button>
         </section>
+          </>
+        ) : null}
 
+        {!isRoleControlsMode ? (
+          <>
         <section className="rounded-lg border border-brand-error bg-white p-5 shadow-sm">
           <h2 className="text-xl font-bold text-brand-error">
             Deactivate or delete
@@ -1202,14 +1259,9 @@ export function LiveUserManagement() {
           >
             {isResetting ? "Resetting..." : "Set Temporary Password"}
           </button>
-          <button
-            className="mt-3 min-h-12 w-full rounded-lg border border-slate-300 bg-slate-50 px-5 py-3 text-sm font-bold text-brand-muted"
-            disabled
-            type="button"
-          >
-            Send password reset email - future SMTP setup
-          </button>
         </section>
+          </>
+        ) : null}
       </aside>
     </div>
   );

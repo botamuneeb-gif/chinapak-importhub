@@ -238,12 +238,12 @@ export const portalRoleConfigs: Record<
     navItems: [
       { href: ROUTES.superAdmin, label: "Dashboard" },
       { href: ROUTES.superAdminUsers, label: "User Management" },
-      { href: ROUTES.superAdminNotifications, label: "Notifications" },
       {
-        href: ROUTES.superAdminUsers,
+        href: ROUTES.superAdminRoleControls,
         label: "Role Controls",
-        supportLabel: "Inside user management",
+        supportLabel: "Assign and repair roles",
       },
+      { href: ROUTES.superAdminNotifications, label: "Notifications" },
       ...maybeNavItem(launchFlags.showFutureNavItems, {
         href: "#system-settings",
         label: "System Settings",
@@ -255,13 +255,13 @@ export const portalRoleConfigs: Record<
     ],
     quickActions: [
       {
-        description: "Search users, reset passwords, and repair role profiles.",
+        description: "Search users, review account status, and manage account safety.",
         href: ROUTES.superAdminUsers,
         label: "User Management",
       },
       {
         description: "Add, revoke, or convert active role assignments.",
-        href: ROUTES.superAdminUsers,
+        href: ROUTES.superAdminRoleControls,
         label: "Role Controls",
       },
       ...maybeQuickAction(launchFlags.showFutureNavItems, {

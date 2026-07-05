@@ -89,13 +89,13 @@ The application creates active role rows through a server-only helper:
 
 Importer signup uses this helper with role `importer`. Public users cannot pass a different role into signup.
 
-Super Admin user management can ensure an active role assignment for manual account setup. That action may assign privileged roles only after the server verifies the caller has an active `super_admin` role.
+Super Admin role controls at `/super-admin/role-controls` can ensure an active role assignment for manual account setup. That action may assign privileged roles only after the server verifies the caller has an active `super_admin` role.
 
 No automatic database trigger is used for privileged role creation. This is intentional: a trigger that converts any `primary_role` edit into an active role assignment could make a mistaken Table Editor edit grant access. Role creation should remain in controlled server actions, with one idempotent backfill migration for existing rows.
 
 ## Role Changes And Revocation
 
-Super Admin user management supports controlled role changes:
+Super Admin role controls support controlled role changes:
 
 - Change `user_profiles.primary_role`.
 - Add an active role assignment.
@@ -131,7 +131,7 @@ Examples:
 - Active `agent` role still needs an `agent_profiles` row before agent workflows can fully operate.
 - Active `importer` role normally needs an `importer_profiles` row for importer/business details.
 
-The Super Admin module can create or activate a basic FMS profile after the FMS role is added. Other role-specific profile creation should be implemented as explicit workflows, not hidden side effects.
+The Super Admin Role Controls module can create or activate a basic FMS profile after the FMS role is added. Other role-specific profile creation should be implemented as explicit workflows, not hidden side effects.
 
 ## Backfill Repair
 

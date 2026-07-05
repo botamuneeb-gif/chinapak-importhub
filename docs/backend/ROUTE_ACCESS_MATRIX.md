@@ -72,7 +72,8 @@ This matrix documents the intended public/private boundary for ChinaPak ImportHu
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/super-admin` | Super Admin | Highest-privilege dashboard. |
-| `/super-admin/users` | Super Admin | User management, role controls, password reset, suspension, soft deletion. |
+| `/super-admin/users` | Super Admin | User directory, account review, password reset, suspension, soft deletion. |
+| `/super-admin/role-controls` | Super Admin | Dedicated role assignment, revocation, single-role conversion, primary-role repair, and FMS profile setup. |
 | `/super-admin/notifications` | Super Admin | Security/user-management notifications. |
 
 ## Agent Portal

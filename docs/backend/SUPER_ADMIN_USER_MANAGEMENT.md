@@ -1,6 +1,6 @@
 # Super Admin User Management
 
-This document describes the safe user-management foundation for ChinaPak ImportHub. It supports searchable account visibility, role hygiene, profile repair, user suspension, Auth soft deletion, and controlled Super Admin password reset without exposing Supabase Auth internals.
+This document describes the safe user-management foundation for ChinaPak ImportHub. It supports searchable account visibility, account safety actions, Auth soft deletion, and controlled Super Admin password reset without exposing Supabase Auth internals. Dedicated role assignment and role repair controls now live in `/super-admin/role-controls`.
 
 ## Identity Model
 
@@ -33,7 +33,7 @@ The view intentionally does not expose password hashes, refresh tokens, confirma
 
 The view grants select access only to `service_role`. The UI reads it through a server action after confirming the caller has an active `super_admin` role.
 
-## Super Admin Page
+## Super Admin Pages
 
 `/super-admin/users` is protected by the Super Admin route guard and by server-side role checks in its actions.
 
@@ -55,11 +55,15 @@ The directory also shows account hygiene badges:
 - `Suspended`: base user profile is suspended.
 - `Super Admin protected`: account has active `super_admin` role and is subject to lockout checks.
 
+`/super-admin/users` is intentionally focused on directory review and account safety. It includes user search, safe profile/account summaries, password reset, suspension, and Auth soft deletion where those existing safeguards apply.
+
+`/super-admin/role-controls` is the dedicated section for changing `role_assignments`, changing primary role, converting accounts to a single active role, and repairing FMS role/profile setup. User rows in `/super-admin/users` include a `Manage Roles` link to `/super-admin/role-controls?user=<userProfileId>`.
+
 Normal admins, importers, FMSs, agents, and future factory users must not access this module.
 
 ## Role Assignment Support
 
-Super Admins can manage `role_assignments` for a selected account from `/super-admin/users`.
+Super Admins manage `role_assignments` for a selected account from `/super-admin/role-controls`.
 
 Role actions:
 
@@ -79,7 +83,7 @@ Role actions:
 
 Role-specific profiles are not created silently when adding roles.
 
-If an account receives `fms` role, Super Admin can create or activate a basic `fms_profiles` row from `/super-admin/users` with:
+If an account receives `fms` role, Super Admin can create or activate a basic `fms_profiles` row from `/super-admin/role-controls` with:
 
 - `fms_code`
 - `tier`
@@ -164,7 +168,7 @@ If audit insertion fails after Supabase Auth accepts the password reset, the act
 
 ## Password Reset Email
 
-The UI includes a disabled placeholder for password reset email. It should be connected later only after Supabase Auth email templates, redirect URLs, and SMTP/sending rules are configured.
+Direct temporary-password reset is implemented for active Super Admins. Password reset email delivery depends on Supabase Auth email/SMTP configuration and should be verified separately before relying on email reset flows in production.
 
 ## Manual Testing
 
@@ -184,7 +188,7 @@ The UI includes a disabled placeholder for password reset email. It should be co
 ## Role Assignment Testing
 
 1. Login as Super Admin.
-2. Open `/super-admin/users`.
+2. Open `/super-admin/role-controls`.
 3. Select a test account.
 4. Use `Activate role assignment` to ensure an active role.
 5. Leave `Also set this as user_profiles.primary_role` checked when repairing a manual account.
@@ -199,8 +203,8 @@ The UI includes a disabled placeholder for password reset email. It should be co
 3. Convert a multi-role account to one role and confirm all other active roles are revoked.
 4. Change primary role without ensuring assignment and confirm the `Role mismatch` badge if no active role exists.
 5. Change primary role with assignment enabled and confirm the matching active role exists.
-6. Add `fms` role to a test account and confirm `Missing FMS profile`.
-7. Create or activate the FMS profile and confirm `/admin/fms` can treat it as usable when profile status is active.
+6. Add `fms` role to a test account in `/super-admin/role-controls` and confirm `Missing FMS profile`.
+7. Create or activate the FMS profile from `/super-admin/role-controls` and confirm `/admin/fms` can treat it as usable when profile status is active.
 8. Suspend a test user and confirm protected portals deny access.
 9. Attempt to revoke/delete the last active Super Admin and confirm it is blocked.
 10. Soft-delete a disposable test Auth user only after typing `DELETE USER`.

@@ -45,6 +45,7 @@ export const ROUTES = {
   superAdmin: "/super-admin",
   superAdminLogin: "/super-admin/login",
   superAdminNotifications: "/super-admin/notifications",
+  superAdminRoleControls: "/super-admin/role-controls",
   superAdminUsers: "/super-admin/users",
   agent: "/agent",
   agentLogin: "/agent/login",
