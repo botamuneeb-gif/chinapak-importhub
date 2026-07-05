@@ -91,9 +91,14 @@ Current behavior:
 2. Supabase sends a confirmation email.
 3. The importer sees: "Please check your email inbox and verify your email
    before logging in."
-4. No `user_profiles`, `role_assignments`, or `importer_profiles` rows are
+4. Signup intentionally does not auto-login when email verification is required.
+   The old "automatic login failed" message must not appear.
+5. The signup success state should show:
+   - "Go to Login"
+   - "Resend verification email"
+6. No `user_profiles`, `role_assignments`, or `importer_profiles` rows are
    created before email verification.
-5. On first verified importer login, the server checks the Supabase Auth user,
+7. On first verified importer login, the server checks the Supabase Auth user,
    confirmed email state, and importer metadata, then creates:
    - `user_profiles`
    - active importer `role_assignments`
@@ -157,6 +162,8 @@ Before launch:
 
 - Importer email/password login works.
 - Public importer signup sends confirmation email and does not auto-confirm.
+- Public importer signup does not attempt automatic login.
+- Signup success does not show "automatic login failed" copy.
 - Unverified importer cannot access `/importer/dashboard`.
 - Verified importer first login creates importer profile and active importer role.
 - Admin email/password login works.

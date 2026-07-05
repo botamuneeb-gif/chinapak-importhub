@@ -136,7 +136,7 @@ export async function signupImporterAction(
     return {
       ok: true,
       message:
-        "Account created. Please check your email inbox and verify your email before logging in.",
+        "Account created. Please check your email inbox and click the verification link. After verification, you can log in and start your Import Project.",
     };
   } catch (error) {
     const message =
