@@ -97,7 +97,7 @@ export function ImporterLoginForm() {
           await supabase.auth.resend({
             email: cleanEmail,
             options: {
-              emailRedirectTo: `${window.location.origin}${ROUTES.login}?verified=1`,
+              emailRedirectTo: `${window.location.origin}${ROUTES.authConfirmed}`,
             },
             type: "signup",
           });

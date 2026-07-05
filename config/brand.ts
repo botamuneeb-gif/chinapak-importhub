@@ -22,6 +22,7 @@ export const ROUTES = {
   authRoleSelect: "/auth/role-select",
   authOtp: "/auth/otp",
   authInvite: "/auth/invite",
+  authConfirmed: "/auth/confirmed",
   authSecurity: "/auth/security",
   learn: "/learn",
   learnImportFromChinaToPakistan: "/learn/import-from-china-to-pakistan",

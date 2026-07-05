@@ -7,13 +7,94 @@ import { SecurityNotice } from "@/components/auth/security-notice";
 import { publicAuthTrustNotes } from "@/config/auth-roles";
 import { ROUTES } from "@/config/brand";
 
+type LoginPageProps = {
+  searchParams?: Promise<{
+    error?: string | string[];
+    reset?: string | string[];
+    verified?: string | string[];
+  }>;
+};
+
+function getSingleParam(value: string | string[] | undefined) {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function getLoginStatusMessage(params: {
+  error?: string | string[];
+  reset?: string | string[];
+  verified?: string | string[];
+}) {
+  const error = getSingleParam(params.error);
+  const reset = getSingleParam(params.reset);
+  const verified = getSingleParam(params.verified);
+
+  if (error === "verification_failed") {
+    return {
+      tone: "error" as const,
+      message:
+        "We could not confirm your email link. Please request a new verification email or contact support.",
+      title: "Verification link issue",
+    };
+  }
+
+  if (reset === "1") {
+    return {
+      tone: "success" as const,
+      message:
+        "Password updated successfully. Please log in with your new password.",
+      title: "Password updated",
+    };
+  }
+
+  if (verified === "1") {
+    return {
+      tone: "success" as const,
+      message: "Email verified successfully. Please log in to continue.",
+      title: "Email verified",
+    };
+  }
+
+  return null;
+}
+
+function LoginStatusBanner({
+  status,
+}: {
+  status: ReturnType<typeof getLoginStatusMessage>;
+}) {
+  if (!status) {
+    return null;
+  }
+
+  const classes =
+    status.tone === "success"
+      ? "border-brand-emerald bg-emerald-50 text-brand-navy"
+      : "border-brand-error bg-red-50 text-brand-navy";
+  const titleClass =
+    status.tone === "success" ? "text-brand-emerald" : "text-brand-error";
+
+  return (
+    <div className={`mb-5 rounded-lg border p-4 text-sm leading-7 ${classes}`}>
+      <p className={`font-bold ${titleClass}`}>{status.title}</p>
+      <p className="mt-1">{status.message}</p>
+    </div>
+  );
+}
+
 export const metadata: Metadata = {
   title: "Login | ChinaPak ImportHub",
   description:
     "Secure importer email login for ChinaPak ImportHub project tracking and reports.",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = searchParams ? await searchParams : {};
+  const status = getLoginStatusMessage(params);
+
   return (
     <AuthShell
       description="Login with your registered email and password to track import projects, invoices, reports, refunds, and notifications."
@@ -22,6 +103,7 @@ export default function LoginPage() {
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <AuthCard title="Login with Email">
+          <LoginStatusBanner status={status} />
           <ImporterLoginForm />
         </AuthCard>
 

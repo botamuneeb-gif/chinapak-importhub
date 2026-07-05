@@ -110,7 +110,7 @@ export async function signupImporterAction(
       email,
       password,
       options: {
-        emailRedirectTo: `${getSiteUrl()}/login?verified=1`,
+        emailRedirectTo: `${getSiteUrl()}/auth/confirmed`,
         data: {
           display_name: fullName,
           full_name: fullName,

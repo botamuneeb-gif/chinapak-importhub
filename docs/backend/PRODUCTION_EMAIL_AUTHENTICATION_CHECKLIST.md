@@ -17,6 +17,10 @@ templates are fully configured.
 3. Add Redirect URLs:
    - `https://chinapakimporthub.com/**`
    - `https://www.chinapakimporthub.com/**`
+   - `https://chinapakimporthub.com/auth/confirmed`
+   - `https://www.chinapakimporthub.com/auth/confirmed`
+   - `https://chinapakimporthub.com/auth/callback`
+   - `https://www.chinapakimporthub.com/auth/callback`
    - `https://chinapakimporthub.com/login`
    - `https://www.chinapakimporthub.com/login`
    - `https://chinapakimporthub.com/reset-password`
@@ -53,6 +57,8 @@ Template rules:
 
 - Use the brand name `ChinaPak ImportHub`.
 - Link to `https://chinapakimporthub.com`.
+- Email verification should redirect to `/auth/confirmed`.
+- Password reset should redirect to `/reset-password`.
 - Avoid promising gateway payment, direct factory contact, or direct FMS chat.
 - Do not include secrets, tokens, or internal IDs beyond the Supabase-managed
   action link.
@@ -71,9 +77,11 @@ Manual test:
 3. Confirm the UI does not reveal whether the email exists.
 4. Open the Supabase password reset email.
 5. Set a new password on `/reset-password`.
-6. Confirm redirect back to `/login`.
-7. Log in with the new password.
-8. Confirm role redirect still works:
+6. Confirm redirect back to `/login?reset=1`.
+7. Confirm the login page shows: "Password updated successfully. Please log in
+   with your new password."
+8. Log in with the new password.
+9. Confirm role redirect still works:
    - importer -> `/importer/dashboard`
    - admin -> `/admin`
    - super admin -> `/super-admin`
@@ -91,14 +99,19 @@ Current behavior:
 2. Supabase sends a confirmation email.
 3. The importer sees: "Please check your email inbox and verify your email
    before logging in."
-4. Signup intentionally does not auto-login when email verification is required.
+4. The verification link redirects to `/auth/confirmed`.
+5. `/auth/confirmed` shows: "Email verified successfully. You can now log in
+   and start your Import Project."
+6. The user clicks "Go to Login" and lands on `/login?verified=1`.
+7. Login shows: "Email verified successfully. Please log in to continue."
+8. Signup intentionally does not auto-login when email verification is required.
    The old "automatic login failed" message must not appear.
-5. The signup success state should show:
+9. The signup success state should show:
    - "Go to Login"
    - "Resend verification email"
-6. No `user_profiles`, `role_assignments`, or `importer_profiles` rows are
+10. No `user_profiles`, `role_assignments`, or `importer_profiles` rows are
    created before email verification.
-7. On first verified importer login, the server checks the Supabase Auth user,
+11. On first verified importer login, the server checks the Supabase Auth user,
    confirmed email state, and importer metadata, then creates:
    - `user_profiles`
    - active importer `role_assignments`
@@ -124,8 +137,9 @@ Manual test:
 3. Confirm the success message is generic and does not reveal whether an account
    exists.
 4. Open the confirmation email.
-5. Confirm the link returns to `/login`.
-6. Log in after confirmation and verify importer profile/role rows are created.
+5. Confirm the link returns to `/auth/confirmed`.
+6. Confirm `/auth/confirmed` shows the success state and a "Go to Login" CTA.
+7. Log in after confirmation and verify importer profile/role rows are created.
 
 ## Vercel Environment Variables
 
@@ -164,6 +178,9 @@ Before launch:
 - Public importer signup sends confirmation email and does not auto-confirm.
 - Public importer signup does not attempt automatic login.
 - Signup success does not show "automatic login failed" copy.
+- Clicking the verification email shows `/auth/confirmed` success UX.
+- `/login?verified=1` shows the sanitized verification success banner.
+- `/login?error=verification_failed` shows the sanitized failure banner.
 - Unverified importer cannot access `/importer/dashboard`.
 - Verified importer first login creates importer profile and active importer role.
 - Admin email/password login works.

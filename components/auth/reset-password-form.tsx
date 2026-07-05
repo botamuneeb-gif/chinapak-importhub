@@ -141,7 +141,7 @@ export function ResetPasswordForm() {
         setPassword("");
         setConfirmPassword("");
         window.setTimeout(() => {
-          router.push(ROUTES.login);
+          router.push(`${ROUTES.login}?reset=1`);
         }, 1200);
       } catch (updateError) {
         setError(
