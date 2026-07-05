@@ -51,9 +51,11 @@ export type LiveFmsAssignmentDetail = LiveFmsAssignmentListItem & {
     quantity: string;
     specialNotes: string;
   };
+  canSubmitFactoryOption: boolean;
   factorySubmissions: LiveFmsFactorySubmission[];
   milestones: Array<{ completed: boolean; label: string }>;
   priority: string;
+  submissionClosedReason: string;
 };
 
 export type LiveFmsFactorySubmission = {
@@ -189,6 +191,31 @@ function generateSubmissionCode() {
   return `FMSS-${year}-${timestampPart}${randomPart}`;
 }
 
+function isAssignmentOpenForFactorySubmission(status: AssignmentStatus) {
+  return [
+    "assigned",
+    "requirements_reviewed",
+    "factory_researching",
+    "changes_requested",
+  ].includes(status);
+}
+
+function getSubmissionClosedReason(status: AssignmentStatus) {
+  if (status === "submitted_for_admin_review") {
+    return "This assignment is under admin review. New factory submissions are paused until admin requests changes or reopens the work.";
+  }
+
+  if (status === "approved_by_admin" || status === "completed_by_admin") {
+    return "This assignment is closed for new submissions because it has already been approved or completed by admin.";
+  }
+
+  if (status === "cancelled") {
+    return "This assignment is cancelled and cannot accept new factory submissions.";
+  }
+
+  return "";
+}
+
 function mapFactorySubmission(
   submission: TableRow<"fms_factory_submissions">,
 ): LiveFmsFactorySubmission {
@@ -286,9 +313,11 @@ function mapAssignmentListItem(
     projectCode: project?.project_code ?? "Project code pending",
     statusRaw: assignment.assignment_status,
     submissionStatus:
-      assignment.assignment_status === "submitted_for_admin_review"
-        ? "Pending Admin Review"
-        : "Not Submitted",
+      assignment.assignment_status === "approved_by_admin"
+        ? "Approved by Admin"
+        : assignment.assignment_status === "submitted_for_admin_review"
+          ? "Pending Admin Review"
+          : "Not Submitted",
   };
 }
 
@@ -523,6 +552,21 @@ export async function getFmsAssignmentDetailAction(
           label,
         }));
 
+  const mappedSubmissions = (submissionRows ?? []).map(mapFactorySubmission);
+  const submissionStatus =
+    mappedSubmissions.some(
+      (submission) => submission.submissionStatus === "Approved by Admin",
+    )
+      ? "Approved by Admin"
+      : mappedSubmissions.some(
+            (submission) =>
+              submission.submissionStatus === "Submitted for Admin Review",
+          )
+        ? "Pending Admin Review"
+        : mappedSubmissions.length > 0
+          ? "Submitted"
+          : listItem?.submissionStatus ?? "Not Submitted";
+
   return {
     ok: true,
     data: {
@@ -535,6 +579,7 @@ export async function getFmsAssignmentDetailAction(
             ? result.data.packageMap.get(project.package_id)
             : undefined,
         )),
+      submissionStatus,
       addOns:
         projectAddons.length > 0
           ? projectAddons.map((selected) => {
@@ -559,9 +604,15 @@ export async function getFmsAssignmentDetailAction(
         quantity: requirement?.quantity ?? "Not provided",
         specialNotes: requirement?.special_notes ?? "No special notes",
       },
-      factorySubmissions: (submissionRows ?? []).map(mapFactorySubmission),
+      canSubmitFactoryOption: isAssignmentOpenForFactorySubmission(
+        assignment.assignment_status,
+      ),
+      factorySubmissions: mappedSubmissions,
       milestones,
       priority: readString(assignmentMetadata.priority, "normal"),
+      submissionClosedReason: getSubmissionClosedReason(
+        assignment.assignment_status,
+      ),
     },
   };
 }
@@ -593,14 +644,12 @@ export async function submitFactoryOptionForAdminReviewAction(
     };
   }
 
-  if (
-    ["cancelled", "completed_by_admin", "approved_by_admin"].includes(
-      assignment.assignment_status,
-    )
-  ) {
+  if (!isAssignmentOpenForFactorySubmission(assignment.assignment_status)) {
     return {
       ok: false,
-      message: "This assignment is not open for new factory submissions.",
+      message:
+        getSubmissionClosedReason(assignment.assignment_status) ||
+        "This assignment is not open for new factory submissions.",
     };
   }
 

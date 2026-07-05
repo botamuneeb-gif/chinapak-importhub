@@ -10,6 +10,7 @@ import {
 } from "@/app/admin/factory-submissions/actions";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { ActionFeedback } from "@/components/ui/action-feedback";
 import { ROUTES } from "@/config/brand";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
@@ -166,18 +167,6 @@ export function LiveFactorySubmissionDetail({
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
       <div className="space-y-6">
-        {(actionMessage || actionError) && (
-          <div
-            className={`rounded-lg border p-4 text-sm font-semibold shadow-sm ${
-              actionError
-                ? "border-brand-error bg-red-50 text-brand-error"
-                : "border-brand-emerald bg-emerald-50 text-brand-emerald"
-            }`}
-          >
-            {actionError || actionMessage}
-          </div>
-        )}
-
         <AdminSectionCard title="Submission Header">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
@@ -350,6 +339,9 @@ export function LiveFactorySubmissionDetail({
             >
               Reject Submission
             </button>
+          </div>
+          <div className="mt-4">
+            <ActionFeedback error={actionError} message={actionMessage} />
           </div>
         </AdminSectionCard>
       </aside>

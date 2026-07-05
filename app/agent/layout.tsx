@@ -7,6 +7,7 @@ const AGENT_PROTECTED_PREFIXES = [
   ROUTES.agentCommissions,
   ROUTES.agentDashboard,
   ROUTES.agentLeads,
+  ROUTES.agentNotifications,
   ROUTES.agentTraining,
 ];
 const AGENT_PUBLIC_PREFIXES = [ROUTES.agentLogin];

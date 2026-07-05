@@ -9,6 +9,7 @@ import {
   type PortalNavItem,
   type PortalQuickAction,
 } from "@/components/navigation/role-nav-items";
+import { PortalNotificationTray } from "@/components/notifications/portal-notification-tray";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/lib/auth/roles";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -174,6 +175,9 @@ export function PortalShell({ children, role }: PortalShellProps) {
   const showDetailCrumb =
     activeItem && pathname !== activeItem.href && lastSegment.length > 0;
   const showQuickActions = pathname === config.dashboardHref;
+  const notificationsHref =
+    config.navItems.find((item) => item.label === "Notifications")?.href ??
+    config.dashboardHref;
 
   useEffect(() => {
     let isMounted = true;
@@ -283,6 +287,10 @@ export function PortalShell({ children, role }: PortalShellProps) {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
+                <PortalNotificationTray
+                  notificationsHref={notificationsHref}
+                  role={role}
+                />
                 <div className="rounded-lg border border-slate-200 bg-brand-background px-3 py-2">
                   <p className="text-xs font-semibold text-brand-muted">
                     Signed in

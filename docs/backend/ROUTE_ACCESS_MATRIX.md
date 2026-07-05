@@ -2,6 +2,8 @@
 
 This matrix documents the intended public/private boundary for ChinaPak ImportHub. Route guards and server actions remain the real access controls; sitemap and robots rules are SEO guidance only.
 
+Public marketing chrome is shown on public website and auth entry routes only. Protected portal routes use the role-based portal shell and must not render visitor navigation such as Packages, Learn, Login, or Start Import Project.
+
 ## Public Website
 
 | Route group | Allowed access | Notes |
@@ -82,6 +84,7 @@ This matrix documents the intended public/private boundary for ChinaPak ImportHu
 |---|---|---|
 | `/agent` | Public/noindex entry | Agent public entry only. |
 | `/agent/dashboard`, `/agent/leads/*`, `/agent/commissions`, `/agent/training` | Agent | Assigned leads and training only. Agents do not perform FMS sourcing work. |
+| `/agent/notifications` | Agent | Own direct/role notifications for active agent accounts. |
 
 ## Billing, Refunds, Files, Documents, Notifications
 
@@ -92,5 +95,5 @@ This matrix documents the intended public/private boundary for ChinaPak ImportHu
 | `/refunds`, `/refunds/request`, `/refunds/[refundId]/document` | Importer owner | Own refund records only. Admin equivalents live under `/admin`. |
 | `/files/*` | No public page; server actions only | File access requires role checks and short-lived signed URLs. |
 | `/documents/*` | No public document index | Document routes are explicit importer/admin routes only. |
-| `/notifications/*` | Role scoped | Importer/FMS/admin/super-admin notifications are scoped by profile/role. |
+| `/notifications/*` | Role scoped | Importer/FMS/admin/super-admin/agent notifications are scoped by profile/role. Portal tray uses the same notification actions and role checks. |
 | `/api/*` | Internal/future | No current API route directory; disallowed in robots as a future private boundary. |

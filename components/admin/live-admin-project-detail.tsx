@@ -23,6 +23,7 @@ import { AdminProjectFilesPanel } from "@/components/files/file-panels";
 import { LiveProjectReportFeedbackPanel } from "@/components/admin/live-project-report-feedback-panel";
 import { ProjectTimeline } from "@/components/admin/project-timeline";
 import { ReviewChecklist } from "@/components/admin/review-checklist";
+import { ActionFeedback } from "@/components/ui/action-feedback";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type LiveAdminProjectDetailProps = {
@@ -112,6 +113,9 @@ export function LiveAdminProjectDetail({
   const [message, setMessage] = useState("");
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState("");
+  const [actionArea, setActionArea] = useState<
+    "payment" | "review" | "assignment" | "report" | null
+  >(null);
   const [paymentNote, setPaymentNote] = useState("");
   const [paymentReference, setPaymentReference] = useState("");
   const [reviewNote, setReviewNote] = useState("");
@@ -241,10 +245,12 @@ export function LiveAdminProjectDetail({
     action: ProjectGateAction,
     input: AdminProjectGateInput,
     successMessage: string,
+    area: "payment" | "review",
   ) {
     setIsMutating(true);
     setActionError("");
     setActionMessage("");
+    setActionArea(area);
 
     try {
       const accessToken = await getAdminAccessToken();
@@ -275,6 +281,7 @@ export function LiveAdminProjectDetail({
     setIsMutating(true);
     setActionError("");
     setActionMessage("");
+    setActionArea("assignment");
 
     try {
       const accessToken = await getAdminAccessToken();
@@ -314,6 +321,7 @@ export function LiveAdminProjectDetail({
     setIsMutating(true);
     setActionError("");
     setActionMessage("");
+    setActionArea("report");
 
     try {
       const accessToken = await getAdminAccessToken();
@@ -427,18 +435,6 @@ export function LiveAdminProjectDetail({
           </p>
         </div>
       </div>
-
-      {(actionMessage || actionError) && (
-        <div
-          className={`mb-6 rounded-lg border p-4 text-sm font-semibold shadow-sm ${
-            actionError
-              ? "border-brand-error bg-red-50 text-brand-error"
-              : "border-brand-emerald bg-emerald-50 text-brand-emerald"
-          }`}
-        >
-          {actionError || actionMessage}
-        </div>
-      )}
 
       <AdminTabs tabs={tabs} />
 
@@ -610,6 +606,7 @@ export function LiveAdminProjectDetail({
                         reference: paymentReference,
                       },
                       "Payment marked as verified. Readiness was recalculated.",
+                      "payment",
                     )
                   }
                   type="button"
@@ -627,6 +624,7 @@ export function LiveAdminProjectDetail({
                         reference: paymentReference,
                       },
                       "Payment issue recorded. FMS assignment remains blocked.",
+                      "payment",
                     )
                   }
                   type="button"
@@ -634,6 +632,11 @@ export function LiveAdminProjectDetail({
                   Mark Payment Issue / Rejected
                 </button>
               </div>
+              {actionArea === "payment" ? (
+                <div className="mt-4">
+                  <ActionFeedback error={actionError} message={actionMessage} />
+                </div>
+              ) : null}
             </div>
           </AdminSectionCard>
 
@@ -673,6 +676,7 @@ export function LiveAdminProjectDetail({
                       approveProjectReviewAction,
                       { note: reviewNote },
                       "Admin review approved. Readiness was recalculated.",
+                      "review",
                     )
                   }
                   type="button"
@@ -687,6 +691,7 @@ export function LiveAdminProjectDetail({
                       markProjectNeedsInfoAction,
                       { note: reviewNote },
                       "Project marked as needing more information.",
+                      "review",
                     )
                   }
                   type="button"
@@ -701,6 +706,7 @@ export function LiveAdminProjectDetail({
                       rejectProjectReviewAction,
                       { note: reviewNote },
                       "Project rejected. FMS assignment is blocked.",
+                      "review",
                     )
                   }
                   type="button"
@@ -708,6 +714,11 @@ export function LiveAdminProjectDetail({
                   Reject Project
                 </button>
               </div>
+              {actionArea === "review" ? (
+                <div className="mt-4">
+                  <ActionFeedback error={actionError} message={actionMessage} />
+                </div>
+              ) : null}
             </div>
           </AdminSectionCard>
 
@@ -871,9 +882,14 @@ export function LiveAdminProjectDetail({
               >
                 {isReadyForFms
                   ? "Importer report release depends on admin-approved submissions"
-                  : "Ready status is derived from payment + admin review"}
+                : "Ready status is derived from payment + admin review"}
               </button>
             </div>
+            {actionArea === "assignment" ? (
+              <div className="mt-4">
+                <ActionFeedback error={actionError} message={actionMessage} />
+              </div>
+            ) : null}
           </AdminSectionCard>
 
           <div className="scroll-mt-24" id="report-release" />
@@ -1156,6 +1172,11 @@ export function LiveAdminProjectDetail({
                 Withdraw Report
               </button>
             </div>
+            {actionArea === "report" ? (
+              <div className="mt-4">
+                <ActionFeedback error={actionError} message={actionMessage} />
+              </div>
+            ) : null}
 
             {project.factoryReport.currentReport ? (
               <div className="mt-6 rounded-lg border border-brand-emerald bg-emerald-50 p-4">

@@ -13,6 +13,7 @@ import { FmsEvidenceUploadPanel } from "@/components/files/file-panels";
 import { FmsSectionCard } from "@/components/fms/fms-section-card";
 import { FmsStatusBadge } from "@/components/fms/fms-status-badge";
 import { MilestoneChecklist } from "@/components/fms/milestone-checklist";
+import { ActionFeedback } from "@/components/ui/action-feedback";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type LiveFmsAssignmentDetailProps = {
@@ -208,6 +209,9 @@ export function LiveFmsAssignmentDetail({
   const [message, setMessage] = useState("");
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState("");
+  const [feedbackArea, setFeedbackArea] = useState<
+    "progress" | "submission" | null
+  >(null);
   const [submissionForm, setSubmissionForm] =
     useState<FactoryOptionSubmissionInput>(initialSubmissionForm);
 
@@ -273,6 +277,7 @@ export function LiveFmsAssignmentDetail({
     setIsMutating(true);
     setActionError("");
     setActionMessage("");
+    setFeedbackArea("progress");
 
     try {
       const accessToken = await getAccessToken();
@@ -316,6 +321,7 @@ export function LiveFmsAssignmentDetail({
     setIsMutating(true);
     setActionError("");
     setActionMessage("");
+    setFeedbackArea("submission");
 
     try {
       const accessToken = await getAccessToken();
@@ -390,18 +396,6 @@ export function LiveFmsAssignmentDetail({
         </div>
       </div>
 
-      {(actionMessage || actionError) && (
-        <div
-          className={`mb-6 rounded-lg border p-4 text-sm font-semibold shadow-sm ${
-            actionError
-              ? "border-brand-error bg-red-50 text-brand-error"
-              : "border-brand-emerald bg-emerald-50 text-brand-emerald"
-          }`}
-        >
-          {actionError || actionMessage}
-        </div>
-      )}
-
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <FmsSectionCard id="brief" title="1. Assignment Brief">
@@ -464,6 +458,11 @@ export function LiveFmsAssignmentDetail({
                 Start Factory Research
               </button>
             </div>
+            {feedbackArea === "progress" ? (
+              <div className="mt-4">
+                <ActionFeedback error={actionError} message={actionMessage} />
+              </div>
+            ) : null}
           </FmsSectionCard>
 
           <FmsSectionCard id="factory-option" title="3. Factory Option Submission">
@@ -472,6 +471,7 @@ export function LiveFmsAssignmentDetail({
               directly to the importer. 请不要在买家可见字段中填写电话、邮箱、微信或付款信息。
             </div>
 
+            {assignment.canSubmitFactoryOption ? (
             <form className="mt-5 space-y-6" onSubmit={submitFactoryOption}>
               <div>
                 <h3 className="text-base font-bold text-brand-navy">
@@ -579,14 +579,33 @@ export function LiveFmsAssignmentDetail({
                 </div>
               </div>
 
-              <button
-                className="min-h-12 rounded-lg bg-brand-emerald px-5 py-3 font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-55"
-                disabled={isMutating}
-                type="submit"
-              >
-                Submit to Admin Review
-              </button>
+              <div className="space-y-3">
+                <button
+                  className="min-h-12 rounded-lg bg-brand-emerald px-5 py-3 font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-55"
+                  disabled={isMutating}
+                  type="submit"
+                >
+                  Submit to Admin Review
+                </button>
+                {feedbackArea === "submission" ? (
+                  <ActionFeedback
+                    error={actionError}
+                    message={actionMessage}
+                  />
+                ) : null}
+              </div>
             </form>
+            ) : (
+              <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-brand-muted">
+                <p className="font-bold text-brand-navy">
+                  This assignment is not open for new factory submissions.
+                </p>
+                <p className="mt-2">
+                  {assignment.submissionClosedReason ||
+                    "Existing submissions remain visible below as read-only records."}
+                </p>
+              </div>
+            )}
 
             {assignment.factorySubmissions.length > 0 ? (
               <div className="mt-6">

@@ -143,6 +143,7 @@ export const portalRoleConfigs: Record<
       { href: ROUTES.agentLeads, label: "Leads" },
       { href: ROUTES.agentCommissions, label: "Commissions" },
       { href: ROUTES.agentTraining, label: "Training" },
+      { href: ROUTES.agentNotifications, label: "Notifications" },
       ...maybeNavItem(launchFlags.enableProfilePages, {
         href: "#profile",
         label: "Profile",

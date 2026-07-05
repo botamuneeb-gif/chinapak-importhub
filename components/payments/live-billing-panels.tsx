@@ -15,6 +15,7 @@ import {
   type RefundListItem,
   type RefundRequestInput,
 } from "@/app/billing/actions";
+import { ActionFeedback } from "@/components/ui/action-feedback";
 import { ROUTES, brand } from "@/config/brand";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
@@ -93,18 +94,6 @@ function ErrorMessage({ message }: { message: string }) {
 
   return (
     <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
-      {message}
-    </p>
-  );
-}
-
-function SuccessMessage({ message }: { message: string }) {
-  if (!message) {
-    return null;
-  }
-
-  return (
-    <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">
       {message}
     </p>
   );
@@ -319,8 +308,6 @@ function ManualPaymentForm({
         This creates a manual review request. No FMS work begins until payment is
         verified and admin review approves the Import Project.
       </Notice>
-      <ErrorMessage message={error} />
-      <SuccessMessage message={message} />
       <button
         className="min-h-12 rounded-lg bg-brand-emerald px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:bg-slate-400"
         disabled={isSubmitting}
@@ -328,6 +315,7 @@ function ManualPaymentForm({
       >
         {isSubmitting ? "Submitting..." : "Submit payment reference"}
       </button>
+      <ActionFeedback error={error} message={message} />
     </form>
   );
 }
@@ -936,8 +924,6 @@ export function LiveRefundRequestForm() {
         assignment/work, admin reviews milestones and may offer reassignment
         before refund.
       </Notice>
-      <ErrorMessage message={error} />
-      <SuccessMessage message={message} />
       <button
         className="min-h-12 rounded-lg bg-brand-emerald px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:bg-slate-400"
         disabled={isSubmitting}
@@ -945,6 +931,7 @@ export function LiveRefundRequestForm() {
       >
         {isSubmitting ? "Submitting..." : "Submit refund request"}
       </button>
+      <ActionFeedback error={error} message={message} />
     </form>
   );
 }

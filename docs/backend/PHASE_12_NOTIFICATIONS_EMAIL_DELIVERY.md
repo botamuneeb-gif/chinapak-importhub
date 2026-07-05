@@ -6,9 +6,10 @@ Phase 12 adds a provider-neutral notification foundation for ChinaPak ImportHub:
 
 - `notifications` for in-app, email-ready, and system notification records.
 - `notification_delivery_logs` for future provider delivery attempts.
-- `notification_preferences` for future per-user language/channel preferences.
+- `notification_preferences` for per-user language/channel foundation and tray category preferences.
 - Server-only notification helpers in `lib/notifications/`.
-- Protected notification centers for importer, FMS, admin, and super admin portals.
+- Protected notification centers for importer, FMS, admin, super admin, and agent portals.
+- A protected portal notification tray with unread count, latest alerts, refresh, mark-read actions, and tray category preferences.
 - Workflow hooks for core operational events.
 
 Email delivery is disabled by default. Local development records in-app notifications only.
@@ -46,8 +47,9 @@ Foundation for:
 - email enabled
 - preferred language
 - role defaults
+- tray category filtering in `metadata.tray_hidden_categories`
 
-Preferences are not yet surfaced in the UI beyond the schema foundation.
+Preferences are surfaced in the portal notification tray. They affect tray visibility only and do not delete notification records. System/security notifications are always shown and cannot be fully suppressed.
 
 ## Delivery Modes
 
@@ -126,6 +128,7 @@ Notification writes are server-only and should not expose service-role credentia
 - FMS can read direct notifications for their own profile.
 - Admin and super admin can read role-targeted operational notifications for active roles.
 - Super admin can read role-targeted super-admin notifications.
+- Agent can read direct/role notifications for active agent accounts.
 - FMS notifications must not include importer name, phone, WhatsApp, email, address, or contact preference.
 - Importer notifications must not include raw FMS submissions, factory contact details, WeChat, phone, email, bank/payment details, or admin-only notes.
 - Action URLs must point to routes that the recipient role can already access.
@@ -138,8 +141,23 @@ Role-targeted notification read state is shared at the notification row level in
 - `/fms/notifications`
 - `/admin/notifications`
 - `/super-admin/notifications`
+- `/agent/notifications`
 
 These routes are protected through existing role-aware portal guards.
+
+## Portal Tray
+
+Protected portals render a near-live notification tray in the portal header. It:
+
+- polls every 45 seconds
+- shows unread count
+- shows latest scoped notifications
+- supports manual refresh
+- supports marking one or all notifications read
+- links to the full notification center
+- stores tray category preferences in `notification_preferences.metadata`
+
+The tray is not rendered on public SEO pages or public login pages.
 
 ## Local Testing Steps
 
@@ -153,13 +171,15 @@ These routes are protected through existing role-aware portal guards.
 8. Submit a factory option as FMS and confirm admin receives an alert.
 9. Release a sanitized report and confirm importer receives a report-ready notification.
 10. Mark notifications read and verify unread count changes.
+11. Toggle a non-critical tray category and confirm the tray filters without deleting records.
+12. Confirm system/security notifications remain visible.
 
 ## Remaining Future Work
 
 - Real Resend/SES/SMTP sending.
 - Recipient email lookup and preference checks before email delivery.
 - Per-user read receipts for role-level notifications.
-- Email unsubscribe/preference UI.
+- Full email unsubscribe/preference UI.
 - WhatsApp/SMS integration.
-- Realtime notification badge/polling.
+- Supabase Realtime badge delivery if needed later.
 - Admin notification filters by type/priority.

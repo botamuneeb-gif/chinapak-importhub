@@ -13,6 +13,7 @@ import {
 } from "@/app/admin/representatives/actions";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { QrCode } from "@/components/qr/qr-code";
+import { ActionFeedback } from "@/components/ui/action-feedback";
 import { getSiteUrl } from "@/config/site-url";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import type { Database } from "@/lib/supabase/types";
@@ -118,6 +119,7 @@ export function LiveAdminRepresentatives() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [mutatingId, setMutatingId] = useState("");
+  const [feedbackTarget, setFeedbackTarget] = useState("");
 
   const loadRepresentatives = useCallback(async () => {
     setIsLoading(true);
@@ -175,6 +177,7 @@ export function LiveAdminRepresentatives() {
     event.preventDefault();
     const form = event.currentTarget;
     const input = formInputFromForm(form);
+    setFeedbackTarget("create");
     setError("");
     setMessage("");
 
@@ -207,6 +210,7 @@ export function LiveAdminRepresentatives() {
     const form = event.currentTarget;
     const input = formInputFromForm(form);
     setMutatingId(representativeId);
+    setFeedbackTarget(representativeId);
     setError("");
     setMessage("");
 
@@ -241,6 +245,7 @@ export function LiveAdminRepresentatives() {
     nextStatus: RepresentativeStatus,
   ) {
     setMutatingId(representativeId);
+    setFeedbackTarget(representativeId);
     setError("");
     setMessage("");
 
@@ -272,6 +277,7 @@ export function LiveAdminRepresentatives() {
 
   async function regenerateCode(representativeId: string) {
     setMutatingId(representativeId);
+    setFeedbackTarget(representativeId);
     setError("");
     setMessage("");
 
@@ -300,22 +306,26 @@ export function LiveAdminRepresentatives() {
     }
   }
 
-  async function copyCode(code: string) {
+  async function copyCode(code: string, representativeId: string) {
     try {
       await navigator.clipboard.writeText(code);
+      setFeedbackTarget(representativeId);
       setMessage("Verification code copied.");
     } catch {
+      setFeedbackTarget(representativeId);
       setMessage(`Verification code: ${code}`);
     }
   }
 
-  async function copyVerificationUrl(code: string) {
+  async function copyVerificationUrl(code: string, representativeId: string) {
     const url = representativeVerificationUrl(code);
 
     try {
       await navigator.clipboard.writeText(url);
+      setFeedbackTarget(representativeId);
       setMessage("Representative verification URL copied.");
     } catch {
+      setFeedbackTarget(representativeId);
       setMessage(`Verification URL: ${url}`);
     }
   }
@@ -336,17 +346,6 @@ export function LiveAdminRepresentatives() {
         warning. Private phone, email, CNIC, address, bank details, and internal
         notes are never returned publicly.
       </AdminRepresentativeNotice>
-
-      {error ? (
-        <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-700">
-          {error}
-        </p>
-      ) : null}
-      {message ? (
-        <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold text-emerald-800">
-          {message}
-        </p>
-      ) : null}
 
       <form
         className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
@@ -398,6 +397,9 @@ export function LiveAdminRepresentatives() {
             Create Representative
           </button>
         </div>
+        {feedbackTarget === "create" ? (
+          <ActionFeedback error={error} message={message} />
+        ) : null}
       </form>
 
       <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
@@ -494,14 +496,16 @@ export function LiveAdminRepresentatives() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
                   className="min-h-10 rounded-lg border border-brand-navy bg-white px-3 py-2 text-xs font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
-                  onClick={() => copyCode(item.verificationCode)}
+                  onClick={() => copyCode(item.verificationCode, item.id)}
                   type="button"
                 >
                   Copy Code
                 </button>
                 <button
                   className="min-h-10 rounded-lg border border-brand-navy bg-white px-3 py-2 text-xs font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald"
-                  onClick={() => copyVerificationUrl(item.verificationCode)}
+                  onClick={() =>
+                    copyVerificationUrl(item.verificationCode, item.id)
+                  }
                   type="button"
                 >
                   Copy Verification URL
@@ -539,6 +543,11 @@ export function LiveAdminRepresentatives() {
                   Regenerate Code
                 </button>
               </div>
+              {feedbackTarget === item.id ? (
+                <div className="mt-4">
+                  <ActionFeedback error={error} message={message} />
+                </div>
+              ) : null}
 
               <details className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
                 <summary className="cursor-pointer text-sm font-bold text-brand-navy">

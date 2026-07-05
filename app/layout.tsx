@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
+import { SiteChrome } from "@/components/layout/site-chrome";
 import { JsonLd } from "@/components/seo/json-ld";
 import { brand } from "@/config/brand";
 import { getSiteUrl } from "@/config/site-url";
@@ -60,9 +59,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-brand-background text-brand-text antialiased">
         <JsonLd data={[organizationJsonLd, websiteJsonLd]} />
-        <SiteHeader />
-        {children}
-        <SiteFooter />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

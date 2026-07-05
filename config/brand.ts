@@ -53,6 +53,7 @@ export const ROUTES = {
   agentLeads: "/agent/leads",
   agentCommissions: "/agent/commissions",
   agentTraining: "/agent/training",
+  agentNotifications: "/agent/notifications",
   factory: "/factory",
   factoriesExportToPakistan: "/factories/export-to-pakistan",
   factoriesFindPakistaniBuyers: "/factories/find-pakistani-buyers",
