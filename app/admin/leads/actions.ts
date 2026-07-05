@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { ROUTES } from "@/config/brand";
 import { fmsApplicationSource } from "@/config/fms-acquisition";
 import { getSiteUrl } from "@/config/site-url";
@@ -171,10 +172,46 @@ function generateReadableCode(prefix: "CPH" | "FMS") {
   return `${prefix}-${year}-${timestampPart}${randomPart}`;
 }
 
-function isFmsApplication(metadata: JsonObject) {
+function isFmsApplication(
+  lead: Pick<LeadRow, "lead_code" | "metadata" | "product_summary">,
+) {
+  const metadata = toJsonObject(lead.metadata);
+  const source = readString(metadata.source);
+  const intendedRole = readString(metadata.intended_role);
+  const leadCode = lead.lead_code.toUpperCase();
+  const productSummary = lead.product_summary.toLowerCase();
+
   return (
-    readString(metadata.source) === fmsApplicationSource ||
-    readString(metadata.intended_role) === USER_ROLES.fms
+    source === fmsApplicationSource ||
+    intendedRole === USER_ROLES.fms ||
+    leadCode.startsWith("FMS-APP") ||
+    productSummary.includes("fms application")
+  );
+}
+
+function getSuperAdminReviewStatus(lead: LeadRow) {
+  return readString(toJsonObject(lead.metadata).super_admin_review_status);
+}
+
+function shouldShowInSuperAdminFmsQueue(lead: LeadRow) {
+  if (!isFmsApplication(lead)) {
+    return false;
+  }
+
+  const workflowStatus = getWorkflowStatus(lead);
+  const superAdminReviewStatus = getSuperAdminReviewStatus(lead);
+
+  return (
+    [
+      "forwarded_to_super_admin",
+      "approved_pending_account_setup",
+      "converted",
+      "super_admin_declined",
+      "pending_more_info",
+    ].includes(workflowStatus) ||
+    ["pending", "approved", "declined", "more_info_requested"].includes(
+      superAdminReviewStatus,
+    )
   );
 }
 
@@ -225,7 +262,7 @@ function mapLeadQueueItem(
   packageRow?: Database["public"]["Tables"]["packages"]["Row"] | null,
 ): AdminLeadQueueItem {
   const metadata = toJsonObject(lead.metadata);
-  const fmsApplication = isFmsApplication(metadata);
+  const fmsApplication = isFmsApplication(lead);
   const workflowStatus = getWorkflowStatus(lead);
   const fmsLocation = [
     readString(metadata.city),
@@ -281,6 +318,7 @@ function mapLeadQueueItem(
     product,
     searchableText: [
       lead.lead_code,
+      lead.id,
       importerName,
       city,
       contactForAdminOnly,
@@ -597,7 +635,7 @@ export async function updateLeadWorkflowAction(
 
     const lead = leadResult.lead;
     const metadata = toJsonObject(lead.metadata);
-    const fmsLead = isFmsApplication(metadata);
+    const fmsLead = isFmsApplication(lead);
     const actionIsFms = input.action.startsWith("fms_");
     const actionIsProject = input.action.startsWith("project_");
 
@@ -658,11 +696,13 @@ export async function updateLeadWorkflowAction(
     if (input.action === "fms_forward_super_admin") {
       await createNotification(
         {
-          actionUrl: ROUTES.superAdminFmsApplications,
+          actionUrl: `${ROUTES.superAdminFmsApplications}?lead=${lead.id}&filter=pending`,
           metadata: {
             lead_code: lead.lead_code,
             lead_id: lead.id,
             source: fmsApplicationSource,
+            super_admin_review_status: "pending",
+            workflow_status: "forwarded_to_super_admin",
           },
           priority: "high",
           recipientRole: USER_ROLES.superAdmin,
@@ -703,6 +743,10 @@ export async function updateLeadWorkflowAction(
       beforeData: metadata,
       entityId: lead.id,
     });
+
+    revalidatePath("/admin/leads");
+    revalidatePath(ROUTES.superAdmin);
+    revalidatePath(ROUTES.superAdminFmsApplications);
 
     return {
       ok: true,
@@ -791,7 +835,7 @@ export async function convertProjectLeadToImportProjectAction(
     const lead = leadResult.lead;
     const metadata = toJsonObject(lead.metadata);
 
-    if (isFmsApplication(metadata)) {
+    if (isFmsApplication(lead)) {
       return { ok: false, message: "FMS applications cannot be converted to Import Projects." };
     }
 
@@ -1020,19 +1064,22 @@ export async function listForwardedFmsApplicationsAction(
       return { ok: false, message: error.message };
     }
 
-    const applicationRows = (leads ?? []).filter((lead) => {
-      const metadata = toJsonObject(lead.metadata);
-      return (
-        isFmsApplication(metadata) &&
-        [
-          "forwarded_to_super_admin",
-          "super_admin_approved",
-          "super_admin_declined",
-          "approved_pending_account_setup",
-          "converted",
-          "pending_more_info",
-        ].includes(getWorkflowStatus(lead))
-      );
+    const leadRows = leads ?? [];
+    const fmsApplicationRows = leadRows.filter((lead) => isFmsApplication(lead));
+    const applicationRows = fmsApplicationRows.filter((lead) =>
+      shouldShowInSuperAdminFmsQueue(lead),
+    );
+
+    console.info("FMS application Super Admin queue diagnostics", {
+      fmsApplicationCount: fmsApplicationRows.length,
+      forwardedOrReviewedCount: applicationRows.length,
+      statuses: fmsApplicationRows.reduce<Record<string, number>>((counts, lead) => {
+        const workflowStatus = getWorkflowStatus(lead);
+        const superAdminStatus = getSuperAdminReviewStatus(lead) || "none";
+        const key = `${workflowStatus}:${superAdminStatus}`;
+        counts[key] = (counts[key] ?? 0) + 1;
+        return counts;
+      }, {}),
     });
 
     return {
@@ -1351,11 +1398,14 @@ export async function reviewFmsApplicationBySuperAdminAction(
     const metadata = toJsonObject(lead.metadata);
     const note = input.note?.trim() ?? "";
 
-    if (!isFmsApplication(metadata)) {
+    if (!isFmsApplication(lead)) {
       return { ok: false, message: "Only FMS application leads can be reviewed here." };
     }
 
-    if (getWorkflowStatus(lead) !== "forwarded_to_super_admin") {
+    if (
+      getWorkflowStatus(lead) !== "forwarded_to_super_admin" &&
+      getSuperAdminReviewStatus(lead) !== "pending"
+    ) {
       return {
         ok: false,
         message:
@@ -1457,7 +1507,7 @@ export async function reviewFmsApplicationBySuperAdminAction(
     await createNotifications(
       [
         {
-          actionUrl: ROUTES.superAdminFmsApplications,
+          actionUrl: `${ROUTES.superAdminFmsApplications}?lead=${lead.id}`,
           metadata: {
             lead_code: lead.lead_code,
             lead_id: lead.id,
@@ -1494,6 +1544,10 @@ export async function reviewFmsApplicationBySuperAdminAction(
       beforeData: metadata,
       entityId: lead.id,
     });
+
+    revalidatePath("/admin/leads");
+    revalidatePath(ROUTES.superAdmin);
+    revalidatePath(ROUTES.superAdminFmsApplications);
 
     return { ok: true, data: null, message };
   } catch (error) {

@@ -62,6 +62,20 @@ export function LiveFmsApplications() {
   const [pageError, setPageError] = useState("");
   const [isPending, startTransition] = useTransition();
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const filterParam = params.get("filter");
+    const leadParam = params.get("lead");
+
+    if (filterParam === "pending") {
+      setActiveFilter("forwarded_to_super_admin");
+    }
+
+    if (leadParam) {
+      setQuery(leadParam);
+    }
+  }, []);
+
   const loadApplications = useCallback(async () => {
     const accessToken = await getAccessToken();
     const result = await listForwardedFmsApplicationsAction(accessToken);
@@ -106,7 +120,17 @@ export function LiveFmsApplications() {
     const normalizedQuery = query.trim().toLowerCase();
 
     return applications.filter((application) => {
-      if (activeFilter !== "all" && application.workflowStatus !== activeFilter) {
+      if (activeFilter === "forwarded_to_super_admin") {
+        if (
+          application.workflowStatus !== "forwarded_to_super_admin" &&
+          application.superAdminReviewStatus.toLowerCase() !== "pending"
+        ) {
+          return false;
+        }
+      } else if (
+        activeFilter !== "all" &&
+        application.workflowStatus !== activeFilter
+      ) {
         return false;
       }
 
@@ -230,7 +254,8 @@ export function LiveFmsApplications() {
               (isPending && busyLeadId === application.id) ||
               busyLeadId === application.id;
             const finalReviewOpen =
-              application.workflowStatus === "forwarded_to_super_admin";
+              application.workflowStatus === "forwarded_to_super_admin" ||
+              application.superAdminReviewStatus.toLowerCase() === "pending";
 
             return (
               <article

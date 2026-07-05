@@ -84,6 +84,15 @@ Super Admin can:
 
 Only leads forwarded by Admin can be final-reviewed here.
 
+Forwarded FMS leads are included in the Super Admin queue when any safe FMS signal is present:
+
+- `metadata.source = public_fms_application`
+- `metadata.intended_role = fms`
+- lead code starts with `FMS-APP`
+- product summary indicates an FMS application
+
+The queue shows leads that have been forwarded or reviewed by Super Admin using either `metadata.workflow_status` or `metadata.super_admin_review_status`. Forward notifications open `/super-admin/fms-applications?lead=<leadId>&filter=pending` so the pending application is visible immediately.
+
 ## FMS Approval And Account Creation
 
 When Super Admin approves a forwarded FMS application, the workflow attempts secure onboarding:
