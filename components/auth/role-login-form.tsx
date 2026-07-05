@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { resolveAuthRedirectAction } from "@/app/auth/actions";
@@ -7,6 +8,7 @@ import { AuthActionButton } from "@/components/auth/auth-action-button";
 import { AuthErrorMessage } from "@/components/auth/auth-error-message";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthModeNotice } from "@/components/auth/auth-mode-notice";
+import { ROUTES } from "@/config/brand";
 import type { UserRole } from "@/lib/auth/roles";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
@@ -95,6 +97,12 @@ export function RoleLoginForm({
       <AuthActionButton disabled={isPending} type="submit">
         {isPending ? "Verifying role..." : submitLabel}
       </AuthActionButton>
+      <Link
+        className="inline-flex text-sm font-bold text-brand-emerald no-underline hover:text-brand-navy"
+        href={ROUTES.forgotPassword}
+      >
+        Forgot password?
+      </Link>
     </form>
   );
 }

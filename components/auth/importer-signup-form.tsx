@@ -101,7 +101,7 @@ export function ImporterSignupForm() {
       <AuthInput
         autoComplete="email"
         id="signup-email"
-        label="Email fallback for testing"
+        label="Email"
         onChange={(event) => setEmail(event.target.value)}
         placeholder="you@example.com"
         required
@@ -161,9 +161,8 @@ export function ImporterSignupForm() {
       </div>
       <AuthErrorMessage message={error} />
       <AuthActionButton disabled={isPending} type="submit">
-        {isPending ? "Creating account..." : "Account بنائیں / OTP بھیجیں"}
+        {isPending ? "Creating account..." : "Create importer account"}
       </AuthActionButton>
     </form>
   );
 }
-

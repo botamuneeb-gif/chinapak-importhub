@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { AuthShell } from "@/components/auth/auth-shell";
-import { OtpInputPlaceholder } from "@/components/auth/otp-input-placeholder";
 import { SecurityNotice } from "@/components/auth/security-notice";
 import { ROUTES } from "@/config/brand";
 
@@ -16,23 +15,22 @@ export default function OtpPage() {
     <AuthShell
       description="Phone/WhatsApp OTP is not active for launch. Use email/password login while SMS provider setup is completed."
       eyebrow="OTP verification"
-      title="Verify Your Code"
+      title="Phone OTP Is Not Active Yet"
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <AuthCard title="Phone OTP status">
           <div aria-label="OTP verification status" className="grid gap-5">
-            <OtpInputPlaceholder />
-
             <div className="rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
-              OTP sending is disabled until SMS/WhatsApp provider activation.
-              Please use email/password login for launch access.
+              Phone and WhatsApp OTP login is disabled until SMS/WhatsApp
+              provider setup is complete. No OTP code is being sent from this
+              page.
             </div>
 
             <Link
               className="font-semibold text-brand-emerald no-underline hover:text-brand-navy"
               href={ROUTES.login}
             >
-              Change number
+              Use email login
             </Link>
           </div>
         </AuthCard>

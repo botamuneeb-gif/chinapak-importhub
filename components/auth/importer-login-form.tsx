@@ -7,7 +7,6 @@ import { resolveAuthRedirectAction } from "@/app/auth/actions";
 import { AuthActionButton } from "@/components/auth/auth-action-button";
 import { AuthErrorMessage } from "@/components/auth/auth-error-message";
 import { AuthInput } from "@/components/auth/auth-input";
-import { AuthModeNotice } from "@/components/auth/auth-mode-notice";
 import { ROUTES } from "@/config/brand";
 import { USER_ROLES } from "@/lib/auth/roles";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -61,41 +60,16 @@ export function ImporterLoginForm() {
 
   return (
     <div className="space-y-5">
-      <AuthModeNotice title="Phone OTP planned">
-        <p>
-          WhatsApp/phone OTP is the main importer auth direction, but it needs
-          SMS provider activation. Email/password below is connected now for
-          testing importer access.
-        </p>
-      </AuthModeNotice>
-
-      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-        <label
-          className="block text-sm font-semibold text-brand-navy"
-          htmlFor="phone-placeholder"
-        >
-          Phone/WhatsApp number
-        </label>
-        <input
-          className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-brand-text placeholder:text-brand-muted"
-          id="phone-placeholder"
-          placeholder="+92 300 0000000"
-          type="tel"
-        />
-        <button
-          className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-bold text-brand-muted"
-          disabled
-          type="button"
-        >
-          Phone OTP unavailable during launch
-        </button>
-      </div>
+      <p className="text-sm leading-7 text-brand-muted">
+        Secure importer login uses your registered email and password. Role
+        access is checked before your importer dashboard opens.
+      </p>
 
       <form className="space-y-4" onSubmit={handleLogin}>
         <AuthInput
           autoComplete="email"
           id="importer-email"
-          label="Email fallback for testing"
+          label="Email"
           onChange={(event) => setEmail(event.target.value)}
           placeholder="you@example.com"
           required
@@ -115,17 +89,24 @@ export function ImporterLoginForm() {
         />
         <AuthErrorMessage message={error} />
         <AuthActionButton disabled={isPending} type="submit">
-          {isPending ? "Checking account..." : "Login with email"}
+          {isPending ? "Checking account..." : "Login with Email"}
         </AuthActionButton>
       </form>
 
-      <p className="text-sm leading-7 text-brand-muted">
-        New importer?{" "}
-        <Link className="font-bold text-brand-emerald" href={ROUTES.signup}>
-          Create an account
+      <div className="flex flex-col gap-2 text-sm leading-7 text-brand-muted sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4">
+        <span>
+          New importer?{" "}
+          <Link className="font-bold text-brand-emerald" href={ROUTES.signup}>
+            Create an account
+          </Link>
+        </span>
+        <Link
+          className="font-bold text-brand-emerald no-underline hover:text-brand-navy"
+          href={ROUTES.forgotPassword}
+        >
+          Forgot password?
         </Link>
-        . Phone OTP will be enabled after SMS provider activation.
-      </p>
+      </div>
     </div>
   );
 }

@@ -17,6 +17,8 @@ export const ROUTES = {
   contact: "/contact",
   login: "/login",
   signup: "/signup",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
   authRoleSelect: "/auth/role-select",
   authOtp: "/auth/otp",
   authInvite: "/auth/invite",

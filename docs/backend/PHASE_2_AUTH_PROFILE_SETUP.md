@@ -6,8 +6,8 @@ refunds, and factory review behavior remain placeholder UI.
 
 ## What Was Added
 
-- Supabase email/password login for importer testing, admin, super admin, FMS,
-  and agent entry pages.
+- Supabase email/password login for importers, admin, super admin, FMS, and
+  agent entry pages.
 - Public importer signup that creates:
   - Supabase Auth user
   - `user_profiles` row
@@ -56,8 +56,15 @@ The importer signup form uses a server action to create the Auth user and
 profile rows. After successful creation, the browser signs in with
 email/password so the protected importer dashboard can verify the session.
 
-Phone/WhatsApp OTP remains visible as the intended importer-first UX, but real
-phone OTP requires SMS/WhatsApp provider activation and is not connected yet.
+Public importer login is email/password for MVP launch. Phone/WhatsApp OTP is
+kept as a noindex informational route only and is not active until provider
+setup, rate limits, and templates are configured.
+
+Current signup still uses the controlled server-side Supabase Admin Auth
+creation path with `email_confirm: true` so importer accounts can use the MVP
+immediately. Before production SMTP is finalized, review
+`PRODUCTION_EMAIL_AUTHENTICATION_CHECKLIST.md` and decide whether to switch
+public importer signup to confirmed-email access.
 
 ## Staff, FMS, And Agent Login
 
@@ -113,8 +120,9 @@ Importer:
 3. Create an importer account with full name, email, password, phone, city, and
    business type.
 4. Confirm redirect to `/importer/dashboard`.
-5. Sign out manually from Supabase local storage if needed, then test `/login`
-   with the same email/password.
+5. Sign out, then test `/login` with the same email/password.
+6. Test `/forgot-password` and `/reset-password` after Supabase SMTP and redirect
+   URLs are configured.
 
 Admin / Super Admin:
 

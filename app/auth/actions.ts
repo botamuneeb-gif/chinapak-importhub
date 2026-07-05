@@ -106,7 +106,7 @@ export async function signupImporterAction(
           phone_whatsapp: phoneWhatsapp || null,
           city,
           business_type: businessType,
-          signup_source: "public_importer_email_fallback",
+          signup_source: "public_importer_email_signup",
         },
       });
 
@@ -130,7 +130,7 @@ export async function signupImporterAction(
           preferred_language: "ur",
           status: "active",
           metadata: {
-            signup_source: "public_importer_email_fallback",
+            signup_source: "public_importer_email_signup",
           },
         },
         { onConflict: "auth_user_id" },

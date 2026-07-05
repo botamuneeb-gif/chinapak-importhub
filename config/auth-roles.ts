@@ -101,8 +101,8 @@ export const publicAuthTrustNotes = [
 
 export const authSecurityPrinciples = [
   {
-    title: "OTP login",
-    body: "Importer access is planned around phone and WhatsApp OTP so shopkeepers do not need to manage passwords first.",
+    title: "Secure email login",
+    body: "Importer access uses email/password for MVP launch. Phone and WhatsApp OTP remain disabled until provider setup, templates, and rate limits are ready.",
   },
   {
     title: "Role-based portals",

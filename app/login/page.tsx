@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
-import { ImporterLoginForm } from "@/components/auth/importer-login-form";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { ImporterLoginForm } from "@/components/auth/importer-login-form";
 import { SecurityNotice } from "@/components/auth/security-notice";
 import { publicAuthTrustNotes } from "@/config/auth-roles";
 import { ROUTES } from "@/config/brand";
@@ -10,20 +10,18 @@ import { ROUTES } from "@/config/brand";
 export const metadata: Metadata = {
   title: "Login | ChinaPak ImportHub",
   description:
-    "Urdu-first importer login with future phone OTP and current email/password testing fallback.",
+    "Secure importer email login for ChinaPak ImportHub project tracking and reports.",
 };
 
 export default function LoginPage() {
   return (
     <AuthShell
-      description="اپنا WhatsApp نمبر درج کریں۔ اگر آپ کا account موجود ہے تو login ہو جائے گا، ورنہ نیا account بن جائے گا۔ Email fallback ابھی testing کے لیے connected ہے۔"
-      dir="rtl"
+      description="Login with your registered email and password to track import projects, invoices, reports, refunds, and notifications."
       eyebrow="Importer Account"
-      lang="ur"
-      title="اپنا Import Account کھولیں"
+      title="Secure Importer Login"
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <AuthCard title="Importer access">
+        <AuthCard title="Login with Email">
           <ImporterLoginForm />
         </AuthCard>
 
@@ -38,20 +36,26 @@ export default function LoginPage() {
 
           <SecurityNotice title="Help and security">
             <p>
-              Public importer login is designed to become phone/WhatsApp
-              OTP-first. For this phase, email/password login checks the
-              Supabase role assignment before opening a portal.
+              Email/password login checks your Supabase session and active
+              importer role assignment before opening the importer portal.
             </p>
-            <Link
-              className="mt-3 inline-flex font-bold text-brand-emerald no-underline hover:text-brand-navy"
-              href={ROUTES.authSecurity}
-            >
-              View security notes
-            </Link>
+            <div className="mt-3 flex flex-col gap-2">
+              <Link
+                className="inline-flex font-bold text-brand-emerald no-underline hover:text-brand-navy"
+                href={ROUTES.forgotPassword}
+              >
+                Forgot password?
+              </Link>
+              <Link
+                className="inline-flex font-bold text-brand-emerald no-underline hover:text-brand-navy"
+                href={ROUTES.authSecurity}
+              >
+                View security notes
+              </Link>
+            </div>
           </SecurityNotice>
         </div>
       </div>
     </AuthShell>
   );
 }
-

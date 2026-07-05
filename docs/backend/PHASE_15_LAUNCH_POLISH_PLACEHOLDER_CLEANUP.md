@@ -10,7 +10,7 @@ No Supabase schema changes, migrations, payment gateway integration, email/SMS p
 
 Static launch flags live in `config/launch-flags.ts`.
 
-Current launch-disabled surfaces:
+Current launch flag state:
 
 - `enableMessages = false`
 - `enableBulkActions = false`
@@ -59,7 +59,7 @@ Visible fake controls were removed from:
 - Admin project list `Prepare Assignment Placeholder` button.
 - Admin project detail fake message/refund action panel.
 - Admin leads fake action buttons and lead action panel.
-- Importer wizard photo/voice method cards.
+- Importer wizard fake photo/voice selector buttons. Product photo/catalog/spec upload and voice note/audio upload are now working private project-file inputs.
 - Importer wizard backend/Supabase explanation text.
 - Public contact placeholder form.
 - Public FMS onboarding placeholder card.
@@ -89,7 +89,8 @@ The protected portal shell does not wrap document routes when `showPortalChromeO
 ## Manual QA Checklist
 
 - Public homepage, packages, contact, FMS entry, and SEO pages load without unfinished call-to-action controls.
-- Importer wizard shows product details and product link inputs, not photo/voice upload cards.
+- Importer wizard shows the current working submission methods: product details, product URL, product photos/screenshots/catalog/spec files, and voice note/audio upload.
+- Importer wizard uploads product files and voice notes as private importer project files for admin review.
 - Importer can submit paid-intent projects and save unpaid leads.
 - Admin project list shows filters and real `Review Project` links only.
 - Admin project detail keeps payment verification, admin review, FMS assignment, report release, feedback, evidence, and document controls.
@@ -107,5 +108,7 @@ The protected portal shell does not wrap document routes when `showPortalChromeO
 - Manual/offline payment verification remains the payment model; gateway payments are intentionally disabled.
 - Email delivery remains notification-record-only unless a provider is configured later.
 - Factory database admin is hidden from launch navigation because the operational factory-submission review workflow is the active path.
-- Phone/WhatsApp OTP remains disabled for launch; email/password importer testing is active.
+- Phone/WhatsApp OTP remains disabled for launch; production-visible importer
+  authentication uses email/password until SMS/WhatsApp provider setup is
+  complete.
 - Some historical config files still contain sample/static data for earlier prototype pages. Keep hidden/static surfaces out of primary launch navigation.
