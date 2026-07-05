@@ -2,6 +2,7 @@
 
 import { USER_ROLES, hasAllowedRole } from "@/lib/auth/roles";
 import { getProfileForAccessToken } from "@/lib/auth/session";
+import { fmsApplicationSource } from "@/config/fms-acquisition";
 import { ensureInvoiceForProject } from "@/lib/billing/invoice-helpers";
 import { createNotification } from "@/lib/notifications/create-notification";
 import { detectContactRiskInFields } from "@/lib/security/contact-firewall";
@@ -64,13 +65,16 @@ export type AdminLiveProjectListItem = {
 
 export type AdminLiveLeadListItem = {
   id: string;
+  adminReviewNote: string;
   leadCode: string;
+  leadTypeLabel: string;
   importerName: string;
   city: string;
   contactForAdminOnly: string;
   product: string;
   packageSelected: string;
   paymentIssue: string;
+  isFmsApplication: boolean;
   leadStatus: string;
   createdDate: string;
 };
@@ -2657,28 +2661,66 @@ export async function listAdminUnpaidLeadsAction(
     return {
       ok: true,
       data: leadRows.map((lead) => {
+        const metadata = toJsonObject(lead.metadata);
+        const isFmsApplication =
+          readString(metadata.source) === fmsApplicationSource ||
+          readString(metadata.intended_role) === USER_ROLES.fms;
         const importer = lead.importer_profile_id
           ? importerMap.get(lead.importer_profile_id)
           : null;
         const packageRow = lead.package_id
           ? packageMap.get(lead.package_id)
           : null;
+        const fmsLocation = [
+          readString(metadata.city),
+          readString(metadata.province),
+        ]
+          .filter(Boolean)
+          .join(", ");
+        const fmsContact = [
+          readString(metadata.wechat_id)
+            ? `WeChat: ${readString(metadata.wechat_id)}`
+            : "",
+          readString(metadata.email) ? `Email: ${readString(metadata.email)}` : "",
+          readString(metadata.phone) ? `Phone: ${readString(metadata.phone)}` : "",
+        ]
+          .filter(Boolean)
+          .join(" | ");
 
         return {
+          adminReviewNote: isFmsApplication
+            ? "Application lead only. Do not create FMS access until manual admin approval."
+            : "Unpaid importer lead. Not assignable to FMS until converted through a future workflow.",
           id: lead.id,
-          city: importer?.city ?? "Not provided",
-          contactForAdminOnly:
-            importer?.phone_whatsapp ??
-            "Hidden because active importer role was not found",
+          city: isFmsApplication
+            ? fmsLocation || "China location not provided"
+            : importer?.city ?? "Not provided",
+          contactForAdminOnly: isFmsApplication
+            ? fmsContact || "No contact channel provided"
+            : importer?.phone_whatsapp ??
+              "Hidden because active importer role was not found",
           createdDate: formatDate(lead.created_at),
-          importerName:
-            importer?.full_name ?? "Importer role inactive or profile pending",
+          importerName: isFmsApplication
+            ? readString(metadata.full_name, "FMS applicant")
+            : importer?.full_name ?? "Importer role inactive or profile pending",
+          isFmsApplication,
           leadCode: lead.lead_code,
           leadStatus: LEAD_STATUS_LABELS[lead.lead_status] ?? lead.lead_status,
-          packageSelected: packageRow?.name ?? "Package pending",
-          paymentIssue:
-            lead.payment_problem_reason ?? "Payment issue not provided",
-          product: lead.product_summary,
+          leadTypeLabel: isFmsApplication
+            ? "FMS application"
+            : "Unpaid importer lead",
+          packageSelected: isFmsApplication
+            ? "Manual FMS candidate review"
+            : packageRow?.name ?? "Package pending",
+          paymentIssue: isFmsApplication
+            ? readString(
+                metadata.sourcing_experience,
+                lead.payment_problem_reason ?? "Experience not provided",
+              )
+            : lead.payment_problem_reason ?? "Payment issue not provided",
+          product: isFmsApplication
+            ? readString(metadata.product_categories, lead.product_summary)
+            : lead.product_summary,
         };
       }),
     };

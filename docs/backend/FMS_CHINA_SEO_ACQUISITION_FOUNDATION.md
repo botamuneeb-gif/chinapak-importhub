@@ -1,0 +1,129 @@
+# FMS China SEO Acquisition Foundation
+
+## What Was Connected
+
+The public FMS area now has a Chinese-first acquisition funnel for China-based Factory Match Specialist candidates.
+
+Public routes added:
+
+- `/fms/apply`
+- `/fms/china-sourcing-jobs`
+- `/fms/factory-match-specialist`
+- `/fms/china-procurement-agent`
+- `/fms/china/guangzhou`
+- `/fms/china/shenzhen`
+- `/fms/china/yiwu`
+- `/fms/china/foshan`
+- `/fms/china/ningbo`
+- `/fms/china/shanghai`
+- `/fms/china/qingdao`
+- `/fms/china/xiamen`
+- `/fms/categories/electronics-sourcing`
+- `/fms/categories/textile-garment-sourcing`
+- `/fms/categories/home-goods-sourcing`
+- `/fms/categories/machinery-sourcing`
+- `/fms/categories/beauty-packaging-sourcing`
+- `/fms/categories/auto-parts-sourcing`
+- `/fms/categories/toys-gifts-sourcing`
+
+The `/fms` page is now the public acquisition hub. It remains separate from protected FMS portal routes such as `/fms/dashboard` and `/fms/assignments`.
+
+## Chinese Keyword Map
+
+The FMS pages use the following keyword themes naturally in Simplified Chinese copy:
+
+- 工厂对接专员
+- 中国采购代理兼职
+- 外贸采购兼职
+- 巴基斯坦买家对接
+- 中国工厂报价收集
+- 供应商资料收集兼职
+- 工厂验厂协助
+- 1688 采购协助
+- 阿里巴巴供应商对接
+- 中国供应链专员
+- 跨境贸易助理
+- 外贸自由职业
+
+## Application Lead Behavior
+
+`/fms/apply` is an application/interest form only.
+
+It does not:
+
+- create a Supabase auth user
+- create an FMS profile
+- assign the `fms` role
+- approve a candidate
+- enable public FMS signup
+
+Submissions are saved in `unpaid_leads` with metadata:
+
+- `source: public_fms_application`
+- `intended_role: fms`
+- `account_creation: not_created`
+- `admin_review_required: true`
+
+Admin can review these records in `/admin/leads`, where they are labeled as FMS applications.
+
+## Admin Review Behavior
+
+FMS application leads remain admin-review records until a real admin/super-admin manually creates or repairs:
+
+- `user_profiles`
+- active `role_assignments` role `fms`
+- active/approved `fms_profiles`
+
+The application lead itself is never assignable to FMS work.
+
+## Sitemap And Robots Behavior
+
+The public FMS acquisition routes are included in `publicSitemapRoutes`, so `/sitemap.xml` can expose them for indexing.
+
+`robots.ts` continues to disallow protected FMS portal paths:
+
+- `/fms/dashboard`
+- `/fms/assignments`
+- `/fms/messages`
+- `/fms/notifications`
+- `/fms/earnings`
+- `/fms/academy`
+
+Public FMS pages such as `/fms`, `/fms/apply`, city pages, category pages, and core acquisition pages remain indexable.
+
+## Hidden Features Kept Disabled
+
+The following remain disabled or admin-controlled:
+
+- public FMS account signup
+- automatic FMS approval
+- direct importer-FMS messaging
+- payment gateway
+- factory contact release
+- importer contact visibility to FMS
+- public factory signup
+
+## Future China Channels
+
+Future off-site acquisition work can include:
+
+- Baidu Webmaster setup
+- WeChat Official Account articles
+- Zhihu educational posts
+- Xiaohongshu/RedNote posts
+- Bilibili sourcing education videos
+- Douyin short videos
+- WeChat QR/contact routing after official account setup
+
+## Manual QA Checklist
+
+- `/fms` loads as a Chinese-first public FMS acquisition page.
+- `/fms/apply` submits an admin-review lead only.
+- No auth user, FMS role, or FMS profile is created from the public form.
+- `/admin/leads` clearly labels public FMS applications.
+- Public FMS SEO pages load without login.
+- Protected FMS portal pages remain protected/noindex.
+- Sitemap includes public FMS SEO pages.
+- Robots does not expose protected routes.
+- Public FMS signup remains disabled.
+- No direct messaging or gateway payment is enabled.

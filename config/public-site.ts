@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ROUTES, brand } from "@/config/brand";
+import { fmsPublicSitemapRoutes } from "@/config/fms-acquisition";
 import { getSiteUrl } from "@/config/site-url";
 
 export type PublicFaqItem = {
@@ -785,7 +786,7 @@ export const publicSitemapRoutes = [
   ...Object.values(publicSeoPages).map((page) => page.canonicalPath),
   ROUTES.verify,
   ROUTES.verifyRepresentative,
-  ROUTES.fms,
+  ...fmsPublicSitemapRoutes,
   ROUTES.fmsOpportunities,
   ROUTES.fmsOpportunityChinaSourcingJobs,
   ROUTES.fmsOpportunityPakistaniImporters,

@@ -28,6 +28,18 @@ The public site now has a shared SEO content configuration and reusable page ren
 - `/china-factory-agent-for-pakistan`
 - `/china-sourcing-service-pakistan`
 
+The FMS acquisition SEO layer now adds Chinese-first public pages for China-based Factory Match Specialist candidates:
+
+- `/fms`
+- `/fms/apply`
+- `/fms/china-sourcing-jobs`
+- `/fms/factory-match-specialist`
+- `/fms/china-procurement-agent`
+- `/fms/china/*`
+- `/fms/categories/*`
+
+`/fms/apply` creates an admin-review lead only. It does not create an FMS auth account, role assignment, or FMS profile.
+
 The homepage was expanded with conversion-focused sections:
 
 - Trust gates and platform rules

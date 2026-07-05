@@ -11,12 +11,13 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 const columns = [
   "Lead ID",
-  "Importer Name",
+  "Lead Type",
+  "Name",
   "City",
   "Contact For Admin Only",
-  "Product",
-  "Package Selected",
-  "Reason Payment Was Not Completed",
+  "Product / Categories",
+  "Package / Review Track",
+  "Reason / Experience Notes",
   "Created Date",
   "Lead Status",
 ];
@@ -111,6 +112,17 @@ export function LiveAdminLeadsTable() {
               <td className="whitespace-nowrap px-4 py-4 font-bold text-brand-navy">
                 {lead.leadCode}
               </td>
+              <td className="whitespace-nowrap px-4 py-4">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${
+                    lead.isFmsApplication
+                      ? "bg-emerald-50 text-brand-emerald"
+                      : "bg-amber-50 text-amber-700"
+                  }`}
+                >
+                  {lead.leadTypeLabel}
+                </span>
+              </td>
               <td className="whitespace-nowrap px-4 py-4 text-brand-text">
                 {lead.importerName}
               </td>
@@ -135,7 +147,12 @@ export function LiveAdminLeadsTable() {
               <td className="px-4 py-4">
                 <AdminStatusBadge status={lead.leadStatus} />
                 <span className="mt-2 block rounded-lg border border-brand-gold bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700">
-                  Unpaid lead - not assignable to FMS
+                  {lead.isFmsApplication
+                    ? "Application only - not an FMS account"
+                    : "Unpaid lead - not assignable to FMS"}
+                </span>
+                <span className="mt-2 block text-xs leading-5 text-brand-muted">
+                  {lead.adminReviewNote}
                 </span>
               </td>
             </tr>

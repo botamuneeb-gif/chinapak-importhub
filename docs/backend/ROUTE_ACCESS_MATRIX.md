@@ -15,8 +15,11 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/how-it-works`, `/about`, `/faq`, `/trust-safety`, `/refund-policy`, `/privacy-policy`, `/terms` | Public | SEO/policy pages. Legal pages still require production legal review. |
 | Public SEO landing pages such as `/import-from-china-to-pakistan`, `/find-chinese-factories`, `/china-sourcing-service-pakistan` | Public | Generated through the public SEO route config. |
 | `/learn/*` | Public | Existing content hub routes. |
-| `/fms` | Public | FMS public entry page only. |
-| `/fms/opportunities/*` | Public | FMS recruitment SEO pages. |
+| `/fms` | Public | Chinese-first FMS acquisition hub. Public FMS signup remains disabled. |
+| `/fms/apply` | Public | FMS application/interest form only. Creates an admin-review lead; does not create auth user, role assignment, or FMS profile. |
+| `/fms/china-sourcing-jobs`, `/fms/factory-match-specialist`, `/fms/china-procurement-agent` | Public | Chinese FMS acquisition SEO pages. |
+| `/fms/china/*`, `/fms/categories/*` | Public | City/category FMS acquisition SEO pages. |
+| `/fms/opportunities/*` | Public | Existing FMS recruitment SEO pages retained for compatibility. |
 | `/factories/export-to-pakistan`, `/factories/find-pakistani-buyers`, `/factories/partnership` | Public | Factory opportunity pages remain future/invitation-only; no public factory signup activation. |
 
 ## Authentication Entry
