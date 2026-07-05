@@ -8,8 +8,10 @@ refunds, and factory review behavior remain placeholder UI.
 
 - Supabase email/password login for importers, admin, super admin, FMS, and
   agent entry pages.
-- Public importer signup that creates:
-  - Supabase Auth user
+- Public importer signup that creates a Supabase Auth user through the standard
+  email confirmation flow. Importer profile rows are created only after the
+  verified user logs in.
+- Verified-importer login provisioning that creates:
   - `user_profiles` row
   - active importer `role_assignments` row
   - `importer_profiles` row
@@ -52,19 +54,24 @@ inside trusted server actions for importer profile creation and role checks.
 
 ## Importer Signup And Login
 
-The importer signup form uses a server action to create the Auth user and
-profile rows. After successful creation, the browser signs in with
-email/password so the protected importer dashboard can verify the session.
+The importer signup form uses a server action to call Supabase public `signUp`
+with importer-only metadata. Supabase sends the confirmation email, and the user
+sees a "check your email" success state. The app does not auto-confirm the email
+and does not redirect directly to the importer dashboard.
+
+On first verified importer login, a server action checks the Supabase Auth user,
+confirmed email status, and importer signup metadata. If the account is verified
+and intended for public importer signup, it creates the base profile, importer
+role assignment, and importer profile. If the email is not verified, no profile
+rows are created.
 
 Public importer login is email/password for MVP launch. Phone/WhatsApp OTP is
 kept as a noindex informational route only and is not active until provider
 setup, rate limits, and templates are configured.
 
-Current signup still uses the controlled server-side Supabase Admin Auth
-creation path with `email_confirm: true` so importer accounts can use the MVP
-immediately. Before production SMTP is finalized, review
-`PRODUCTION_EMAIL_AUTHENTICATION_CHECKLIST.md` and decide whether to switch
-public importer signup to confirmed-email access.
+Public importer signup must not use `email_confirm: true` in production. Review
+`PRODUCTION_EMAIL_AUTHENTICATION_CHECKLIST.md` before launch to confirm Supabase
+SMTP, Site URL, and redirect URLs are configured.
 
 ## Staff, FMS, And Agent Login
 
@@ -119,9 +126,13 @@ Importer:
 2. Open `/signup`.
 3. Create an importer account with full name, email, password, phone, city, and
    business type.
-4. Confirm redirect to `/importer/dashboard`.
-5. Sign out, then test `/login` with the same email/password.
-6. Test `/forgot-password` and `/reset-password` after Supabase SMTP and redirect
+4. Confirm the signup success state asks the user to check email.
+5. Try `/login` before confirmation and confirm access is denied with a clear
+   verification message.
+6. Confirm the email from Supabase, then log in.
+7. Confirm first verified login creates `user_profiles`, active importer
+   `role_assignments`, and `importer_profiles`.
+8. Test `/forgot-password` and `/reset-password` after Supabase SMTP and redirect
    URLs are configured.
 
 Admin / Super Admin:

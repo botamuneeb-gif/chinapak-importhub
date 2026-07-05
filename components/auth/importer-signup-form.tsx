@@ -1,21 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import {
-  resolveAuthRedirectAction,
-  signupImporterAction,
-} from "@/app/auth/actions";
+import { signupImporterAction } from "@/app/auth/actions";
 import { AuthActionButton } from "@/components/auth/auth-action-button";
 import { AuthErrorMessage } from "@/components/auth/auth-error-message";
 import { AuthInput } from "@/components/auth/auth-input";
 import { AuthModeNotice } from "@/components/auth/auth-mode-notice";
 import { businessTypes } from "@/config/auth-roles";
-import { USER_ROLES } from "@/lib/auth/roles";
-import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 export function ImporterSignupForm() {
-  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,11 +16,13 @@ export function ImporterSignupForm() {
   const [city, setCity] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isPending, startTransition] = useTransition();
 
   function handleSignup(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     startTransition(async () => {
       const result = await signupImporterAction({
@@ -44,40 +39,8 @@ export function ImporterSignupForm() {
         return;
       }
 
-      try {
-        const supabase = createBrowserSupabaseClient();
-        const { data, error: signInError } =
-          await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-
-        if (signInError || !data.session?.access_token) {
-          setError(
-            "Account was created, but automatic login failed. Please use the login page with the same email and password.",
-          );
-          return;
-        }
-
-        const roleResult = await resolveAuthRedirectAction(
-          data.session.access_token,
-          [USER_ROLES.importer],
-        );
-
-        if (!roleResult.ok) {
-          await supabase.auth.signOut();
-          setError(roleResult.message);
-          return;
-        }
-
-        router.push(roleResult.redirectTo);
-      } catch (signInError) {
-        setError(
-          signInError instanceof Error
-            ? signInError.message
-            : "Account was created, but automatic login is not configured yet.",
-        );
-      }
+      setSuccessMessage(result.message);
+      setPassword("");
     });
   }
 
@@ -160,8 +123,14 @@ export function ImporterSignupForm() {
         </select>
       </div>
       <AuthErrorMessage message={error} />
+      {successMessage ? (
+        <div className="rounded-lg border border-brand-emerald bg-emerald-50 p-4 text-sm leading-7 text-brand-navy">
+          {successMessage} After verification, you can log in and start your
+          Import Project.
+        </div>
+      ) : null}
       <AuthActionButton disabled={isPending} type="submit">
-        {isPending ? "Creating account..." : "Create importer account"}
+        {isPending ? "Creating account..." : "Create account and verify email"}
       </AuthActionButton>
     </form>
   );

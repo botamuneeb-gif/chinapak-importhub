@@ -1,5 +1,6 @@
 "use server";
 
+import { getSiteUrl } from "@/config/site-url";
 import { getDefaultRedirectForRoles } from "@/lib/auth/redirects";
 import { ensureActiveRoleAssignment } from "@/lib/auth/role-assignments";
 import {
@@ -9,12 +10,23 @@ import {
 } from "@/lib/auth/roles";
 import { getProfileForAccessToken } from "@/lib/auth/session";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export type AuthActionResult =
   | {
       ok: true;
       redirectTo: string;
       message?: string;
+    }
+  | {
+      ok: false;
+      message: string;
+    };
+
+export type AuthSimpleActionResult =
+  | {
+      ok: true;
+      message: string;
     }
   | {
       ok: false;
@@ -73,7 +85,7 @@ function getPublicRoleLabel(role: UserRole | null, roleCount: number) {
 
 export async function signupImporterAction(
   input: ImporterSignupInput,
-): Promise<AuthActionResult> {
+): Promise<AuthSimpleActionResult> {
   const fullName = cleanText(input.fullName);
   const email = cleanText(input.email).toLowerCase();
   const password = input.password;
@@ -93,24 +105,26 @@ export async function signupImporterAction(
   }
 
   try {
-    const supabase = createAdminSupabaseClient();
-    const { data: authData, error: authError } =
-      await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: {
+    const supabase = createServerSupabaseClient();
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${getSiteUrl()}/login?verified=1`,
+        data: {
           display_name: fullName,
           full_name: fullName,
           name: fullName,
           phone_whatsapp: phoneWhatsapp || null,
           city,
           business_type: businessType,
-          signup_source: "public_importer_email_signup",
+          intended_role: PUBLIC_SIGNUP_ROLE,
+          signup_source: "public_importer_email_verification",
         },
-      });
+      },
+    });
 
-    if (authError || !authData.user) {
+    if (authError) {
       return {
         ok: false,
         message:
@@ -119,40 +133,155 @@ export async function signupImporterAction(
       };
     }
 
-    const authUserId = authData.user.id;
-    const { data: profile, error: profileError } = await supabase
+    return {
+      ok: true,
+      message:
+        "Account created. Please check your email inbox and verify your email before logging in.",
+    };
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Supabase is not configured for importer signup yet.";
+
+    return { ok: false, message };
+  }
+}
+
+function getStringMetadataValue(
+  metadata: Record<string, unknown>,
+  key: string,
+) {
+  const value = metadata[key];
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function isEmailVerified(user: {
+  confirmed_at?: string | null;
+  email_confirmed_at?: string | null;
+}) {
+  return Boolean(user.email_confirmed_at || user.confirmed_at);
+}
+
+export async function prepareVerifiedImporterProfileAction(
+  accessToken: string,
+): Promise<AuthSimpleActionResult> {
+  if (!accessToken) {
+    return { ok: false, message: "No active Supabase session was found." };
+  }
+
+  try {
+    const serverSupabase = createServerSupabaseClient();
+    const {
+      data: { user },
+      error: userError,
+    } = await serverSupabase.auth.getUser(accessToken);
+
+    if (userError || !user) {
+      return { ok: false, message: "Your session could not be verified." };
+    }
+
+    const adminSupabase = createAdminSupabaseClient();
+    const { data: profile, error: profileError } = await adminSupabase
       .from("user_profiles")
-      .upsert(
-        {
-          auth_user_id: authUserId,
+      .select("id, status")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      return {
+        ok: false,
+        message: "Your ChinaPak profile could not be checked.",
+      };
+    }
+
+    if (profile && profile.status !== "active") {
+      return {
+        ok: false,
+        message:
+          "This ChinaPak ImportHub profile is not active. Please contact admin support.",
+      };
+    }
+
+    if (profile) {
+      return {
+        ok: true,
+        message: "Importer profile is ready.",
+      };
+    }
+
+    if (!isEmailVerified(user)) {
+      return {
+        ok: false,
+        message: "Please verify your email inbox before logging in.",
+      };
+    }
+
+    const metadata = user.user_metadata ?? {};
+    const intendedRole = getStringMetadataValue(metadata, "intended_role");
+    const signupSource = getStringMetadataValue(metadata, "signup_source");
+
+    if (
+      intendedRole !== PUBLIC_SIGNUP_ROLE ||
+      signupSource !== "public_importer_email_verification"
+    ) {
+      return {
+        ok: false,
+        message:
+          "This account is missing importer signup verification metadata. Please contact ChinaPak ImportHub support.",
+      };
+    }
+
+    const fullName =
+      getStringMetadataValue(metadata, "full_name") ||
+      getStringMetadataValue(metadata, "display_name") ||
+      user.email ||
+      "Importer";
+    const phoneWhatsapp = getStringMetadataValue(metadata, "phone_whatsapp");
+    const city = getStringMetadataValue(metadata, "city");
+    const businessType = getStringMetadataValue(metadata, "business_type");
+
+    if (!city || !businessType) {
+      return {
+        ok: false,
+        message:
+          "This importer signup is missing required profile details. Please contact ChinaPak ImportHub support.",
+      };
+    }
+
+    const { data: createdProfile, error: createProfileError } =
+      await adminSupabase
+        .from("user_profiles")
+        .insert({
+          auth_user_id: user.id,
           display_name: fullName,
           primary_role: PUBLIC_SIGNUP_ROLE,
           preferred_language: "ur",
           status: "active",
           metadata: {
-            signup_source: "public_importer_email_signup",
+            email_verified_profile_created: true,
+            signup_source: "public_importer_email_verification",
           },
-        },
-        { onConflict: "auth_user_id" },
-      )
-      .select("id")
-      .single();
+        })
+        .select("id")
+        .single();
 
-    if (profileError || !profile) {
+    if (createProfileError || !createdProfile) {
       return {
         ok: false,
         message:
-          "Auth user was created, but the importer profile could not be saved. Please contact admin support before trying again.",
+          "Your email was verified, but the importer profile could not be created. Please contact admin support.",
       };
     }
 
     const roleResult = await ensureActiveRoleAssignment({
       metadata: {
-        auth_user_id: authUserId,
+        auth_user_id: user.id,
+        email_verified_profile_created: true,
       },
       role: PUBLIC_SIGNUP_ROLE,
-      source: "public_importer_signup",
-      userProfileId: profile.id,
+      source: "public_importer_verified_login",
+      userProfileId: createdProfile.id,
     });
 
     if (!roleResult.ok) {
@@ -163,18 +292,20 @@ export async function signupImporterAction(
       };
     }
 
-    const { error: importerError } = await supabase
+    const { error: importerError } = await adminSupabase
       .from("importer_profiles")
       .upsert(
         {
-          user_profile_id: profile.id,
+          user_profile_id: createdProfile.id,
           full_name: fullName,
           phone_whatsapp: phoneWhatsapp || null,
           city,
           business_type: businessType,
           verification_status: "unverified",
           metadata: {
+            email_verified_profile_created: true,
             phone_otp_status: "future_sms_setup",
+            signup_source: "public_importer_email_verification",
           },
         },
         { onConflict: "user_profile_id" },
@@ -190,14 +321,13 @@ export async function signupImporterAction(
 
     return {
       ok: true,
-      redirectTo: "/importer/dashboard",
-      message: "Importer account created.",
+      message: "Importer profile is ready.",
     };
   } catch (error) {
     const message =
       error instanceof Error
         ? error.message
-        : "Supabase is not configured for importer signup yet.";
+        : "Importer profile could not be prepared.";
 
     return { ok: false, message };
   }

@@ -17,9 +17,14 @@ templates are fully configured.
 3. Add Redirect URLs:
    - `https://chinapakimporthub.com/**`
    - `https://www.chinapakimporthub.com/**`
+   - `https://chinapakimporthub.com/login`
+   - `https://www.chinapakimporthub.com/login`
+   - `https://chinapakimporthub.com/reset-password`
+   - `https://www.chinapakimporthub.com/reset-password`
    - Vercel preview URL patterns used for staging tests.
 4. Confirm email/password provider is enabled.
-5. Confirm phone provider is not enabled for production launch unless a real
+5. Enable email confirmations for public signup.
+6. Confirm phone provider is not enabled for production launch unless a real
    SMS/WhatsApp provider is configured and tested.
 
 ## Custom SMTP
@@ -29,16 +34,18 @@ templates are fully configured.
 3. Use a verified sender domain for `chinapakimporthub.com`.
 4. Test deliverability for:
    - Password reset email
-   - Signup confirmation email, if enabled later
+   - Signup confirmation email
    - Email change confirmation, if enabled later
-5. Do not store SMTP credentials in source code, docs, screenshots, or logs.
+5. Without custom SMTP, verification and password reset emails may not be
+   reliable enough for production importer onboarding.
+6. Do not store SMTP credentials in source code, docs, screenshots, or logs.
 
 ## Email Templates
 
 Review Supabase Auth email templates before launch:
 
 - Password reset
-- Confirm signup, if public signup is switched to confirmed-email access
+- Confirm signup
 - Magic link, if ever enabled
 - Email change confirmation
 
@@ -73,28 +80,47 @@ Manual test:
    - fms -> `/fms/dashboard`
    - agent -> `/agent/dashboard`
 
-## Signup Confirmation Readiness
+## Public Importer Signup Verification
 
-Current public importer signup still uses the controlled server-side Supabase
-Admin Auth creation path with `email_confirm: true`. This was retained to avoid
-changing launch access semantics before SMTP is configured.
+Public importer signup must use the Supabase public signup confirmation flow.
+Do not use `email_confirm: true` for public importer signup in production.
 
-Before stricter production rollout, choose one:
+Current behavior:
 
-1. Keep immediate importer access:
-   - Continue using the controlled Admin Auth creation path.
-   - Accept that email ownership is not confirmed at signup.
-   - Monitor abuse and support load closely.
-2. Switch to confirmed-email importer signup:
-   - Enable production SMTP.
-   - Use Supabase signup confirmation emails.
-   - Adjust importer profile creation to wait for confirmed Auth users or use a
-     secure pending-profile workflow.
-   - Retest signup, login, role assignment, project submission, and password
-     reset.
+1. `/signup` calls Supabase `signUp` with importer-only metadata.
+2. Supabase sends a confirmation email.
+3. The importer sees: "Please check your email inbox and verify your email
+   before logging in."
+4. No `user_profiles`, `role_assignments`, or `importer_profiles` rows are
+   created before email verification.
+5. On first verified importer login, the server checks the Supabase Auth user,
+   confirmed email state, and importer metadata, then creates:
+   - `user_profiles`
+   - active importer `role_assignments`
+   - `importer_profiles`
+
+If the Auth user is not email-confirmed, the importer sees: "Please verify your
+email inbox before logging in."
+
+If importer metadata is missing, the app shows a safe support message instead
+of granting access.
 
 Admin, super admin, FMS, and agent accounts must remain manually created or
 admin-controlled. Do not create public signup for privileged roles.
+
+## Resend Verification Email
+
+The importer login form includes a "Resend verification email" action.
+
+Manual test:
+
+1. Enter the importer email on `/login`.
+2. Click "Resend verification email."
+3. Confirm the success message is generic and does not reveal whether an account
+   exists.
+4. Open the confirmation email.
+5. Confirm the link returns to `/login`.
+6. Log in after confirmation and verify importer profile/role rows are created.
 
 ## Vercel Environment Variables
 
@@ -130,6 +156,9 @@ Before launch:
 ## Acceptance Checklist
 
 - Importer email/password login works.
+- Public importer signup sends confirmation email and does not auto-confirm.
+- Unverified importer cannot access `/importer/dashboard`.
+- Verified importer first login creates importer profile and active importer role.
 - Admin email/password login works.
 - FMS email/password login works.
 - Super admin email/password login works.
