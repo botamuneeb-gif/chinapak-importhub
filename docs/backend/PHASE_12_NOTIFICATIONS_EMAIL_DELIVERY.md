@@ -98,17 +98,24 @@ Templates must not include raw FMS notes, factory contact details, importer cont
 
 ## FMS Application Decision Emails
 
-Super Admin FMS application decisions use the email foundation for candidate-facing updates:
+FMS application communication uses the email foundation for candidate-facing updates:
 
+- Submission confirmation email: `Your ChinaPak ImportHub FMS application was received`
+- Admin more-info email: `More information needed for your ChinaPak ImportHub FMS application`
+- Admin final-review update email: `Your FMS application is under final review`
 - Approval email: `Your ChinaPak ImportHub FMS application has been approved`
 - Decline email: `Update on your ChinaPak ImportHub FMS application`
-- More-info email: `More information needed for your ChinaPak ImportHub FMS application`
+- Super Admin more-info email: `More information needed for your ChinaPak ImportHub FMS application`
 
-These emails are separate from the Supabase invite email. The Supabase invite/password setup email handles secure account activation when approval can create or link an FMS account. The decision email explains the decision, next steps, and platform boundaries.
+These emails are separate from the Supabase invite email. The Supabase invite/password setup email handles secure account activation when approval can create or link an FMS account. Operational application emails explain submission receipt, candidate information requests, forwarding to final review, decisions, next steps, and platform boundaries.
 
-Decision emails use a separate applicant-facing message field. Internal Super Admin notes are stored for admin/audit context and are never sent to the candidate.
+Admin and Super Admin application actions use separate applicant-facing message fields. Internal Admin/Super Admin notes are stored for admin/audit context and are never sent to the candidate.
 
-If `EMAIL_DELIVERY_MODE=disabled`, the decision is still saved, an email notification/delivery-log record is written with skipped status, and Super Admin sees a warning to contact the candidate manually.
+More-information emails for existing FMS applications include a secure `/fms/application-update/[token]` link instead of plain `/fms/apply`. The token is generated server-side, only a SHA-256 hash and expiry are stored in `unpaid_leads.metadata`, and successful updates modify the existing lead instead of creating a duplicate application. Invalid or expired links show a safe generic error.
+
+Approval emails do not present `/fms/login` as a signup link. They explain secure invitation-only access, point to `/auth/invite` for invitation/code setup help, tell approved candidates to check the separate Supabase invite/password setup email when one is sent, and describe `/fms/login` only as the portal login route after activation.
+
+If `EMAIL_DELIVERY_MODE=disabled`, the workflow action is still saved, an email notification/delivery-log record is written with skipped status, and Admin/Super Admin sees a warning to contact the candidate manually. Public `/fms/apply` does not show technical email-disabled copy to candidates.
 
 ## Workflow Hooks
 
@@ -133,7 +140,7 @@ Notifications are created after successful workflow actions:
 - evidence released to importer
 - super-admin password reset
 - super-admin role/user-management security events
-- Super Admin FMS application approve/decline/more-info decision emails
+- FMS application submission confirmation, Admin more-info/forward updates, and Super Admin approve/decline/more-info decision emails
 
 Notification writes are server-only and should not expose service-role credentials to client components.
 

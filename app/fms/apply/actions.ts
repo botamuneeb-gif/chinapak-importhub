@@ -4,6 +4,7 @@ import { ROUTES } from "@/config/brand";
 import { fmsApplicationSource } from "@/config/fms-acquisition";
 import { USER_ROLES } from "@/lib/auth/roles";
 import { createNotification } from "@/lib/notifications/create-notification";
+import { sendFmsApplicationConfirmationEmail } from "@/lib/notifications/fms-application-emails";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/types";
 
@@ -159,7 +160,7 @@ export async function submitFmsApplicationLeadAction(
       if (lead) {
         await createNotification(
           {
-            actionUrl: "/admin/leads",
+            actionUrl: `/admin/leads?lead=${lead.id}&filter=fms`,
             metadata: {
               lead_id: lead.id,
               source: fmsApplicationSource,
@@ -173,6 +174,14 @@ export async function submitFmsApplicationLeadAction(
           },
           supabase,
         );
+
+        await sendFmsApplicationConfirmationEmail({
+          candidateEmail: email,
+          candidateName: fullName,
+          leadCode: lead.lead_code,
+          leadId: lead.id,
+          supabase,
+        });
 
         return {
           leadCode: lead.lead_code,

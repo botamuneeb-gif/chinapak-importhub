@@ -37,7 +37,7 @@ const filters: Array<{ id: LeadFilter; label: string }> = [
 
 const fmsActions: Array<{ action: LeadWorkflowAction; label: string }> = [
   { action: "fms_in_review", label: "Mark In Review" },
-  { action: "fms_pending_more_info", label: "Pending More Info" },
+  { action: "fms_pending_more_info", label: "Request Candidate Info" },
   { action: "fms_forward_super_admin", label: "Forward to Super Admin" },
   { action: "fms_decline_admin", label: "Decline Screening" },
 ];
@@ -169,6 +169,7 @@ export function LiveAdminLeadsTable() {
   const [activeFilter, setActiveFilter] = useState<LeadFilter>("all");
   const [query, setQuery] = useState("");
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [candidateMessages, setCandidateMessages] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<FeedbackState>({});
   const [busyLeadId, setBusyLeadId] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -182,6 +183,20 @@ export function LiveAdminLeadsTable() {
     }
 
     setLeads(result.data);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const filterParam = params.get("filter");
+    const leadParam = params.get("lead");
+
+    if (filterParam === "fms") {
+      setActiveFilter("fms");
+    }
+
+    if (leadParam) {
+      setQuery(leadParam);
+    }
   }, []);
 
   useEffect(() => {
@@ -247,6 +262,7 @@ export function LiveAdminLeadsTable() {
         const accessToken = await getAccessToken();
         const result = await updateLeadWorkflowAction(accessToken, {
           action,
+          applicantMessage: candidateMessages[lead.id] ?? "",
           leadId: lead.id,
           note: notes[lead.id] ?? "",
         });
@@ -477,10 +493,30 @@ export function LiveAdminLeadsTable() {
                             [lead.id]: event.target.value,
                           }))
                         }
-                        placeholder="Optional note for this action"
+                        placeholder="Optional internal note for this action. This is not emailed to the candidate."
                         value={notes[lead.id] ?? ""}
                       />
                     </label>
+                    {lead.isFmsApplication && showFmsScreeningActions ? (
+                      <label className="block space-y-2 text-sm font-semibold text-brand-navy">
+                        Message to candidate
+                        <textarea
+                          className="min-h-28 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal text-brand-text focus:border-brand-emerald focus:outline-none"
+                          onChange={(event) =>
+                            setCandidateMessages((current) => ({
+                              ...current,
+                              [lead.id]: event.target.value,
+                            }))
+                          }
+                          placeholder="Please provide more details about your sourcing experience, product categories, city/province coverage, WeChat ID, and any sample quotation or supplier report."
+                          value={candidateMessages[lead.id] ?? ""}
+                        />
+                        <span className="block text-xs font-normal leading-5 text-brand-muted">
+                          Required for Request Candidate Info. Optional for forwarding
+                          a final-review update. Internal notes are never emailed.
+                        </span>
+                      </label>
+                    ) : null}
                     <div className="grid gap-2">
                       {lead.isFmsApplication && fmsReadOnlyMessage ? (
                         <p className="rounded-lg border border-slate-200 bg-white p-3 text-xs font-semibold leading-5 text-brand-muted">

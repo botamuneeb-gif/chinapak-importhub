@@ -1,18 +1,22 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { ROUTES, brand } from "@/config/brand";
+import { ROUTES } from "@/config/brand";
 import { fmsApplicationSource } from "@/config/fms-acquisition";
 import { getSiteUrl } from "@/config/site-url";
 import { ensureActiveRoleAssignment } from "@/lib/auth/role-assignments";
 import { USER_ROLES, hasAllowedRole } from "@/lib/auth/roles";
 import { getProfileForAccessToken } from "@/lib/auth/session";
 import { ensureInvoiceForProject } from "@/lib/billing/invoice-helpers";
+import { createFmsApplicationUpdateToken } from "@/lib/fms/application-update-tokens";
+import {
+  sendFmsApplicationAdminMoreInfoEmail,
+  sendFmsApplicationDecisionEmail,
+  sendFmsApplicationForwardedEmail,
+} from "@/lib/notifications/fms-application-emails";
 import { createNotification, createNotifications } from "@/lib/notifications/create-notification";
-import { deliverEmail } from "@/lib/notifications/email-provider";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import type { Database, Json } from "@/lib/supabase/types";
-import type { EmailTemplatePayload } from "@/lib/notifications/types";
 
 type LeadRow = Database["public"]["Tables"]["unpaid_leads"]["Row"];
 type JsonObject = { [key: string]: Json | undefined };
@@ -80,6 +84,7 @@ export type LeadWorkflowAction =
   | "archive";
 
 export type UpdateLeadWorkflowInput = {
+  applicantMessage?: string;
   action: LeadWorkflowAction;
   leadId: string;
   note?: string;
@@ -188,6 +193,10 @@ function generateReadableCode(prefix: "CPH" | "FMS") {
   const randomPart = Math.floor(10 + Math.random() * 90);
 
   return `${prefix}-${year}-${timestampPart}${randomPart}`;
+}
+
+function buildFmsApplicationUpdateUrl(token: string) {
+  return `${getSiteUrl()}${ROUTES.fmsApplicationUpdate}/${token}`;
 }
 
 function isFmsApplication(
@@ -355,287 +364,6 @@ function buildFmsContact(metadata: JsonObject) {
   ]
     .filter(Boolean)
     .join(" | ");
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function absoluteSiteUrl(path: string) {
-  return `${getSiteUrl()}${path}`;
-}
-
-function formatEmailParagraphs(paragraphs: string[]) {
-  return paragraphs
-    .filter((paragraph) => paragraph.trim())
-    .map(
-      (paragraph) =>
-        `<p style="margin:0 0 14px;line-height:1.7">${escapeHtml(paragraph)}</p>`,
-    )
-    .join("");
-}
-
-function formatEmailList(items: string[]) {
-  return `<ul style="margin:0 0 16px 20px;padding:0;line-height:1.7">${items
-    .map((item) => `<li>${escapeHtml(item)}</li>`)
-    .join("")}</ul>`;
-}
-
-function buildFmsDecisionEmailTemplate({
-  applicantMessage,
-  decision,
-  leadCode,
-  name,
-}: {
-  applicantMessage: string;
-  decision: SuperAdminFmsDecision;
-  leadCode: string;
-  name: string;
-}): EmailTemplatePayload {
-  const greetingName = name || "FMS applicant";
-  const fmsLoginUrl = absoluteSiteUrl(ROUTES.fmsLogin);
-  const fmsAcademyUrl = absoluteSiteUrl(ROUTES.fmsAcademy);
-  const fmsApplyUrl = absoluteSiteUrl(ROUTES.fmsApply);
-  const contactUrl = absoluteSiteUrl(ROUTES.contact);
-  const subject =
-    decision === "approve"
-      ? "Your ChinaPak ImportHub FMS application has been approved"
-      : decision === "decline"
-        ? "Update on your ChinaPak ImportHub FMS application"
-        : "More information needed for your ChinaPak ImportHub FMS application";
-
-  const decisionParagraphs =
-    decision === "approve"
-      ? [
-          `Hello ${greetingName},`,
-          `Your Factory Match Specialist application ${leadCode} has been approved by ChinaPak ImportHub.`,
-          applicantMessage ||
-            "Welcome to ChinaPak ImportHub. Please complete your secure account setup using the invite link sent to your inbox.",
-          "Use the secure invite/password setup email to activate your FMS account. Public FMS signup is not enabled; your access is created through secure invite-based onboarding only.",
-          "After setup, use the FMS portal to review assignments and submit factory options/evidence for admin review.",
-        ]
-      : decision === "decline"
-        ? [
-            `Hello ${greetingName},`,
-            `Thank you for applying to become a Factory Match Specialist with ChinaPak ImportHub. We are unable to approve your FMS application ${leadCode} at this time.`,
-            applicantMessage,
-            "You may reapply after updating your experience details and providing stronger sourcing/factory information.",
-          ]
-        : [
-            `Hello ${greetingName},`,
-            `Your FMS application ${leadCode} is still under review. We need more information before a final decision can be made.`,
-            applicantMessage,
-            "If there is no update form available yet, please submit a new application with the additional information requested.",
-          ];
-
-  const html = `
-    <div style="font-family:Arial,sans-serif;background:#F7F9FC;padding:24px;color:#111827">
-      <div style="max-width:680px;margin:0 auto;background:#fff;border:1px solid #E5E7EB;padding:24px">
-        <div style="border-bottom:4px solid #C99A2E;padding-bottom:16px">
-          <h1 style="margin:0;color:#0B1F3A">${escapeHtml(brand.name)}</h1>
-          <p style="margin:8px 0 0;color:#6B7280">${escapeHtml(brand.tagline)}</p>
-        </div>
-        <h2 style="color:#0B1F3A;margin-top:24px">${escapeHtml(subject)}</h2>
-        ${formatEmailParagraphs(decisionParagraphs)}
-        ${
-          decision === "approve"
-            ? `
-              <div style="border:1px solid #D1FAE5;background:#ECFDF5;padding:16px;margin:18px 0">
-                <p style="margin:0 0 10px;font-weight:bold;color:#0B1F3A">Important platform boundaries</p>
-                ${formatEmailList([
-                  "FMS does not contact importers directly.",
-                  "FMS submits factory options and evidence for admin review only.",
-                  "Factory contact details must not be released without admin approval.",
-                ])}
-              </div>
-              <p><a href="${escapeHtml(fmsLoginUrl)}" style="display:inline-block;background:#138A4A;color:#fff;padding:12px 16px;text-decoration:none;font-weight:bold">Open FMS Login</a></p>
-              <p style="line-height:1.7;color:#6B7280">FMS Academy: <a href="${escapeHtml(fmsAcademyUrl)}">${escapeHtml(fmsAcademyUrl)}</a></p>
-            `
-            : decision === "decline"
-              ? `
-                <div style="border:1px solid #E5E7EB;background:#F9FAFB;padding:16px;margin:18px 0">
-                  <p style="margin:0 0 10px;font-weight:bold;color:#0B1F3A">What we usually require</p>
-                  ${formatEmailList([
-                    "Clear city/province in China.",
-                    "Verified WeChat/contact details.",
-                    "Sourcing/factory experience.",
-                    "Product category knowledge.",
-                    "Ability to collect quotations, photos, and videos.",
-                    "Basic English or ability to communicate with the admin team.",
-                    "Sample report or resume if available.",
-                  ])}
-                </div>
-                <p><a href="${escapeHtml(fmsApplyUrl)}" style="display:inline-block;background:#138A4A;color:#fff;padding:12px 16px;text-decoration:none;font-weight:bold">Apply Again</a></p>
-              `
-              : `<p><a href="${escapeHtml(fmsApplyUrl)}" style="display:inline-block;background:#138A4A;color:#fff;padding:12px 16px;text-decoration:none;font-weight:bold">Submit Updated Application</a></p>`
-        }
-        <p style="border-top:1px solid #E5E7EB;margin-top:24px;padding-top:16px;color:#6B7280;font-size:13px;line-height:1.6">
-          Need help? Contact ${escapeHtml(brand.name)} support through
-          <a href="${escapeHtml(contactUrl)}">${escapeHtml(contactUrl)}</a>.
-          This email does not contain importer data, factory private data, passwords, or internal admin notes.
-        </p>
-      </div>
-    </div>`;
-
-  const textLines = [
-    brand.name,
-    "",
-    subject,
-    "",
-    ...decisionParagraphs,
-    "",
-    ...(decision === "approve"
-      ? [
-          "Important platform boundaries:",
-          "- FMS does not contact importers directly.",
-          "- FMS submits factory options and evidence for admin review only.",
-          "- Factory contact details must not be released without admin approval.",
-          "",
-          `FMS login: ${fmsLoginUrl}`,
-          `FMS Academy: ${fmsAcademyUrl}`,
-        ]
-      : decision === "decline"
-        ? [
-            "What we usually require:",
-            "- Clear city/province in China.",
-            "- Verified WeChat/contact details.",
-            "- Sourcing/factory experience.",
-            "- Product category knowledge.",
-            "- Ability to collect quotations, photos, and videos.",
-            "- Basic English or ability to communicate with the admin team.",
-            "- Sample report or resume if available.",
-            "",
-            `Reapply: ${fmsApplyUrl}`,
-          ]
-        : [`Submit updated application: ${fmsApplyUrl}`]),
-    "",
-    `Support: ${contactUrl}`,
-    brand.domain,
-  ];
-
-  return {
-    html,
-    subject,
-    text: textLines.join("\n"),
-  };
-}
-
-async function sendFmsDecisionEmail({
-  applicantMessage,
-  decision,
-  lead,
-  metadata,
-  supabase,
-}: {
-  applicantMessage: string;
-  decision: SuperAdminFmsDecision;
-  lead: LeadRow;
-  metadata: JsonObject;
-  supabase: SupabaseAdmin;
-}) {
-  const email = readString(metadata.email).toLowerCase();
-  const name = readString(metadata.full_name, "FMS applicant");
-  const template = buildFmsDecisionEmailTemplate({
-    applicantMessage,
-    decision,
-    leadCode: lead.lead_code,
-    name,
-  });
-
-  const { data: notification, error: notificationError } = await supabase
-    .from("notifications")
-    .insert({
-      action_url:
-        decision === "approve"
-          ? absoluteSiteUrl(ROUTES.fmsLogin)
-          : absoluteSiteUrl(ROUTES.fmsApply),
-      channel: "email",
-      message: template.text,
-      metadata: {
-        applicant_email_available: Boolean(email),
-        decision,
-        lead_code: lead.lead_code,
-        lead_id: lead.id,
-        source: fmsApplicationSource,
-        subject: template.subject,
-      },
-      priority: decision === "approve" ? "high" : "normal",
-      status: "queued",
-      title: template.subject,
-      type: "fms_application_decision_email",
-    })
-    .select("id")
-    .single();
-
-  if (notificationError || !notification) {
-    return {
-      statusMessage:
-        "Decision saved, but the applicant email attempt could not be recorded.",
-      status: "failed" as const,
-    };
-  }
-
-  const delivery = await deliverEmail({ template, to: email || null });
-
-  await supabase.from("notification_delivery_logs").insert({
-    delivery_status: delivery.status,
-    error_message: delivery.ok ? null : delivery.errorMessage,
-    metadata: {
-      applicant_email_available: Boolean(email),
-      decision,
-      email_delivery_mode: process.env.EMAIL_DELIVERY_MODE ?? "disabled",
-      lead_code: lead.lead_code,
-      subject: template.subject,
-    },
-    notification_id: notification.id,
-    provider: delivery.provider,
-    provider_message_id: delivery.ok ? delivery.providerMessageId ?? null : null,
-  });
-
-  await supabase
-    .from("notifications")
-    .update({ status: delivery.status })
-    .eq("id", notification.id);
-
-  if (!email) {
-    return {
-      statusMessage:
-        "Decision saved, but no candidate email is available. Please contact the candidate manually.",
-      status: "skipped" as const,
-    };
-  }
-
-  if (delivery.provider === "disabled") {
-    return {
-      statusMessage:
-        "Decision saved, but email delivery is disabled. Please contact the candidate manually.",
-      status: "skipped" as const,
-    };
-  }
-
-  if (!delivery.ok) {
-    return {
-      statusMessage: `Decision saved, but applicant email was not queued: ${delivery.errorMessage}`,
-      status: delivery.status,
-    };
-  }
-
-  if (delivery.provider === "log") {
-    return {
-      statusMessage:
-        "Decision saved and applicant email was logged safely because EMAIL_DELIVERY_MODE=log.",
-      status: "skipped" as const,
-    };
-  }
-
-  return {
-    statusMessage: "Decision saved and applicant email queued.",
-    status: delivery.status,
-  };
 }
 
 function mapLeadQueueItem(
@@ -881,7 +609,7 @@ function leadStatusForWorkflow(action: LeadWorkflowAction): {
       };
     case "fms_pending_more_info":
       return {
-        followUpStatus: "FMS more info needed",
+        followUpStatus: "Pending candidate information",
         leadStatus: "awaiting_customer",
         workflowStatus: "pending_more_info",
       };
@@ -1037,6 +765,23 @@ export async function updateLeadWorkflowAction(
     const next = leadStatusForWorkflow(input.action);
     const now = new Date().toISOString();
     const note = input.note?.trim() ?? "";
+    const applicantMessage = input.applicantMessage?.trim() ?? "";
+    const actionUsesApplicantMessage =
+      input.action === "fms_pending_more_info" ||
+      input.action === "fms_forward_super_admin";
+    const updateToken =
+      input.action === "fms_pending_more_info"
+        ? createFmsApplicationUpdateToken()
+        : null;
+
+    if (input.action === "fms_pending_more_info" && !applicantMessage) {
+      return {
+        ok: false,
+        message:
+          "Please add a message to the candidate before requesting more information.",
+      };
+    }
+
     const nextMetadata: JsonObject = {
       ...metadata,
       admin_review_status:
@@ -1045,12 +790,26 @@ export async function updateLeadWorkflowAction(
           : next.workflowStatus === "pending_more_info"
             ? "pending_more_info"
             : "in_review",
+      last_applicant_message:
+        actionUsesApplicantMessage && applicantMessage
+          ? applicantMessage
+          : readString(metadata.last_applicant_message),
       last_admin_note: note || readString(metadata.last_admin_note),
       last_workflow_action: input.action,
       reviewed_at: now,
       reviewed_by_profile_id: admin.profileId,
       workflow_status: next.workflowStatus,
     };
+
+    if (updateToken) {
+      nextMetadata.fms_application_update_token_hash = updateToken.tokenHash;
+      nextMetadata.fms_application_update_token_expires_at =
+        updateToken.expiresAt;
+      nextMetadata.fms_application_update_requested_at = now;
+      nextMetadata.fms_application_update_requested_by_profile_id =
+        admin.profileId;
+      nextMetadata.fms_application_update_request_source = "admin_more_info";
+    }
 
     if (input.action === "fms_forward_super_admin") {
       nextMetadata.forwarded_by_profile_id = admin.profileId;
@@ -1101,6 +860,54 @@ export async function updateLeadWorkflowAction(
       );
     }
 
+    let applicantEmailStatusMessage = "";
+
+    if (input.action === "fms_pending_more_info") {
+      const emailResult = await sendFmsApplicationAdminMoreInfoEmail({
+        applicantMessage,
+        candidateEmail: readString(metadata.email),
+        candidateName: readString(metadata.full_name),
+        leadCode: lead.lead_code,
+        leadId: lead.id,
+        supabase,
+        updateExpiresAt: updateToken?.expiresAt,
+        updateUrl: updateToken
+          ? buildFmsApplicationUpdateUrl(updateToken.token)
+          : null,
+      });
+      applicantEmailStatusMessage = emailResult.statusMessage;
+
+      await createNotification(
+        {
+          actionUrl: `/admin/leads?lead=${lead.id}&filter=fms`,
+          metadata: {
+            email_status: emailResult.status,
+            lead_code: lead.lead_code,
+            lead_id: lead.id,
+            workflow_status: next.workflowStatus,
+          },
+          priority: "normal",
+          recipientRole: USER_ROLES.admin,
+          title: "FMS candidate information requested",
+          message: `${lead.lead_code}: Admin requested more information from the FMS candidate.`,
+          type: "unpaid_lead_created",
+        },
+        supabase,
+      );
+    }
+
+    if (input.action === "fms_forward_super_admin") {
+      const emailResult = await sendFmsApplicationForwardedEmail({
+        applicantMessage,
+        candidateEmail: readString(metadata.email),
+        candidateName: readString(metadata.full_name),
+        leadCode: lead.lead_code,
+        leadId: lead.id,
+        supabase,
+      });
+      applicantEmailStatusMessage = emailResult.statusMessage;
+    }
+
     if (input.action === "project_decline") {
       await createNotification(
         {
@@ -1138,7 +945,14 @@ export async function updateLeadWorkflowAction(
     return {
       ok: true,
       data: null,
-      message: `${lead.lead_code} updated to ${WORKFLOW_LABELS[next.workflowStatus]}.`,
+      message: `${lead.lead_code} updated to ${
+        fmsLead
+          ? getFmsApplicationDisplayStatusLabel(
+              { ...lead, metadata: asJson(nextMetadata) },
+              next.workflowStatus,
+            )
+          : WORKFLOW_LABELS[next.workflowStatus]
+      }.${applicantEmailStatusMessage ? ` ${applicantEmailStatusMessage}` : ""}`,
     };
   } catch (error) {
     return {
@@ -1815,6 +1629,10 @@ export async function reviewFmsApplicationBySuperAdminAction(
     }
 
     const now = new Date().toISOString();
+    const updateToken =
+      input.decision === "request_more_info"
+        ? createFmsApplicationUpdateToken()
+        : null;
     let nextMetadata: JsonObject = {
       ...metadata,
       applicant_decision_message:
@@ -1839,6 +1657,11 @@ export async function reviewFmsApplicationBySuperAdminAction(
     } else if (input.decision === "request_more_info") {
       nextMetadata = {
         ...nextMetadata,
+        fms_application_update_request_source: "super_admin_more_info",
+        fms_application_update_requested_at: now,
+        fms_application_update_requested_by_profile_id: superAdmin.profileId,
+        fms_application_update_token_expires_at: updateToken?.expiresAt,
+        fms_application_update_token_hash: updateToken?.tokenHash,
         super_admin_review_status: "more_info_requested",
         workflow_status: "pending_more_info",
       };
@@ -1907,6 +1730,13 @@ export async function reviewFmsApplicationBySuperAdminAction(
       supabase,
     });
 
+    const adminDecisionTitle =
+      input.decision === "approve"
+        ? "FMS application approved by Super Admin"
+        : input.decision === "decline"
+          ? "FMS application declined by Super Admin"
+          : "More information requested by Super Admin";
+
     await createNotifications(
       [
         {
@@ -1923,7 +1753,7 @@ export async function reviewFmsApplicationBySuperAdminAction(
           type: "role_changed",
         },
         {
-          actionUrl: "/admin/leads",
+          actionUrl: `/admin/leads?lead=${lead.id}&filter=fms`,
           metadata: {
             lead_code: lead.lead_code,
             lead_id: lead.id,
@@ -1931,7 +1761,7 @@ export async function reviewFmsApplicationBySuperAdminAction(
           },
           priority: "high",
           recipientRole: USER_ROLES.admin,
-          title: "FMS application reviewed by Super Admin",
+          title: adminDecisionTitle,
           message,
           type: "role_changed",
         },
@@ -1939,12 +1769,18 @@ export async function reviewFmsApplicationBySuperAdminAction(
       supabase,
     );
 
-    const emailResult = await sendFmsDecisionEmail({
+    const emailResult = await sendFmsApplicationDecisionEmail({
       applicantMessage,
+      candidateEmail: readString(metadata.email),
+      candidateName: readString(metadata.full_name),
       decision: input.decision,
-      lead,
-      metadata,
+      leadCode: lead.lead_code,
+      leadId: lead.id,
       supabase,
+      updateExpiresAt: updateToken?.expiresAt,
+      updateUrl: updateToken
+        ? buildFmsApplicationUpdateUrl(updateToken.token)
+        : null,
     });
     message = `${message} ${emailResult.statusMessage}`;
 

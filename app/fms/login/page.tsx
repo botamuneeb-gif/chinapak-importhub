@@ -38,10 +38,14 @@ export default function FmsLoginPage() {
             className="mt-3 inline-flex font-bold text-brand-emerald no-underline hover:text-brand-navy"
             href={ROUTES.authInvite}
           >
-            Need invitation help?
+            Already have an invitation?
           </Link>
           <p className="mt-4 text-sm">
-            FMS 账户需要通过 ChinaPak ImportHub 审核或邀请后才能使用。
+            FMS 账户必须通过 ChinaPak ImportHub 审核或邀请后才能使用。
+          </p>
+          <p className="mt-2 text-sm">
+            Enter your invitation code or secure invite details to continue
+            with your FMS account setup.
           </p>
         </SecurityNotice>
       </div>

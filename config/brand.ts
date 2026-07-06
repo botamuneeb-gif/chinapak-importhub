@@ -14,6 +14,7 @@ export const ROUTES = {
   refundsRequest: "/refunds/request",
   fms: "/fms",
   fmsApply: "/fms/apply",
+  fmsApplicationUpdate: "/fms/application-update",
   fmsChinaProcurementAgent: "/fms/china-procurement-agent",
   fmsChinaSourcingJobs: "/fms/china-sourcing-jobs",
   fmsFactoryMatchSpecialist: "/fms/factory-match-specialist",

@@ -65,7 +65,12 @@ export default function InvitePage() {
 
           <SecurityNotice title="FMS support note" tone="info">
             <p lang="zh-CN">
-              FMS 账户需要通过 ChinaPak ImportHub 审核或邀请后才能使用。
+              FMS 账户必须通过 ChinaPak ImportHub 审核或邀请后才能使用。
+            </p>
+            <p className="mt-2">
+              Enter your invitation code or secure invite details to continue
+              with your FMS account setup. After activation, use the FMS login
+              page for portal access.
             </p>
           </SecurityNotice>
         </div>

@@ -18,6 +18,7 @@ const privateRoutes = [
   "/importer/reports",
   "/importer/start",
   "/fms/dashboard",
+  "/fms/application-update",
   "/fms/assignments",
   "/fms/messages",
   "/fms/notifications",

@@ -17,6 +17,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/learn/*` | Public | Existing content hub routes. |
 | `/fms` | Public | Chinese-first FMS acquisition hub. Public FMS signup remains disabled. |
 | `/fms/apply` | Public | FMS application/interest form only. Creates an admin-review lead; does not create auth user, role assignment, or FMS profile. |
+| `/fms/application-update/[token]` | Public token-scoped, noindex | Secure existing-application update link for FMS candidates when Admin/Super Admin requests more information. Updates only the matching `unpaid_leads` record and does not create duplicate applications or accounts. |
 | `/fms/china-sourcing-jobs`, `/fms/factory-match-specialist`, `/fms/china-procurement-agent` | Public | Chinese FMS acquisition SEO pages. |
 | `/fms/china/*`, `/fms/categories/*` | Public | City/category FMS acquisition SEO pages. |
 | `/fms/opportunities/*` | Public | Existing FMS recruitment SEO pages retained for compatibility. |
@@ -27,7 +28,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/login`, `/signup` | Public | Importer-first auth entry. Public signup creates importer role only. |
-| `/auth/role-select`, `/auth/otp`, `/auth/invite`, `/auth/security` | Public or placeholder | Invite and OTP remain controlled/future flows. |
+| `/auth/role-select`, `/auth/otp`, `/auth/invite`, `/auth/security` | Public or placeholder | Invite and OTP remain controlled/future flows. `/auth/invite` is the invitation/code-help entry; public FMS signup is not enabled. |
 | `/admin/login` | Public login page | Access after login requires active `admin` or `super_admin`. |
 | `/super-admin/login` | Public login page | Access after login requires active `super_admin`. |
 | `/fms/login` | Public login page | Access after login requires active `fms` role and usable FMS profile. |

@@ -68,6 +68,8 @@ Admin can review these records in `/admin/leads`, where they are labeled as FMS 
 
 Admin can pre-screen, request more information, decline at admin screening, or forward suitable applications to Super Admin. Normal Admin cannot final-approve FMS users.
 
+When a candidate supplies an email address, the system records and attempts a confirmation email after successful `/fms/apply` submission. In disabled email mode, the application still saves and the public success message remains simple; technical delivery status is kept internal.
+
 ## Admin Review Behavior
 
 FMS application leads remain admin-review records until Super Admin final review.
@@ -96,6 +98,18 @@ Super Admin final decisions also create candidate-facing decision emails when an
 
 Internal admin notes stay internal. Only the separate applicant-facing message is included in decline or more-info emails. If app email delivery is disabled, the workflow still saves and tells Super Admin to contact the candidate manually.
 
+More-information emails use a secure existing-application update link instead of sending candidates back to `/fms/apply`. The link points to `/fms/application-update/[token]`, is noindex, is excluded from sitemap, and updates only the matching `unpaid_leads` record. The public `/fms/apply` page remains for new applications only.
+
+Admin request-info and forward actions also use applicant-facing messages:
+
+- Request Candidate Info requires a candidate message and sends/queues the more-info email.
+- Forward to Super Admin notifies Super Admin internally and can send/queue a candidate final-review update.
+- Super Admin decisions notify Admin internally after final action.
+
+Approved applicants are not told to use public signup. The operational approval email explains that FMS access is secure invitation-only, points to `/auth/invite` for invitation/code setup help, tells the candidate to check the separate secure Supabase invite/password setup email when one is sent, and describes `/fms/login` only as the login route after activation.
+
+The FMS login/invitation frontend now labels the invitation path as `Already have an invitation?` instead of `Need invitation help?`, matching the invitation-code/account-setup flow.
+
 ## Sitemap And Robots Behavior
 
 The public FMS acquisition routes are included in `publicSitemapRoutes`, so `/sitemap.xml` can expose them for indexing.
@@ -110,6 +124,8 @@ The public FMS acquisition routes are included in `publicSitemapRoutes`, so `/si
 - `/fms/academy`
 
 Public FMS pages such as `/fms`, `/fms/apply`, city pages, category pages, and core acquisition pages remain indexable.
+
+Candidate update links under `/fms/application-update/[token]` are not SEO landing pages. They are noindex and disallowed in robots because they are secure workflow links sent by email.
 
 ## Hidden Features Kept Disabled
 
@@ -139,6 +155,7 @@ Future off-site acquisition work can include:
 
 - `/fms` loads as a Chinese-first public FMS acquisition page.
 - `/fms/apply` submits an admin-review lead only.
+- More-info emails update the existing application through `/fms/application-update/[token]` and do not create duplicate FMS leads.
 - No auth user, FMS role, or FMS profile is created from the public form.
 - `/admin/leads` clearly labels public FMS applications.
 - Public FMS SEO pages load without login.
