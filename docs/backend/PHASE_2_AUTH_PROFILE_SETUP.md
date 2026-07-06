@@ -85,6 +85,27 @@ verify active roles before redirecting:
 
 If role lookup fails, access is denied and the browser session is signed out.
 
+### FMS Invite Acceptance
+
+Public FMS signup remains disabled. FMS accounts are created only after Admin
+pre-screening and Super Admin approval.
+
+When Super Admin approves a public FMS application, the system uses Supabase
+Admin Auth `inviteUserByEmail` with the invite redirect set to `/auth/invite`.
+The candidate receives a Supabase invite email, clicks `Accept Invitation`,
+lands on `/auth/invite`, and sets a password to activate the invited FMS
+account. After password setup, the app signs out the temporary invite session
+and redirects to `/fms/login?activated=1`.
+
+Use invite/setup language for this flow:
+
+- `Activate your FMS account`
+- `Set your password`
+- `Set Password & Continue`
+
+Do not describe FMS invitation acceptance as public signup or password reset.
+No default password is created or displayed.
+
 ## First Admin / Super Admin Setup
 
 Do not create hard-coded admin credentials in this repository.
@@ -145,9 +166,13 @@ Admin / Super Admin:
 
 FMS / Agent:
 
-1. Manually create approved/invited Auth users and role rows.
-2. Open `/fms/login` or `/agent/login`.
-3. Confirm role-correct redirect and denial for wrong roles.
+1. For FMS, approve a forwarded FMS application from Super Admin or manually
+   create an approved/invited Auth user and role rows.
+2. Confirm the Supabase invite email lands on `/auth/invite`.
+3. Set the FMS password from the invite page.
+4. Confirm the success redirect to `/fms/login?activated=1`.
+5. Log in through `/fms/login`.
+6. Confirm role-correct redirect and denial for wrong roles.
 
 ## Still Placeholder / Future
 

@@ -1425,7 +1425,7 @@ async function createOrInviteFmsAccount({
         intended_role: USER_ROLES.fms,
         signup_source: "super_admin_fms_application_approval",
       },
-      redirectTo: `${siteUrl}${ROUTES.fmsLogin}`,
+      redirectTo: `${siteUrl}${ROUTES.authInvite}`,
     });
 
   if (inviteError || !invitedUser.user) {

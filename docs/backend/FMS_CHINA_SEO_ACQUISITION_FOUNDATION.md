@@ -106,9 +106,9 @@ Admin request-info and forward actions also use applicant-facing messages:
 - Forward to Super Admin notifies Super Admin internally and can send/queue a candidate final-review update.
 - Super Admin decisions notify Admin internally after final action.
 
-Approved applicants are not told to use public signup. The operational approval email explains that FMS access is secure invitation-only, points to `/auth/invite` for invitation/code setup help, tells the candidate to check the separate secure Supabase invite/password setup email when one is sent, and describes `/fms/login` only as the login route after activation.
+Approved applicants are not told to use public signup. The operational approval email explains that FMS access is secure invitation-only, tells the candidate to check the separate Supabase invite email, explains that `Accept Invitation` opens `/auth/invite` for password setup, and describes `/fms/login` only as the login route after activation.
 
-The FMS login/invitation frontend now labels the invitation path as `Already have an invitation?` instead of `Need invitation help?`, matching the invitation-code/account-setup flow.
+The FMS login/invitation frontend now labels the invitation path as `Already have an invitation?` instead of `Need invitation help?`, matching the invite acceptance/account-setup flow.
 
 ## Sitemap And Robots Behavior
 

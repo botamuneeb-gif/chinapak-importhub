@@ -165,11 +165,29 @@ Approval also records and attempts a professional applicant decision email:
 
 - Subject: `Your ChinaPak ImportHub FMS application has been approved`
 - Explains that access is invite-based and public FMS signup is not enabled.
-- Points the candidate to `/auth/invite` for invitation/code setup help.
-- Tells the candidate to check the separate secure Supabase invite/password setup email when it is available.
+- Tells the candidate that a separate Supabase invitation email is the secure activation path.
+- Explains that the candidate clicks `Accept Invitation`, lands on `/auth/invite`, and sets a password there.
 - Mentions `/fms/login` only as the portal login route after account activation.
+- States that no default password is provided and public FMS signup remains disabled.
 - Reminds the candidate that FMS does not contact importers directly, submits evidence for admin review, and cannot release factory contact details without admin approval.
-- If Supabase invite email provides the secure setup path, the applicant is told to check their inbox. The platform does not invent or display default passwords.
+- If the Supabase invite link expires, the applicant is told to contact ChinaPak ImportHub for a new invitation. The platform does not invent or display default passwords.
+
+## FMS Invite Acceptance UX
+
+Super Admin approval uses Supabase Admin Auth `inviteUserByEmail` with `redirectTo = /auth/invite`.
+
+The invite acceptance flow is:
+
+1. Super Admin approves the FMS application.
+2. Supabase creates/sends the secure invite email.
+3. The candidate clicks `Accept Invitation`.
+4. The browser lands on `/auth/invite`.
+5. `/auth/invite` exchanges the Supabase invite code/session and shows `Activate your FMS account`.
+6. The candidate sets a password with `Set Password & Continue`.
+7. The app signs out the temporary invite session and redirects to `/fms/login?activated=1`.
+8. The candidate logs in through `/fms/login`.
+
+The invite page must not use reset-password language, public signup wording, or default-password instructions.
 
 Decline and more-info decisions also record applicant emails:
 
@@ -255,7 +273,8 @@ If the email belongs to an existing FMS-only account, the workflow can ensure th
 - Open `/super-admin/fms-applications`; confirm the lead appears.
 - Confirm normal Admin cannot access `/super-admin/fms-applications`.
 - Approve an FMS application with an unused email; confirm no default password is created.
-- If invite works, confirm `user_profiles`, active `role_assignments`, and active `fms_profiles` exist.
+- If invite works, confirm the Supabase invite email lands on `/auth/invite`, lets the candidate set a password, and then sends them to `/fms/login?activated=1`.
+- Confirm `user_profiles`, active `role_assignments`, and active `fms_profiles` exist.
 - If invite fails, confirm lead is `approved_pending_account_setup`.
 - Decline an FMS application and confirm status updates.
 - Request candidate info and confirm the email links to `/fms/application-update/[token]`, not plain `/fms/apply`.

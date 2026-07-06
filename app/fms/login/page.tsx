@@ -12,13 +12,26 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function FmsLoginPage() {
+type FmsLoginPageProps = {
+  searchParams?: Promise<{ activated?: string }>;
+};
+
+export default async function FmsLoginPage({ searchParams }: FmsLoginPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const activated = resolvedSearchParams.activated === "1";
+
   return (
     <AuthShell
       description="Factory Match Specialist access is invitation-only. Login requires a Supabase account with an active FMS role assigned by ChinaPak ImportHub."
       eyebrow="Factory Match Specialist"
       title="FMS Login"
     >
+      {activated ? (
+        <div className="mb-6 rounded-lg border border-brand-emerald bg-emerald-50 p-4 text-sm leading-7 text-brand-navy">
+          Your FMS account is activated. Please log in with your email and new
+          password to open the FMS Portal.
+        </div>
+      ) : null}
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <AuthCard title="Invitation-only FMS access">
           <RoleLoginForm

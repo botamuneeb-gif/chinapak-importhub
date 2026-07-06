@@ -107,13 +107,13 @@ FMS application communication uses the email foundation for candidate-facing upd
 - Decline email: `Update on your ChinaPak ImportHub FMS application`
 - Super Admin more-info email: `More information needed for your ChinaPak ImportHub FMS application`
 
-These emails are separate from the Supabase invite email. The Supabase invite/password setup email handles secure account activation when approval can create or link an FMS account. Operational application emails explain submission receipt, candidate information requests, forwarding to final review, decisions, next steps, and platform boundaries.
+These emails are separate from the Supabase invite email. The Supabase invite/password setup email handles secure account activation when approval can create or link an FMS account. The invite link redirects to `/auth/invite`, where the candidate sets a password before using `/fms/login`. Operational application emails explain submission receipt, candidate information requests, forwarding to final review, decisions, next steps, and platform boundaries.
 
 Admin and Super Admin application actions use separate applicant-facing message fields. Internal Admin/Super Admin notes are stored for admin/audit context and are never sent to the candidate.
 
 More-information emails for existing FMS applications include a secure `/fms/application-update/[token]` link instead of plain `/fms/apply`. The token is generated server-side, only a SHA-256 hash and expiry are stored in `unpaid_leads.metadata`, and successful updates modify the existing lead instead of creating a duplicate application. Invalid or expired links show a safe generic error.
 
-Approval emails do not present `/fms/login` as a signup link. They explain secure invitation-only access, point to `/auth/invite` for invitation/code setup help, tell approved candidates to check the separate Supabase invite/password setup email when one is sent, and describe `/fms/login` only as the portal login route after activation.
+Approval emails do not present `/fms/login` as a signup link. They explain secure invitation-only access, tell approved candidates to check the separate Supabase invite email, explain that `Accept Invitation` opens `/auth/invite` for password setup, and describe `/fms/login` only as the portal login route after activation. They also state that public FMS signup is disabled and no default password is provided.
 
 If `EMAIL_DELIVERY_MODE=disabled`, the workflow action is still saved, an email notification/delivery-log record is written with skipped status, and Admin/Super Admin sees a warning to contact the candidate manually. Public `/fms/apply` does not show technical email-disabled copy to candidates.
 

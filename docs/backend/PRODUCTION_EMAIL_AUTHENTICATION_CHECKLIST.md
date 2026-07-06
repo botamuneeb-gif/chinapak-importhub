@@ -21,8 +21,12 @@ templates are fully configured.
    - `https://www.chinapakimporthub.com/auth/confirmed`
    - `https://chinapakimporthub.com/auth/callback`
    - `https://www.chinapakimporthub.com/auth/callback`
+   - `https://chinapakimporthub.com/auth/invite`
+   - `https://www.chinapakimporthub.com/auth/invite`
    - `https://chinapakimporthub.com/login`
    - `https://www.chinapakimporthub.com/login`
+   - `https://chinapakimporthub.com/fms/login`
+   - `https://www.chinapakimporthub.com/fms/login`
    - `https://chinapakimporthub.com/reset-password`
    - `https://www.chinapakimporthub.com/reset-password`
    - Vercel preview URL patterns used for staging tests.
@@ -50,6 +54,7 @@ Review Supabase Auth email templates before launch:
 
 - Password reset
 - Confirm signup
+- Invite User
 - Magic link, if ever enabled
 - Email change confirmation
 
@@ -59,9 +64,43 @@ Template rules:
 - Link to `https://chinapakimporthub.com`.
 - Email verification should redirect to `/auth/confirmed`.
 - Password reset should redirect to `/reset-password`.
+- FMS invite acceptance should redirect to `/auth/invite`.
 - Avoid promising gateway payment, direct factory contact, or direct FMS chat.
 - Do not include secrets, tokens, or internal IDs beyond the Supabase-managed
   action link.
+
+### Invite User Template
+
+Update this in Supabase Dashboard -> Authentication -> Email Templates ->
+Invite User.
+
+Recommended subject:
+
+```text
+Activate your ChinaPak ImportHub FMS account
+```
+
+Recommended body concept:
+
+```html
+<p>Hello,</p>
+
+<p>Your ChinaPak ImportHub FMS account has been created after application approval.</p>
+
+<p>Click the button below to accept the invitation and set your account password.</p>
+
+<p><a href="{{ .ConfirmationURL }}">Accept invitation</a></p>
+
+<p>After activation, you can log in at:</p>
+<p>https://chinapakimporthub.com/fms/login</p>
+
+<p>FMS users never contact importers directly and never see importer contact details. All sourcing evidence is submitted for admin review first.</p>
+```
+
+Keep the Supabase-managed `{{ .ConfirmationURL }}` variable exactly as provided
+by Supabase. Do not replace it with a hard-coded URL or expose tokens manually.
+The application sets FMS invite redirects to `/auth/invite`, so the candidate
+sees the `Activate your FMS account` page and sets a password there.
 
 ## Forgot Password Flow
 
@@ -87,6 +126,22 @@ Manual test:
    - super admin -> `/super-admin`
    - fms -> `/fms/dashboard`
    - agent -> `/agent/dashboard`
+
+## FMS Invite Activation Flow
+
+This is separate from forgot/reset password.
+
+1. Super Admin approves a forwarded FMS application.
+2. Supabase sends the Invite User email.
+3. Candidate clicks `Accept invitation`.
+4. Candidate lands on `/auth/invite`.
+5. Candidate sees `Activate your FMS account`.
+6. Candidate sets a password with `Set Password & Continue`.
+7. The app signs out the temporary invite session and redirects to
+   `/fms/login?activated=1`.
+8. Candidate logs in through `/fms/login`.
+
+Do not enable public FMS signup. Do not create or show a default password.
 
 ## Public Importer Signup Verification
 
@@ -185,6 +240,10 @@ Before launch:
 - Verified importer first login creates importer profile and active importer role.
 - Admin email/password login works.
 - FMS email/password login works.
+- FMS invite email lands on `/auth/invite`, lets the candidate set a password,
+  and redirects to `/fms/login?activated=1`.
+- FMS invite acceptance does not use public signup, reset-password wording, or a
+  default password.
 - Super admin email/password login works.
 - Wrong-role login is rejected and signed out.
 - Password reset email can be requested without account-existence disclosure.

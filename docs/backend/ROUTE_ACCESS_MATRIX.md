@@ -28,7 +28,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/login`, `/signup` | Public | Importer-first auth entry. Public signup creates importer role only. |
-| `/auth/role-select`, `/auth/otp`, `/auth/invite`, `/auth/security` | Public or placeholder | Invite and OTP remain controlled/future flows. `/auth/invite` is the invitation/code-help entry; public FMS signup is not enabled. |
+| `/auth/role-select`, `/auth/otp`, `/auth/invite`, `/auth/security` | Public/noindex auth utilities | OTP remains inactive. `/auth/invite` is the Supabase invite acceptance page for approved FMS account activation and password setup; public FMS signup is not enabled. |
 | `/admin/login` | Public login page | Access after login requires active `admin` or `super_admin`. |
 | `/super-admin/login` | Public login page | Access after login requires active `super_admin`. |
 | `/fms/login` | Public login page | Access after login requires active `fms` role and usable FMS profile. |

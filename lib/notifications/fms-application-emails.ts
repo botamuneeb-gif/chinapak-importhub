@@ -217,21 +217,23 @@ function buildDecisionTemplate({
       `Hello ${candidateName},`,
       `Your Factory Match Specialist application ${leadCode} has been approved by ChinaPak ImportHub.`,
       applicantMessage ||
-        "Welcome to ChinaPak ImportHub. Please complete your secure account setup using the invite link sent to your inbox.",
-      "Your FMS access is created through secure invitation only. Public FMS signup is not enabled.",
-      "Please check your inbox for the secure Supabase account setup invitation. If you were also given an invitation code, enter it on the invitation page.",
+        "Welcome to ChinaPak ImportHub. Your FMS account has been created through secure invitation only.",
+      "You will receive a separate secure invitation email from ChinaPak ImportHub/Supabase. Click Accept Invitation in that email, then set your password to activate your account.",
+      "Public FMS signup is disabled and no default password is provided.",
       "After activation, log in through the FMS login page to review assignments and submit factory options/evidence for admin review.",
+      "If the invite link expires, contact ChinaPak ImportHub for a new invitation.",
     ];
 
     return buildFmsApplicationTemplate({
-      actionUrl: inviteUrl,
+      actionUrl: fmsLoginUrl,
       bodyHtml: `${formatEmailParagraphs(paragraphs)}
         <div style="border:1px solid #D1FAE5;background:#ECFDF5;padding:16px;margin:18px 0">
           <p style="margin:0 0 10px;font-weight:bold;color:#0B1F3A">Secure account activation</p>
           ${formatEmailList([
-            "Use the secure Supabase account setup invitation sent separately as the activation step.",
-            "If you were given an invitation code, enter it on the invitation page for account setup support.",
-            "Use FMS Login only after activation is complete.",
+            "Open the separate Supabase invitation email.",
+            "Click Accept Invitation.",
+            "Set your password on the secure activation page.",
+            "Use FMS Login only after password setup is complete.",
           ])}
           <p style="margin:0 0 10px;font-weight:bold;color:#0B1F3A">Important platform boundaries</p>
           ${formatEmailList([
@@ -240,7 +242,7 @@ function buildDecisionTemplate({
             "FMS submits factory options and evidence for admin review only.",
             "Factory contact details must not be released without admin approval.",
           ])}
-          <p style="line-height:1.7;color:#6B7280">Invitation/code help: <a href="${escapeHtml(inviteUrl)}">${escapeHtml(inviteUrl)}</a></p>
+          <p style="line-height:1.7;color:#6B7280">Activation page used by invite links: <a href="${escapeHtml(inviteUrl)}">${escapeHtml(inviteUrl)}</a></p>
           <p style="line-height:1.7;color:#6B7280">FMS Login after activation: <a href="${escapeHtml(fmsLoginUrl)}">${escapeHtml(fmsLoginUrl)}</a></p>
           <p style="line-height:1.7;color:#6B7280">FMS Academy: <a href="${escapeHtml(fmsAcademyUrl)}">${escapeHtml(fmsAcademyUrl)}</a></p>
         </div>`,
@@ -248,9 +250,10 @@ function buildDecisionTemplate({
         ...paragraphs,
         "",
         "Secure account activation:",
-        "- Use the secure Supabase account setup invitation sent separately as the activation step.",
-        "- If you were given an invitation code, enter it on the invitation page for account setup support.",
-        "- Use FMS Login only after activation is complete.",
+        "- Open the separate Supabase invitation email.",
+        "- Click Accept Invitation.",
+        "- Set your password on the secure activation page.",
+        "- Use FMS Login only after password setup is complete.",
         "",
         "Important platform boundaries:",
         "- FMS does not contact importers directly.",
@@ -258,11 +261,11 @@ function buildDecisionTemplate({
         "- FMS submits factory options and evidence for admin review only.",
         "- Factory contact details must not be released without admin approval.",
         "",
-        `Invitation/code help: ${inviteUrl}`,
+        `Activation page used by invite links: ${inviteUrl}`,
         `FMS Login after activation: ${fmsLoginUrl}`,
         `FMS Academy: ${fmsAcademyUrl}`,
       ],
-      ctaLabel: "Open Invitation Help",
+      ctaLabel: "FMS Login After Activation",
       subject,
     });
   }
@@ -539,7 +542,7 @@ export async function sendFmsApplicationDecisionEmail({
   return recordAndDeliverFmsApplicationEmail({
     actionUrl:
       decision === "approve"
-        ? absoluteSiteUrl(ROUTES.authInvite)
+        ? absoluteSiteUrl(ROUTES.fmsLogin)
         : updateUrl || absoluteSiteUrl(ROUTES.fmsApply),
     candidateEmail,
     kind: "fms_application_decision_email",
