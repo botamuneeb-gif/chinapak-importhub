@@ -56,6 +56,7 @@ export function LiveFmsApplications() {
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]["id"]>("all");
   const [query, setQuery] = useState("");
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [applicantMessages, setApplicantMessages] = useState<Record<string, string>>({});
   const [feedback, setFeedback] = useState<FeedbackState>({});
   const [busyLeadId, setBusyLeadId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -162,6 +163,7 @@ export function LiveFmsApplications() {
       try {
         const accessToken = await getAccessToken();
         const result = await reviewFmsApplicationBySuperAdminAction(accessToken, {
+          applicantMessage: applicantMessages[application.id] ?? "",
           decision,
           leadId: application.id,
           note: notes[application.id] ?? "",
@@ -317,15 +319,17 @@ export function LiveFmsApplications() {
                     </dl>
                     {application.convertedEntityId ? (
                       <p className="mt-4 rounded-lg border border-brand-emerald bg-emerald-50 p-3 text-sm font-semibold text-brand-emerald">
-                        Converted to {application.convertedEntityType}:{" "}
-                        <span translate="no">{application.convertedEntityId}</span>
+                        FMS profile created successfully.
+                        <span className="block text-xs text-brand-muted" translate="no">
+                          Profile reference: {application.convertedEntityId.slice(0, 8)}
+                        </span>
                       </p>
                     ) : null}
                   </div>
 
                   <div className="space-y-3 rounded-lg border border-slate-200 bg-brand-background p-4">
                     <label className="block space-y-2 text-sm font-semibold text-brand-navy">
-                      Super Admin note
+                      Internal Super Admin note
                       <textarea
                         className="min-h-28 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal text-brand-text focus:border-brand-emerald focus:outline-none"
                         onChange={(event) =>
@@ -334,9 +338,26 @@ export function LiveFmsApplications() {
                             [application.id]: event.target.value,
                           }))
                         }
-                        placeholder="Required context for approval/decline"
+                        placeholder="Optional internal note for Super Admin records. This is not emailed to the applicant."
                         value={notes[application.id] ?? ""}
                       />
+                    </label>
+                    <label className="block space-y-2 text-sm font-semibold text-brand-navy">
+                      Applicant-facing decision message
+                      <textarea
+                        className="min-h-32 w-full rounded-lg border border-slate-300 px-3 py-2 font-normal text-brand-text focus:border-brand-emerald focus:outline-none"
+                        onChange={(event) =>
+                          setApplicantMessages((current) => ({
+                            ...current,
+                            [application.id]: event.target.value,
+                          }))
+                        }
+                        placeholder="Decline example: We could not verify enough sourcing/factory experience for the categories selected. More-info example: Please provide your main sourcing categories, factory city coverage, WeChat ID, and any sample quotation or supplier report. Approval optional: Welcome to ChinaPak ImportHub."
+                        value={applicantMessages[application.id] ?? ""}
+                      />
+                      <span className="block text-xs font-normal leading-5 text-brand-muted">
+                        Required for decline and more-info decisions. Internal notes are never sent to the applicant.
+                      </span>
                     </label>
                     <div className="grid gap-2">
                       <Button

@@ -88,6 +88,14 @@ The application lead itself is never assignable to FMS work.
 
 The workflow never creates a default weak password and never enables public FMS signup.
 
+Super Admin final decisions also create candidate-facing decision emails when an email address is available:
+
+- Approved applicants receive a professional approval email and are told to use the secure invite/password setup email. They are not told to publicly sign up.
+- Declined applicants receive a polite decision email with the applicant-facing reason and reapply guidance.
+- More-info applicants receive a request explaining what additional sourcing/factory information is needed.
+
+Internal admin notes stay internal. Only the separate applicant-facing message is included in decline or more-info emails. If app email delivery is disabled, the workflow still saves and tells Super Admin to contact the candidate manually.
+
 ## Sitemap And Robots Behavior
 
 The public FMS acquisition routes are included in `publicSitemapRoutes`, so `/sitemap.xml` can expose them for indexing.

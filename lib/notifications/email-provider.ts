@@ -20,6 +20,14 @@ function getDeliveryMode() {
   return process.env.EMAIL_DELIVERY_MODE?.trim() || "disabled";
 }
 
+function getFromAddress() {
+  const fromName = process.env.EMAIL_FROM_NAME?.trim() || "ChinaPak ImportHub";
+  const fromAddress =
+    process.env.EMAIL_FROM_ADDRESS?.trim() || "no-reply@chinapakimporthub.com";
+
+  return `${fromName} <${fromAddress}>`;
+}
+
 export async function deliverEmail(input: {
   template: EmailTemplatePayload;
   to?: string | null;
@@ -48,7 +56,9 @@ export async function deliverEmail(input: {
   }
 
   if (mode === "resend") {
-    if (!process.env.RESEND_API_KEY || !input.to) {
+    const apiKey = process.env.RESEND_API_KEY?.trim();
+
+    if (!apiKey || !input.to) {
       return {
         ok: false,
         errorMessage:
@@ -58,11 +68,55 @@ export async function deliverEmail(input: {
       };
     }
 
-    return {
-      ok: true,
-      provider: "resend",
-      status: "queued",
-    };
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        body: JSON.stringify({
+          from: getFromAddress(),
+          html: input.template.html,
+          subject: input.template.subject,
+          text: input.template.text,
+          to: [input.to],
+        }),
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      });
+
+      const responseBody = (await response.json().catch(() => ({}))) as {
+        id?: string;
+        message?: string;
+        name?: string;
+      };
+
+      if (!response.ok) {
+        return {
+          ok: false,
+          errorMessage:
+            responseBody.message ||
+            responseBody.name ||
+            `Resend request failed with status ${response.status}.`,
+          provider: "resend",
+          status: "failed",
+        };
+      }
+
+      return {
+        ok: true,
+        provider: "resend",
+        providerMessageId: responseBody.id ?? null,
+        status: "queued",
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        errorMessage:
+          error instanceof Error ? error.message : "Resend request failed.",
+        provider: "resend",
+        status: "failed",
+      };
+    }
   }
 
   if (mode === "smtp") {

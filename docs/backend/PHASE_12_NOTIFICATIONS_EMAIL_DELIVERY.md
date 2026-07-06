@@ -70,10 +70,10 @@ Modes:
 
 - `disabled`: default. Creates notification records and skips email delivery.
 - `log`: logs a safe email summary without secrets or message body dumping.
-- `resend`: provider-ready placeholder. Requires `RESEND_API_KEY` and a recipient email before future sending is activated.
+- `resend`: sends through the Resend API only when `EMAIL_DELIVERY_MODE=resend`, `RESEND_API_KEY`, sender env vars, and a recipient email are configured.
 - `smtp`: provider-ready placeholder. Requires SMTP environment variables before future sending is activated.
 
-Real email sending is intentionally not active in this phase.
+Real email sending is not active in default/local mode.
 
 ## Template Strategy
 
@@ -95,6 +95,20 @@ Language intent:
 - Admin/Super Admin: English-first.
 
 Templates must not include raw FMS notes, factory contact details, importer contact details, passwords, tokens, or payment credentials.
+
+## FMS Application Decision Emails
+
+Super Admin FMS application decisions use the email foundation for candidate-facing updates:
+
+- Approval email: `Your ChinaPak ImportHub FMS application has been approved`
+- Decline email: `Update on your ChinaPak ImportHub FMS application`
+- More-info email: `More information needed for your ChinaPak ImportHub FMS application`
+
+These emails are separate from the Supabase invite email. The Supabase invite/password setup email handles secure account activation when approval can create or link an FMS account. The decision email explains the decision, next steps, and platform boundaries.
+
+Decision emails use a separate applicant-facing message field. Internal Super Admin notes are stored for admin/audit context and are never sent to the candidate.
+
+If `EMAIL_DELIVERY_MODE=disabled`, the decision is still saved, an email notification/delivery-log record is written with skipped status, and Super Admin sees a warning to contact the candidate manually.
 
 ## Workflow Hooks
 
@@ -119,6 +133,7 @@ Notifications are created after successful workflow actions:
 - evidence released to importer
 - super-admin password reset
 - super-admin role/user-management security events
+- Super Admin FMS application approve/decline/more-info decision emails
 
 Notification writes are server-only and should not expose service-role credentials to client components.
 

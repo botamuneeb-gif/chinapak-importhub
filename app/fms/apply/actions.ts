@@ -127,6 +127,7 @@ export async function submitFmsApplicationLeadAction(
       full_name: fullName,
       intended_role: USER_ROLES.fms,
       languages,
+      lead_type: "fms_application",
       phone,
       product_categories: productCategories,
       province,
@@ -134,6 +135,7 @@ export async function submitFmsApplicationLeadAction(
       source: fmsApplicationSource,
       sourcing_experience: sourcingExperience,
       wechat_id: wechatId,
+      workflow_status: "new",
     } satisfies Record<string, boolean | string>;
 
     let lastErrorMessage = "";
@@ -143,7 +145,7 @@ export async function submitFmsApplicationLeadAction(
       const { data: lead, error } = await supabase
         .from("unpaid_leads")
         .insert({
-          follow_up_status: "FMS application - new",
+          follow_up_status: "New FMS application",
           lead_code: leadCode,
           lead_status: "new_lead",
           metadata: metadata as Json,

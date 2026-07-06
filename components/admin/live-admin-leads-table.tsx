@@ -49,6 +49,14 @@ const projectActions: Array<{ action: LeadWorkflowAction; label: string }> = [
   { action: "project_decline", label: "Decline" },
 ];
 
+const finalFmsWorkflowStatuses = new Set<AdminLeadQueueItem["workflowStatus"]>([
+  "admin_declined",
+  "approved_pending_account_setup",
+  "converted",
+  "super_admin_approved",
+  "super_admin_declined",
+]);
+
 async function getAccessToken() {
   const supabase = createBrowserSupabaseClient();
   const {
@@ -117,6 +125,41 @@ function workflowBadgeClass(status: AdminLeadQueueItem["workflowStatus"]) {
   }
 
   return "bg-slate-100 text-brand-muted";
+}
+
+function canShowFmsScreeningActions(lead: AdminLeadQueueItem) {
+  return (
+    lead.isFmsApplication &&
+    !finalFmsWorkflowStatuses.has(lead.workflowStatus) &&
+    lead.workflowStatus !== "forwarded_to_super_admin"
+  );
+}
+
+function getFmsReadOnlyMessage(lead: AdminLeadQueueItem) {
+  if (lead.workflowStatus === "forwarded_to_super_admin") {
+    return "Forwarded to Super Admin for final review.";
+  }
+
+  if (lead.workflowStatus === "converted") {
+    return "Final decision complete. FMS profile has been created or linked.";
+  }
+
+  if (lead.workflowStatus === "approved_pending_account_setup") {
+    return "Approved by Super Admin. Manual account setup is required.";
+  }
+
+  if (
+    lead.workflowStatus === "admin_declined" ||
+    lead.workflowStatus === "super_admin_declined"
+  ) {
+    return "Application declined. No further screening actions are available.";
+  }
+
+  if (lead.workflowStatus === "super_admin_approved") {
+    return "Approved by Super Admin. No further admin screening actions are available.";
+  }
+
+  return "";
 }
 
 export function LiveAdminLeadsTable() {
@@ -317,9 +360,11 @@ export function LiveAdminLeadsTable() {
       ) : (
         <div className="space-y-4">
           {visibleLeads.map((lead) => {
-            const actionOptions = lead.isFmsApplication
-              ? fmsActions
-              : projectActions;
+            const actionOptions = lead.isFmsApplication ? fmsActions : projectActions;
+            const showFmsScreeningActions = canShowFmsScreeningActions(lead);
+            const fmsReadOnlyMessage = lead.isFmsApplication
+              ? getFmsReadOnlyMessage(lead)
+              : "";
             const isBusy = (isPending && busyLeadId === lead.id) || busyLeadId === lead.id;
 
             return (
@@ -372,7 +417,9 @@ export function LiveAdminLeadsTable() {
                       </div>
                       <div>
                         <dt className="font-bold text-brand-navy">
-                          Package / Review track
+                          {lead.isFmsApplication
+                            ? "Review track"
+                            : "Package / Review track"}
                         </dt>
                         <dd>{lead.packageSelected}</dd>
                       </div>
@@ -387,7 +434,11 @@ export function LiveAdminLeadsTable() {
                         <dd>{lead.createdDate}</dd>
                       </div>
                       <div>
-                        <dt className="font-bold text-brand-navy">Lead status</dt>
+                        <dt className="font-bold text-brand-navy">
+                          {lead.isFmsApplication
+                            ? "Application status"
+                            : "Lead status"}
+                        </dt>
                         <dd className="mt-1">
                           <AdminStatusBadge status={lead.leadStatus} />
                         </dd>
@@ -395,8 +446,19 @@ export function LiveAdminLeadsTable() {
                     </dl>
                     {lead.convertedEntityId ? (
                       <p className="mt-4 rounded-lg border border-brand-emerald bg-emerald-50 p-3 text-sm font-semibold text-brand-emerald">
-                        Converted to {lead.convertedEntityType}:{" "}
-                        <span translate="no">{lead.convertedEntityId}</span>
+                        {lead.isFmsApplication ? (
+                          <>
+                            FMS profile created successfully.
+                            <span className="block text-xs text-brand-muted" translate="no">
+                              Profile reference: {lead.convertedEntityId.slice(0, 8)}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            Converted to {lead.convertedEntityType}:{" "}
+                            <span translate="no">{lead.convertedEntityId}</span>
+                          </>
+                        )}
                       </p>
                     ) : null}
                     <p className="mt-4 rounded-lg bg-brand-background p-3 text-sm leading-7 text-brand-muted">
@@ -420,23 +482,30 @@ export function LiveAdminLeadsTable() {
                       />
                     </label>
                     <div className="grid gap-2">
-                      {actionOptions.map((option) => (
-                        <Button
-                          disabled={isBusy}
-                          key={option.action}
-                          onClick={() => runWorkflowAction(lead, option.action)}
-                          type="button"
-                          variant={
-                            option.action.includes("decline")
-                              ? "outline"
-                              : option.action.includes("forward")
-                                ? "gold"
-                                : "secondary"
-                          }
-                        >
-                          {option.label}
-                        </Button>
-                      ))}
+                      {lead.isFmsApplication && fmsReadOnlyMessage ? (
+                        <p className="rounded-lg border border-slate-200 bg-white p-3 text-xs font-semibold leading-5 text-brand-muted">
+                          {fmsReadOnlyMessage}
+                        </p>
+                      ) : null}
+                      {(!lead.isFmsApplication || showFmsScreeningActions)
+                        ? actionOptions.map((option) => (
+                            <Button
+                              disabled={isBusy}
+                              key={option.action}
+                              onClick={() => runWorkflowAction(lead, option.action)}
+                              type="button"
+                              variant={
+                                option.action.includes("decline")
+                                  ? "outline"
+                                  : option.action.includes("forward")
+                                    ? "gold"
+                                    : "secondary"
+                              }
+                            >
+                              {option.label}
+                            </Button>
+                          ))
+                        : null}
                       {!lead.isFmsApplication ? (
                         <Button
                           disabled={isBusy || !lead.canConvertProjectLead}

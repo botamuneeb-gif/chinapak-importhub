@@ -24,6 +24,8 @@ FMS application leads are detected from metadata:
 
 - `metadata.source = public_fms_application`
 - `metadata.intended_role = fms`
+- `metadata.lead_type = fms_application`
+- lead code starts with `FMS-APP`
 
 All other `unpaid_leads` records are treated as project/importer leads unless future metadata adds a different lead type.
 
@@ -46,6 +48,20 @@ The workflow uses these metadata values:
 
 `lead_status` remains mapped to the closest existing enum value so existing lead pages and filters keep working.
 
+Because `unpaid_leads` is shared storage, FMS application records may still carry generic `lead_status` or `follow_up_status` values internally. The Admin and Super Admin UIs do not show project/payment/customer labels for FMS applications. They map FMS workflow metadata into professional application labels:
+
+- `new` or missing workflow: `New FMS Application`
+- `in_review`: `Admin Screening`
+- `pending_more_info`: `Pending Candidate Info`
+- `forwarded_to_super_admin` or Super Admin status `pending`: `Pending Super Admin Review`
+- Super Admin status `more_info_requested`: `More Info Requested by Super Admin`
+- `approved_pending_account_setup`: `Approved - Account Setup Needed`
+- `converted`: `FMS Profile Created`
+- `admin_declined`: `Declined by Admin Screening`
+- `super_admin_declined`: `Declined by Super Admin`
+
+Project/importer leads keep the normal project lead labels such as contacted, qualified, awaiting customer, converted, and declined.
+
 ## Admin Responsibilities
 
 Admin and Super Admin can use `/admin/leads`.
@@ -59,6 +75,8 @@ For FMS application leads, Admin can:
 - add internal notes
 
 Admin cannot final-approve FMS users.
+
+After an FMS application is forwarded, approved, converted, or declined, the Admin Leads card becomes read-only for normal screening actions. Converted FMS applications show `FMS profile created successfully` instead of a raw converted entity string.
 
 For project leads, Admin can:
 
@@ -83,6 +101,11 @@ Super Admin can:
 - add Super Admin notes
 
 Only leads forwarded by Admin can be final-reviewed here.
+
+Super Admin decisions keep two notes separate:
+
+- Internal Super Admin note: stored for admin/audit context and never emailed to the applicant.
+- Applicant-facing decision message: used in candidate decision emails. It is required for decline and more-info decisions and optional for approval.
 
 Forwarded FMS leads are included in the Super Admin queue when any safe FMS signal is present:
 
@@ -111,6 +134,23 @@ If invite email cannot be created safely, the lead is marked:
 - `workflow_status = approved_pending_account_setup`
 
 The UI explains that manual account setup is required. The system does not create or display weak/default passwords.
+
+Approval also records and attempts a professional applicant decision email:
+
+- Subject: `Your ChinaPak ImportHub FMS application has been approved`
+- Explains that access is invite-based and public FMS signup is not enabled.
+- Points the candidate to `/fms/login` and `/fms/academy`.
+- Reminds the candidate that FMS does not contact importers directly, submits evidence for admin review, and cannot release factory contact details without admin approval.
+- If Supabase invite email provides the secure setup path, the applicant is told to check their inbox. The platform does not invent or display default passwords.
+
+Decline and more-info decisions also record applicant emails:
+
+- Decline subject: `Update on your ChinaPak ImportHub FMS application`
+- More-info subject: `More information needed for your ChinaPak ImportHub FMS application`
+- Decline requires an applicant-facing reason and includes professional reapply guidance.
+- More-info requires an applicant-facing request and asks the candidate to submit a new `/fms/apply` application with the extra details if no update route exists yet.
+
+If `EMAIL_DELIVERY_MODE=disabled`, the decision still saves, a safe delivery attempt is logged, and Super Admin sees: `Decision saved, but email delivery is disabled. Please contact the candidate manually.`
 
 ## Project Lead Conversion
 
