@@ -6,6 +6,7 @@ const ROLE_REDIRECTS: Record<UserRole, string> = {
   fms: ROUTES.fmsDashboard,
   agent: ROUTES.agentDashboard,
   admin: ROUTES.admin,
+  project_manager: ROUTES.projectManagerDashboard,
   super_admin: ROUTES.superAdmin,
   factory_future: ROUTES.factoryLogin,
 };
@@ -13,6 +14,7 @@ const ROLE_REDIRECTS: Record<UserRole, string> = {
 const ROLE_PRIORITY: UserRole[] = [
   USER_ROLES.superAdmin,
   USER_ROLES.admin,
+  USER_ROLES.projectManager,
   USER_ROLES.fms,
   USER_ROLES.agent,
   USER_ROLES.importer,

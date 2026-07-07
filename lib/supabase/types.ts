@@ -687,6 +687,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      import_project_internal_notes: {
+        Row: {
+          id: string;
+          project_id: string;
+          author_admin_profile_id: string | null;
+          note_body: string;
+          note_type: string;
+          pinned: boolean;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+          updated_by: string | null;
+          metadata: Json;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          author_admin_profile_id?: string | null;
+          note_body: string;
+          note_type?: string;
+          pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+          metadata?: Json;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          author_admin_profile_id?: string | null;
+          note_body?: string;
+          note_type?: string;
+          pinned?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+          metadata?: Json;
+        };
+        Relationships: [];
+      };
       invoices: {
         Row: {
           id: string;
@@ -2253,6 +2295,7 @@ export type Database = {
         | "fms"
         | "agent"
         | "admin"
+        | "project_manager"
         | "super_admin"
         | "factory_future";
       profile_status:

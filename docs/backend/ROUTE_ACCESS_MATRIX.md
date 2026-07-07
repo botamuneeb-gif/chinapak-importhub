@@ -30,6 +30,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/login`, `/signup` | Public | Importer-first auth entry. Public signup creates importer role only. |
 | `/auth/role-select`, `/auth/otp`, `/auth/invite`, `/auth/security` | Public/noindex auth utilities | OTP remains inactive. `/auth/invite` is the Supabase invite acceptance page for approved FMS account activation and password setup; public FMS signup is not enabled. |
 | `/admin/login` | Public login page | Access after login requires active `admin` or `super_admin`. |
+| `/project-manager/login` | Public login page | Access after login requires active `project_manager`. |
 | `/super-admin/login` | Public login page | Access after login requires active `super_admin`. |
 | `/fms/login` | Public login page | Access after login requires active `fms` role and usable FMS profile. |
 | `/agent/login` | Public login page | Access after login requires active `agent` role. |
@@ -73,6 +74,14 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/admin/payments`, `/admin/refunds` | Admin, Super Admin | Manual payment/refund review. |
 | `/admin/messages/*`, `/admin/notifications` | Admin, Super Admin | Operational communication/notification surfaces. |
 
+## Project Manager Portal
+
+| Route group | Allowed access | Notes |
+|---|---|---|
+| `/project-manager`, `/project-manager/dashboard` | Project Manager | Limited project-flow dashboard. No Admin/Super Admin privileges. |
+| `/project-manager/projects`, `/project-manager/projects/[projectId]` | Project Manager | Safe project operational view, internal notes, workflow markers, and Admin escalation only. No payment verification, FMS assignment, FMS submission approval, report release, refunds, or user management. |
+| `/project-manager/notifications` | Project Manager | Own direct/role notifications and escalation/project-flow notices. |
+
 ## Super Admin Portal
 
 | Route group | Allowed access | Notes |
@@ -100,5 +109,5 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/refunds`, `/refunds/request`, `/refunds/[refundId]/document` | Importer owner | Own refund records only. Admin equivalents live under `/admin`. |
 | `/files/*` | No public page; server actions only | File access requires role checks and short-lived signed URLs. |
 | `/documents/*` | No public document index | Document routes are explicit importer/admin routes only. |
-| `/notifications/*` | Role scoped | Importer/FMS/admin/super-admin/agent notifications are scoped by profile/role. Portal tray uses the same notification actions and role checks. |
+| `/notifications/*` | Role scoped | Importer/FMS/admin/project-manager/super-admin/agent notifications are scoped by profile/role. Portal tray uses the same notification actions and role checks. |
 | `/api/*` | Internal/future | No current API route directory; disallowed in robots as a future private boundary. |

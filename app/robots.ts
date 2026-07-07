@@ -6,6 +6,8 @@ const privateRoutes = [
   "/admin/",
   "/super-admin",
   "/super-admin/",
+  "/project-manager",
+  "/project-manager/",
   "/agent/dashboard",
   "/agent/leads",
   "/agent/commissions",

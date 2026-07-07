@@ -9,6 +9,8 @@ The workflow supports two launch lead types:
 - `project_lead`: importer/project leads saved before payment
 - `fms_application`: public FMS candidate applications from `/fms/apply`
 
+Project Manager is intentionally not a lead-management role. Project Managers can monitor Import Projects and escalate project-flow issues to Admin, but they cannot final-approve FMS applications, convert FMS applications, create users, or manage Admin Leads.
+
 No Supabase schema migration was added. The existing `unpaid_leads` table already has:
 
 - `lead_status`

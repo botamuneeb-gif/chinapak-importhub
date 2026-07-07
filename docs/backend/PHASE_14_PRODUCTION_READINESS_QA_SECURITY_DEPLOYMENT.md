@@ -106,6 +106,7 @@ Current migration inventory:
 - `019_phase_10_invoice_payment_refund_statuses.sql`
 - `020_phase_12_notifications_email_foundation.sql`
 - `021_representative_verification_workflow.sql`
+- `022_project_manager_role.sql`
 
 Apply/check migrations:
 
@@ -128,6 +129,7 @@ Critical tables/views to verify:
 - `refunds`
 - `file_assets`
 - `notifications`
+- `audit_logs`
 - `admin_user_directory`
 - `representatives`
 - `representative_verification_attempts`

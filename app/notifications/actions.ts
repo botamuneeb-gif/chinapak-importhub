@@ -21,9 +21,10 @@ type ActionResult<T> =
 export type NotificationCenterRole =
   | typeof USER_ROLES.importer
   | typeof USER_ROLES.fms
+  | typeof USER_ROLES.agent
   | typeof USER_ROLES.admin
-  | typeof USER_ROLES.superAdmin
-  | typeof USER_ROLES.agent;
+  | typeof USER_ROLES.projectManager
+  | typeof USER_ROLES.superAdmin;
 
 export type NotificationTrayCategory =
   | "projects"

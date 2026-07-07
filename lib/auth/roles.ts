@@ -5,6 +5,7 @@ export const USER_ROLES = {
   fms: "fms",
   agent: "agent",
   admin: "admin",
+  projectManager: "project_manager",
   superAdmin: "super_admin",
   factoryFuture: "factory_future",
 } as const;
@@ -23,6 +24,7 @@ export const PORTAL_ROLES = [
   USER_ROLES.fms,
   USER_ROLES.agent,
   USER_ROLES.admin,
+  USER_ROLES.projectManager,
   USER_ROLES.superAdmin,
   USER_ROLES.factoryFuture,
 ] as const satisfies readonly UserRole[];

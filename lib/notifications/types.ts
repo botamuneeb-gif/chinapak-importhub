@@ -33,7 +33,9 @@ export type NotificationType =
   | "password_reset_by_super_admin"
   | "role_changed"
   | "user_suspended"
-  | "suspicious_access_or_role_mismatch";
+  | "suspicious_access_or_role_mismatch"
+  | "project_manager_project_updated"
+  | "project_manager_project_escalated";
 
 export type NotificationChannel = "in_app" | "email" | "system";
 export type NotificationPriority = "low" | "normal" | "high" | "urgent";

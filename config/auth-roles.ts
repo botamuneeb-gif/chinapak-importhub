@@ -5,6 +5,7 @@ export type AuthRoleId =
   | "fms"
   | "agent"
   | "admin"
+  | "project-manager"
   | "super-admin"
   | "factory";
 
@@ -61,6 +62,16 @@ export const authRoles: AuthRole[] = [
     statusLabel: "Internal",
   },
   {
+    id: "project-manager",
+    title: "Project Manager",
+    subtitle: "Project flow operations",
+    description: "Limited internal project-flow monitoring and escalation portal.",
+    href: ROUTES.projectManagerLogin,
+    futureDashboard: ROUTES.projectManagerDashboard,
+    accessModel: "Super Admin-assigned internal access",
+    statusLabel: "Internal limited",
+  },
+  {
     id: "super-admin",
     title: "Super Admin",
     subtitle: "Platform control",
@@ -91,7 +102,12 @@ export const businessTypes = [
   "Other",
 ] as const;
 
-export const inviteRoles = ["FMS", "Agent", "Factory Future"] as const;
+export const inviteRoles = [
+  "FMS",
+  "Agent",
+  "Project Manager",
+  "Factory Future",
+] as const;
 
 export const publicAuthTrustNotes = [
   "Secure project tracking",
@@ -106,7 +122,7 @@ export const authSecurityPrinciples = [
   },
   {
     title: "Role-based portals",
-    body: "Importer, FMS, Agent, Admin, Super Admin, and future Factory users route to separate protected dashboards later.",
+    body: "Importer, FMS, Agent, Project Manager, Admin, Super Admin, and future Factory users route to separate protected dashboards later.",
   },
   {
     title: "Contact detail protection",

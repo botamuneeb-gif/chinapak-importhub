@@ -231,6 +231,34 @@ export const portalRoleConfigs: Record<
       },
     ],
   },
+  [USER_ROLES.projectManager]: {
+    dashboardHref: ROUTES.projectManagerDashboard,
+    loginHref: ROUTES.projectManagerLogin,
+    roleLabel: "Project Manager Portal",
+    supportLabel: "Limited project-flow operations",
+    navItems: [
+      { href: ROUTES.projectManagerDashboard, label: "Dashboard" },
+      { href: ROUTES.projectManagerProjects, label: "Projects" },
+      { href: ROUTES.projectManagerNotifications, label: "Notifications" },
+    ],
+    quickActions: [
+      {
+        description: "Review submitted projects, safe workflow markers, and next steps.",
+        href: ROUTES.projectManagerProjects,
+        label: "Review Projects",
+      },
+      {
+        description: "Find projects that need importer information or admin escalation.",
+        href: ROUTES.projectManagerProjects,
+        label: "Project Queue",
+      },
+      {
+        description: "Review project-flow alerts without accessing admin-only controls.",
+        href: ROUTES.projectManagerNotifications,
+        label: "Notifications",
+      },
+    ],
+  },
   [USER_ROLES.superAdmin]: {
     dashboardHref: ROUTES.superAdmin,
     loginHref: ROUTES.superAdminLogin,

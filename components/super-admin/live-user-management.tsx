@@ -24,6 +24,7 @@ const roleFilters = [
   "fms",
   "agent",
   "admin",
+  "project_manager",
   "super_admin",
   "factory_future",
 ];
@@ -42,6 +43,7 @@ const assignableRoleOptions = [
   "fms",
   "agent",
   "admin",
+  "project_manager",
   "super_admin",
   "factory_future",
 ];

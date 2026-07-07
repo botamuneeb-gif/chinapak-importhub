@@ -74,6 +74,8 @@ function getPublicRoleLabel(role: UserRole | null, roleCount: number) {
       return "Agent";
     case "admin":
       return "Admin";
+    case "project_manager":
+      return "Project Manager";
     case "super_admin":
       return "Super Admin";
     case "factory_future":

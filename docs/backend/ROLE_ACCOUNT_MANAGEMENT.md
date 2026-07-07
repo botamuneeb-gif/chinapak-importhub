@@ -8,13 +8,14 @@ Status: account hygiene guidance for Phase 2+ auth/profile setup.
 
 `user_profiles` is the ChinaPak ImportHub base application profile for all roles. Admins and super admins are expected to exist here. Seeing an admin in `auth.users` or `user_profiles` is normal and not a bug.
 
-`role_assignments` is the source of truth for access. A user should be treated as an importer, FMS, agent, admin, super admin, or factory future user only when they have an active row for that role.
+`role_assignments` is the source of truth for access. A user should be treated as an importer, FMS, agent, Project Manager, admin, super admin, or factory future user only when they have an active row for that role.
 
 Role-specific profile tables are extensions:
 
 - `importer_profiles`: importer business/customer details.
 - `fms_profiles`: Factory Match Specialist details.
 - `agent_profiles`: Pakistani representative details.
+- Project Manager has no separate profile table in MVP; it uses `user_profiles`, active `role_assignments.role = project_manager`, internal notes, timeline events, and audit logs.
 - `admin_profiles`: internal operations staff details.
 - `super_admin_profiles`: highest-privilege platform control details.
 - `factory_profiles_future`: hidden/future factory account details.
@@ -25,8 +26,9 @@ The existence of a role-specific extension row is not enough to grant access. Ro
 
 - Public signup creates importer accounts only.
 - Public importer signup creates `user_profiles`, an active `role_assignments` row with role `importer`, and `importer_profiles`.
-- Public users cannot self-select `admin`, `super_admin`, `fms`, `agent`, or `factory_future`.
+- Public users cannot self-select `admin`, `project_manager`, `super_admin`, `fms`, `agent`, or `factory_future`.
 - `/admin` requires active `admin` or `super_admin`.
+- `/project-manager` requires active `project_manager`.
 - `/super-admin` requires active `super_admin`.
 - `/fms/dashboard`, `/fms/assignments`, `/fms/earnings`, `/fms/academy`, and `/fms/messages` require active `fms`.
 - `/agent/dashboard`, `/agent/leads`, `/agent/commissions`, and `/agent/training` require active `agent`.
@@ -37,13 +39,13 @@ The existence of a role-specific extension row is not enough to grant access. Ro
 
 ## Admin/Super Admin Creation
 
-Do not use public importer signup to create production admin accounts.
+Do not use public importer signup to create production internal accounts.
 
-For now, create the first admin or super admin manually:
+For now, create the first admin, Project Manager, or super admin manually:
 
 1. Create a Supabase Auth user with a secure email/password.
 2. Insert a `user_profiles` row linked to the Auth user.
-3. Insert an active `role_assignments` row for `admin` or `super_admin`.
+3. Insert an active `role_assignments` row for `admin`, `project_manager`, or `super_admin`.
 4. Optionally create the matching `admin_profiles` or `super_admin_profiles` row when that workflow is implemented.
 
 Do not hard-code admin credentials in the repository.
@@ -66,7 +68,9 @@ General account views should be labeled `All Accounts` or `User Profiles`, not `
 
 Importer/customer-only lists must filter to users with active `importer`.
 
-Staff lists must filter to active `admin` or `super_admin`.
+Admin staff lists must filter to active `admin` or `super_admin`.
+
+Project Manager lists must filter to active `project_manager`.
 
 FMS lists must filter to active `fms`.
 
@@ -89,7 +93,7 @@ The application creates active role rows through a server-only helper:
 
 Importer signup uses this helper with role `importer`. Public users cannot pass a different role into signup.
 
-Super Admin role controls at `/super-admin/role-controls` can ensure an active role assignment for manual account setup. That action may assign privileged roles only after the server verifies the caller has an active `super_admin` role.
+Super Admin role controls at `/super-admin/role-controls` can ensure an active role assignment for manual account setup, including `project_manager`. That action may assign privileged roles only after the server verifies the caller has an active `super_admin` role.
 
 No automatic database trigger is used for privileged role creation. This is intentional: a trigger that converts any `primary_role` edit into an active role assignment could make a mistaken Table Editor edit grant access. Role creation should remain in controlled server actions, with one idempotent backfill migration for existing rows.
 

@@ -16,6 +16,7 @@ const protectedPortalPrefixes = [
   "/refunds",
   "/admin",
   "/super-admin",
+  "/project-manager",
   "/agent/dashboard",
   "/agent/leads",
   "/agent/commissions",
@@ -32,6 +33,7 @@ const protectedPortalPrefixes = [
 const publicAuthPrefixes = [
   "/admin/login",
   "/super-admin/login",
+  "/project-manager/login",
   "/agent/login",
   "/fms/login",
 ];

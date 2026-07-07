@@ -722,7 +722,7 @@ export async function assignUserRoleBySuperAdminAction(
       return {
         ok: false,
         message:
-          "Confirm privileged role assignment before adding staff, FMS, agent, super admin, or factory-future access.",
+          "Confirm privileged role assignment before adding staff, FMS, agent, Project Manager, super admin, or factory-future access.",
       };
     }
 

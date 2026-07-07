@@ -192,6 +192,16 @@ export function getNotificationTemplate(
         title: "Role mismatch warning",
         message: `Potential role/profile mismatch detected. Super Admin review is recommended.`,
       };
+    case "project_manager_project_updated":
+      return {
+        title: "Project Manager update",
+        message: `${projectCode} was updated by a Project Manager. Review the internal timeline before the next operational step.`,
+      };
+    case "project_manager_project_escalated":
+      return {
+        title: "Project escalated by Project Manager",
+        message: `${projectCode} was escalated to Admin for a restricted decision or operational unblock.`,
+      };
     default:
       return {
         title: "ChinaPak ImportHub update",

@@ -9,6 +9,7 @@ export type UserRole =
   | "fms"
   | "agent"
   | "admin"
+  | "project_manager"
   | "super_admin"
   | "factory_future";
 

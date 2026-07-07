@@ -7,7 +7,7 @@ import { authRoles } from "@/config/auth-roles";
 export const metadata: Metadata = {
   title: "Select Role | ChinaPak ImportHub",
   description:
-    "Role-based entry for importer, FMS, agent, admin, super admin, and invitation-only factory access.",
+    "Role-based entry for importer, FMS, agent, project manager, admin, super admin, and invitation-only factory access.",
 };
 
 export default function RoleSelectPage() {
