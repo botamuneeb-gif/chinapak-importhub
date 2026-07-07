@@ -162,6 +162,51 @@ function getFmsReadOnlyMessage(lead: AdminLeadQueueItem) {
   return "";
 }
 
+function FmsAttributionSection({ lead }: { lead: AdminLeadQueueItem }) {
+  if (!lead.isFmsApplication || !lead.fmsAttribution) {
+    return null;
+  }
+
+  const attributionRows = [
+    ["Source", lead.fmsAttribution.source],
+    ["Landing page", lead.fmsAttribution.landingPage],
+    ["Referrer", lead.fmsAttribution.referrer],
+    ["Campaign", lead.fmsAttribution.campaign],
+    ["UTM source", lead.fmsAttribution.utmSource],
+    ["UTM medium", lead.fmsAttribution.utmMedium],
+    ["UTM campaign", lead.fmsAttribution.utmCampaign],
+    ["FMS SEO page type", lead.fmsAttribution.fmsSeoPageType],
+    ["Source page slug", lead.fmsAttribution.sourcePageSlug],
+    ["Submitted from", lead.fmsAttribution.submittedFromUrl],
+    ["User language", lead.fmsAttribution.userLanguage],
+    ["Submitted at", lead.fmsAttribution.submittedAt],
+  ];
+
+  return (
+    <details className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
+      <summary className="cursor-pointer font-bold text-brand-navy">
+        FMS acquisition attribution
+      </summary>
+      <dl className="mt-3 grid gap-3 md:grid-cols-2">
+        {attributionRows.map(([label, value]) => (
+          <div key={label}>
+            <dt className="text-xs font-bold uppercase tracking-wide text-brand-muted">
+              {label}
+            </dt>
+            <dd
+              className="mt-1 max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-semibold text-brand-navy"
+              title={value}
+              translate="no"
+            >
+              {value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </details>
+  );
+}
+
 export function LiveAdminLeadsTable() {
   const [leads, setLeads] = useState<AdminLeadQueueItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -480,6 +525,7 @@ export function LiveAdminLeadsTable() {
                     <p className="mt-4 rounded-lg bg-brand-background p-3 text-sm leading-7 text-brand-muted">
                       {lead.adminReviewNote}
                     </p>
+                    <FmsAttributionSection lead={lead} />
                   </div>
 
                   <div className="space-y-3 rounded-lg border border-slate-200 bg-brand-background p-4">

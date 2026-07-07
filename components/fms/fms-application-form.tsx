@@ -17,6 +17,48 @@ const initialState: FormState = {
   message: "",
 };
 
+const trackingParamKeys = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "source_page",
+  "source_page_slug",
+  "fms_seo_page_type",
+] as const;
+
+function appendAttribution(formData: FormData) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const currentUrl = new URL(window.location.href);
+  const sourcePage = currentUrl.searchParams.get("source_page") || currentUrl.pathname;
+  const sourcePageSlug =
+    currentUrl.searchParams.get("source_page_slug") ||
+    sourcePage.replace(/^\/+/, "").replaceAll("/", "-") ||
+    "fms-apply";
+
+  formData.set("tracking_landing_page", sourcePage);
+  formData.set("tracking_referrer", document.referrer || "");
+  formData.set("tracking_source_page_slug", sourcePageSlug);
+  formData.set(
+    "tracking_fms_seo_page_type",
+    currentUrl.searchParams.get("fms_seo_page_type") || "apply",
+  );
+  formData.set("tracking_user_language", navigator.language || "");
+  formData.set("tracking_submitted_from_url", window.location.href);
+
+  trackingParamKeys.forEach((key) => {
+    const value = currentUrl.searchParams.get(key);
+
+    if (value) {
+      formData.set(`tracking_${key}`, value);
+    }
+  });
+}
+
 export function FmsApplicationForm() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const [state, setState] = useState<FormState>(initialState);
@@ -27,6 +69,7 @@ export function FmsApplicationForm() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    appendAttribution(formData);
 
     setState(initialState);
     startTransition(async () => {

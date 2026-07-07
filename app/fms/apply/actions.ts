@@ -44,6 +44,33 @@ function readBoolean(formData: FormData, key: string) {
   return value === "on" || value === "true" || value === "yes";
 }
 
+function readTrackingString(formData: FormData, key: string, max = 500) {
+  const value = formData.get(key);
+  const text = typeof value === "string" ? value.trim() : "";
+
+  if (!text) {
+    return "";
+  }
+
+  return text.replace(/[\u0000-\u001f\u007f]/g, "").slice(0, max);
+}
+
+function readFmsSeoPageType(formData: FormData) {
+  const value = readTrackingString(formData, "tracking_fms_seo_page_type", 40);
+
+  if (
+    value === "hub" ||
+    value === "core" ||
+    value === "city" ||
+    value === "category" ||
+    value === "apply"
+  ) {
+    return value;
+  }
+
+  return "apply";
+}
+
 function hasContactChannel(values: {
   email: string;
   phone: string;
@@ -100,6 +127,7 @@ export async function submitFmsApplicationLeadAction(
     const canCollectEvidence = readBoolean(formData, "can_collect_evidence");
     const canVisitFactories = readBoolean(formData, "can_visit_factories");
     const consent = readBoolean(formData, "consent");
+    const submittedAt = new Date().toISOString();
 
     if (!hasContactChannel({ email, phone, wechatId })) {
       return {
@@ -125,16 +153,31 @@ export async function submitFmsApplicationLeadAction(
       consent_received: true,
       email,
       factory_regions: factoryRegions,
+      fms_seo_page_type: readFmsSeoPageType(formData),
       full_name: fullName,
       intended_role: USER_ROLES.fms,
+      landing_page: readTrackingString(formData, "tracking_landing_page"),
       languages,
       lead_type: "fms_application",
       phone,
       product_categories: productCategories,
       province,
+      referrer: readTrackingString(formData, "tracking_referrer"),
       short_introduction: shortIntroduction,
       source: fmsApplicationSource,
+      source_page_slug: readTrackingString(formData, "tracking_source_page_slug", 160),
       sourcing_experience: sourcingExperience,
+      submitted_at: submittedAt,
+      submitted_from_url: readTrackingString(
+        formData,
+        "tracking_submitted_from_url",
+      ),
+      user_language: readTrackingString(formData, "tracking_user_language", 80),
+      utm_campaign: readTrackingString(formData, "tracking_utm_campaign", 160),
+      utm_content: readTrackingString(formData, "tracking_utm_content", 160),
+      utm_medium: readTrackingString(formData, "tracking_utm_medium", 120),
+      utm_source: readTrackingString(formData, "tracking_utm_source", 120),
+      utm_term: readTrackingString(formData, "tracking_utm_term", 160),
       wechat_id: wechatId,
       workflow_status: "new",
     } satisfies Record<string, boolean | string>;

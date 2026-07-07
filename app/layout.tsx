@@ -4,6 +4,7 @@ import { SiteChrome } from "@/components/layout/site-chrome";
 import { JsonLd } from "@/components/seo/json-ld";
 import { brand } from "@/config/brand";
 import { getSiteUrl } from "@/config/site-url";
+import { getWebmasterVerificationMetadata } from "@/config/webmaster-verification";
 import "@/styles/globals.css";
 
 const siteUrl = getSiteUrl();
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  verification: getWebmasterVerificationMetadata(),
 };
 
 export const viewport: Viewport = {

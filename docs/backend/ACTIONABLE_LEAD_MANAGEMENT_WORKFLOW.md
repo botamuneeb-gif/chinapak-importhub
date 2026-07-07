@@ -29,6 +29,8 @@ FMS application leads are detected from metadata:
 - `metadata.lead_type = fms_application`
 - lead code starts with `FMS-APP`
 
+FMS application metadata also stores safe acquisition attribution such as `landing_page`, `referrer`, UTM fields, `source_page_slug`, `fms_seo_page_type`, `user_language`, `submitted_from_url`, and `submitted_at`. These fields are admin-only context for lead review and do not create accounts, roles, or public applicant tracking.
+
 All other `unpaid_leads` records are treated as project/importer leads unless future metadata adds a different lead type.
 
 ## Workflow Statuses
@@ -77,6 +79,8 @@ For FMS application leads, Admin can:
 - add internal notes
 
 Admin cannot final-approve FMS users.
+
+FMS application cards show a compact source-attribution section so Admin can see whether the candidate came from the FMS hub, a city page, a category page, direct/referral traffic, or a campaign URL.
 
 After an FMS application is forwarded, approved, converted, or declined, the Admin Leads card becomes read-only for normal screening actions. Converted FMS applications show `FMS profile created successfully` instead of a raw converted entity string.
 

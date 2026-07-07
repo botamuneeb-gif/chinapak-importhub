@@ -4,7 +4,11 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
 import { ROUTES, brand } from "@/config/brand";
 import type { FmsSeoPage } from "@/config/fms-acquisition";
-import { buildFmsPageUrl, fmsAcquisitionKeywords } from "@/config/fms-acquisition";
+import {
+  buildFmsApplyTrackingHref,
+  buildFmsPageUrl,
+  fmsAcquisitionKeywords,
+} from "@/config/fms-acquisition";
 
 type FmsSeoLandingPageProps = {
   page: FmsSeoPage;
@@ -57,6 +61,10 @@ export function FmsWeChatShareNote() {
 
 export function FmsSeoLandingPage({ page }: FmsSeoLandingPageProps) {
   const pageUrl = buildFmsPageUrl(page.canonicalPath);
+  const applyHref = buildFmsApplyTrackingHref({
+    pageType: page.kind,
+    sourcePage: page.canonicalPath,
+  });
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -77,10 +85,39 @@ export function FmsSeoLandingPage({ page }: FmsSeoLandingPageProps) {
     name: brand.name,
     url: `https://${brand.domain}`,
   };
+  const jobPostingJsonLd =
+    page.kind === "core"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "JobPosting",
+          applicantLocationRequirements: {
+            "@type": "Country",
+            name: "China",
+          },
+          datePosted: new Date().toISOString().slice(0, 10),
+          description: `${page.description} Manual review and invitation-only onboarding are required. Public FMS signup is disabled and work is not guaranteed.`,
+          directApply: true,
+          employmentType: "CONTRACTOR",
+          hiringOrganization: {
+            "@type": "Organization",
+            name: brand.name,
+            sameAs: `https://${brand.domain}`,
+          },
+          jobLocationType: "TELECOMMUTE",
+          title: `${page.h1} / Factory Match Specialist`,
+          url: buildFmsPageUrl(ROUTES.fmsApply),
+        }
+      : null;
 
   return (
     <main className="bg-brand-background" lang="zh-CN">
-      <JsonLd data={[organizationJsonLd, faqJsonLd]} />
+      <JsonLd
+        data={[
+          organizationJsonLd,
+          faqJsonLd,
+          ...(jobPostingJsonLd ? [jobPostingJsonLd] : []),
+        ]}
+      />
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_0.75fr] lg:items-center">
           <div>
@@ -94,7 +131,7 @@ export function FmsSeoLandingPage({ page }: FmsSeoLandingPageProps) {
               {page.intro}
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Button href={ROUTES.fmsApply} variant="secondary">
+              <Button href={applyHref} variant="secondary">
                 Apply as FMS
               </Button>
               <Button href={ROUTES.fms} variant="outline">
@@ -180,7 +217,7 @@ export function FmsSeoLandingPage({ page }: FmsSeoLandingPageProps) {
                 请提交真实城市、类别、语言和采购经验。管理员会先审核申请，再决定是否联系候选人。
               </p>
               <div className="mt-4">
-                <Button href={ROUTES.fmsApply} variant="secondary">
+                <Button href={applyHref} variant="secondary">
                   Apply as FMS
                 </Button>
               </div>
@@ -195,7 +232,7 @@ export function FmsSeoLandingPage({ page }: FmsSeoLandingPageProps) {
                   <Link href={ROUTES.fms}>FMS public hub</Link>
                 </li>
                 <li>
-                  <Link href={ROUTES.fmsApply}>FMS application</Link>
+                  <Link href={applyHref}>FMS application</Link>
                 </li>
                 <li>
                   <a href={pageUrl} translate="no">

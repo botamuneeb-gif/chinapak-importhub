@@ -16,10 +16,10 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Public SEO landing pages such as `/import-from-china-to-pakistan`, `/find-chinese-factories`, `/china-sourcing-service-pakistan` | Public | Generated through the public SEO route config. |
 | `/learn/*` | Public | Existing content hub routes. |
 | `/fms` | Public | Chinese-first FMS acquisition hub. Public FMS signup remains disabled. |
-| `/fms/apply` | Public | FMS application/interest form only. Creates an admin-review lead; does not create auth user, role assignment, or FMS profile. |
+| `/fms/apply` | Public | FMS application/interest form only. Creates an admin-review lead; does not create auth user, role assignment, or FMS profile. Stores safe source/UTM attribution in `unpaid_leads.metadata` for Admin review. |
 | `/fms/application-update/[token]` | Public token-scoped, noindex | Secure existing-application update link for FMS candidates when Admin/Super Admin requests more information. Updates only the matching `unpaid_leads` record and does not create duplicate applications or accounts. |
-| `/fms/china-sourcing-jobs`, `/fms/factory-match-specialist`, `/fms/china-procurement-agent` | Public | Chinese FMS acquisition SEO pages. |
-| `/fms/china/*`, `/fms/categories/*` | Public | City/category FMS acquisition SEO pages. |
+| `/fms/china-sourcing-jobs`, `/fms/factory-match-specialist`, `/fms/china-procurement-agent` | Public | Chinese FMS acquisition SEO pages. Indexable and linked to `/fms/apply` with safe attribution parameters. |
+| `/fms/china/*`, `/fms/categories/*` | Public | City/category FMS acquisition SEO pages. Indexable and linked to `/fms/apply` with safe attribution parameters. |
 | `/fms/opportunities/*` | Public | Existing FMS recruitment SEO pages retained for compatibility. |
 | `/factories/export-to-pakistan`, `/factories/find-pakistani-buyers`, `/factories/partnership` | Public | Factory opportunity pages remain future/invitation-only; no public factory signup activation. |
 

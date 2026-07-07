@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { FmsSeoLandingPage } from "@/components/fms/fms-acquisition-page";
-import { getFmsSeoPageBySlug, fmsSeoPages } from "@/config/fms-acquisition";
+import {
+  fmsAcquisitionKeywords,
+  getFmsSeoPageBySlug,
+  fmsSeoPages,
+} from "@/config/fms-acquisition";
 
 type FmsSeoPageRouteProps = {
   params: Promise<{
@@ -32,10 +36,18 @@ export async function generateMetadata({
     description: page.description,
     openGraph: {
       description: page.description,
+      locale: "zh_CN",
       title: page.title,
+      type: "website",
       url: page.canonicalPath,
     },
+    keywords: [...fmsAcquisitionKeywords],
     title: page.title,
+    twitter: {
+      card: "summary",
+      description: page.description,
+      title: page.title,
+    },
   };
 }
 

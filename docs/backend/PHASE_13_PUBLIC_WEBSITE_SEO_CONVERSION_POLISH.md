@@ -40,6 +40,8 @@ The FMS acquisition SEO layer now adds Chinese-first public pages for China-base
 
 `/fms/apply` creates an admin-review lead only. It does not create an FMS auth account, role assignment, or FMS profile.
 
+The FMS acquisition SEO layer also records safe attribution for FMS applications. CTAs from `/fms`, city pages, category pages, and core FMS SEO pages append compact source/UTM parameters into `/fms/apply`; the application action stores sanitized attribution in `unpaid_leads.metadata` for Admin review.
+
 The homepage was expanded with conversion-focused sections:
 
 - Trust gates and platform rules
@@ -67,9 +69,13 @@ The copy avoids aggressive claims against marketplaces. The safe positioning is:
 - Marketplaces and middle channels may involve multiple layers.
 - ChinaPak ImportHub focuses on Import Project tracking, FMS research, admin-reviewed factory options, and importer-safe factory-side evidence.
 
+Chinese-first FMS pages use Chinese metadata, `zh_CN` Open Graph locale, FMS keyword coverage, FAQ structured data, and conservative JobPosting structured data where appropriate. JobPosting content does not promise guaranteed income, public signup, or automatic approval.
+
 ## Public And Private Route Boundary
 
 The sitemap includes only public website, SEO, learning, FMS opportunity, and future factory partnership pages.
+
+Public FMS acquisition pages are included in the sitemap. Secure FMS update links such as `/fms/application-update/[token]` and protected FMS portal pages are excluded.
 
 The robots configuration disallows private or transactional portal routes such as:
 
@@ -80,6 +86,8 @@ The robots configuration disallows private or transactional portal routes such a
 - `/importer/reports`
 - `/fms/dashboard`
 - `/fms/assignments`
+- `/fms/application-update`
+- `/project-manager`
 - `/invoices`
 - `/payments`
 - `/refunds`
@@ -108,6 +116,10 @@ The site includes JSON-LD for:
 - `WebSite`
 - `Service`
 - `FAQPage` where FAQ content is rendered
+
+FMS acquisition pages include Organization and FAQPage data. The FMS hub and core FMS opportunity pages may include conservative JobPosting data for contractor-style sourcing support in China, without salary guarantees or public signup claims.
+
+Optional Baidu, Bing, and Google webmaster verification meta tags are controlled by env vars and render only when real verification values are configured.
 
 No fake reviews, ratings, partner logos, or office addresses were added.
 

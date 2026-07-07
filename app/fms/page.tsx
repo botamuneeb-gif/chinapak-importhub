@@ -5,7 +5,12 @@ import { FmsTrustNotice } from "@/components/fms/fms-acquisition-page";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
 import { ROUTES, brand } from "@/config/brand";
-import { fmsAcquisitionKeywords, fmsSeoPages } from "@/config/fms-acquisition";
+import {
+  buildFmsApplyTrackingHref,
+  buildFmsPageUrl,
+  fmsAcquisitionKeywords,
+  fmsSeoPages,
+} from "@/config/fms-acquisition";
 
 export const metadata: Metadata = {
   alternates: {
@@ -16,8 +21,17 @@ export const metadata: Metadata = {
   openGraph: {
     description:
       "Chinese-first FMS acquisition hub for China-based sourcing specialists. Applications are reviewed manually by admin.",
+    locale: "zh_CN",
     title: "成为 ChinaPak ImportHub 工厂对接专员",
+    type: "website",
     url: ROUTES.fms,
+  },
+  keywords: [...fmsAcquisitionKeywords],
+  twitter: {
+    card: "summary",
+    description:
+      "Chinese-first FMS acquisition hub for China-based sourcing specialists. Manual approval only; public FMS signup is disabled.",
+    title: "ChinaPak ImportHub FMS",
   },
   title: "成为 ChinaPak ImportHub 工厂对接专员",
 };
@@ -44,6 +58,10 @@ const earningNotes = [
 ];
 
 export default function FmsPage() {
+  const applyHref = buildFmsApplyTrackingHref({
+    pageType: "hub",
+    sourcePage: ROUTES.fms,
+  });
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -73,6 +91,27 @@ export default function FmsPage() {
         },
       ],
     },
+    {
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      applicantLocationRequirements: {
+        "@type": "Country",
+        name: "China",
+      },
+      datePosted: new Date().toISOString().slice(0, 10),
+      description:
+        "Factory Match Specialist / sourcing support contractor opportunity for China-based candidates. Applications are manually reviewed. Public FMS signup is disabled and work is not guaranteed.",
+      directApply: true,
+      employmentType: "CONTRACTOR",
+      hiringOrganization: {
+        "@type": "Organization",
+        name: brand.name,
+        sameAs: `https://${brand.domain}`,
+      },
+      jobLocationType: "TELECOMMUTE",
+      title: "Factory Match Specialist",
+      url: buildFmsPageUrl(ROUTES.fmsApply),
+    },
   ];
 
   return (
@@ -96,7 +135,7 @@ export default function FmsPage() {
               signup remains disabled; candidates apply for manual review only.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Button href={ROUTES.fmsApply} variant="secondary">
+              <Button href={applyHref} variant="secondary">
                 Apply as FMS
               </Button>
               <Button href={ROUTES.fmsFactoryMatchSpecialist} variant="outline">
@@ -239,7 +278,7 @@ export default function FmsPage() {
             提交申请后，管理员会审核你的城市、类别经验、语言能力和合规意识。申请不会自动开通账号。
           </p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button href={ROUTES.fmsApply} variant="gold">
+            <Button href={applyHref} variant="gold">
               Apply as FMS
             </Button>
             <Button href={ROUTES.fmsLogin} variant="lightOutline">

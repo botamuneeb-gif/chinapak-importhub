@@ -63,8 +63,13 @@ Submissions are saved in `unpaid_leads` with metadata:
 - `intended_role: fms`
 - `account_creation: not_created`
 - `admin_review_required: true`
+- `lead_type: fms_application`
+- `workflow_status`
+- FMS SEO attribution fields such as `landing_page`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `source_page_slug`, `fms_seo_page_type`, `submitted_from_url`, and `submitted_at`
 
 Admin can review these records in `/admin/leads`, where they are labeled as FMS applications.
+
+Admin can also see a compact attribution section for FMS applications. This helps identify whether an applicant came from `/fms`, a city page, a category page, a direct referral, or a campaign URL. Attribution is stored in metadata only and is not shown to applicants.
 
 Admin can pre-screen, request more information, decline at admin screening, or forward suitable applications to Super Admin. Normal Admin cannot final-approve FMS users.
 
@@ -127,6 +132,29 @@ Public FMS pages such as `/fms`, `/fms/apply`, city pages, category pages, and c
 
 Candidate update links under `/fms/application-update/[token]` are not SEO landing pages. They are noindex and disallowed in robots because they are secure workflow links sent by email.
 
+## China Indexing And Tracking Readiness
+
+The FMS SEO layer now includes Chinese-first metadata, `zh_CN` Open Graph locale, FAQ structured data, conservative JobPosting structured data on the hub/core FMS pages, and tracked CTA links into `/fms/apply`.
+
+CTA links from public FMS SEO pages append safe attribution parameters such as:
+
+- `source_page`
+- `source_page_slug`
+- `fms_seo_page_type`
+- `utm_source=fms_seo`
+- `utm_medium=organic_page`
+- campaign values such as `fms_hub_acquisition`, `fms_china_acquisition`, and `fms_category_acquisition`
+
+Optional webmaster verification can be configured through:
+
+- `NEXT_PUBLIC_BAIDU_SITE_VERIFICATION`
+- `NEXT_PUBLIC_BING_SITE_VERIFICATION`
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
+
+No fake verification IDs are rendered when these variables are blank.
+
+Detailed indexing and submission instructions live in `docs/backend/FMS_SEO_TRACKING_AND_CHINA_INDEXING.md`.
+
 ## Hidden Features Kept Disabled
 
 The following remain disabled or admin-controlled:
@@ -158,9 +186,11 @@ Future off-site acquisition work can include:
 - More-info emails update the existing application through `/fms/application-update/[token]` and do not create duplicate FMS leads.
 - No auth user, FMS role, or FMS profile is created from the public form.
 - `/admin/leads` clearly labels public FMS applications.
+- `/admin/leads` shows FMS application attribution metadata for Admin/Super Admin only.
 - Public FMS SEO pages load without login.
 - Protected FMS portal pages remain protected/noindex.
 - Sitemap includes public FMS SEO pages.
 - Robots does not expose protected routes.
+- Webmaster verification meta tags render only when real env values are configured.
 - Public FMS signup remains disabled.
 - No direct messaging or gateway payment is enabled.

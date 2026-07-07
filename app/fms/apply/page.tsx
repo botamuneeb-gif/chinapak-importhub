@@ -5,21 +5,30 @@ import { FmsTrustNotice, FmsWeChatShareNote } from "@/components/fms/fms-acquisi
 import { JsonLd } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
 import { ROUTES, brand } from "@/config/brand";
-import { buildFmsPageUrl } from "@/config/fms-acquisition";
+import { buildFmsPageUrl, fmsAcquisitionKeywords } from "@/config/fms-acquisition";
 
 export const metadata: Metadata = {
   alternates: {
     canonical: ROUTES.fmsApply,
   },
   description:
-    "Apply for manual admin review as a ChinaPak ImportHub Factory Match Specialist. This is an application lead only, not public FMS signup.",
+    "申请成为 ChinaPak ImportHub 工厂对接专员候选人。管理员人工审核，不是公开 FMS 注册。",
   openGraph: {
     description:
       "Submit an FMS application for admin review. Public FMS signup remains disabled.",
-    title: "Apply as FMS | ChinaPak ImportHub",
+    locale: "zh_CN",
+    title: "申请工厂对接专员 | ChinaPak ImportHub",
+    type: "website",
     url: ROUTES.fmsApply,
   },
-  title: "Apply as FMS | ChinaPak ImportHub",
+  keywords: [...fmsAcquisitionKeywords],
+  title: "申请工厂对接专员 | ChinaPak ImportHub",
+  twitter: {
+    card: "summary",
+    description:
+      "Manual FMS application for China-based sourcing specialists. No public FMS signup.",
+    title: "申请工厂对接专员 | ChinaPak ImportHub",
+  },
 };
 
 export default function FmsApplyPage() {

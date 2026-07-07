@@ -34,6 +34,23 @@ type ActionResult<T> =
       message: string;
     };
 
+export type FmsLeadAttribution = {
+  campaign: string;
+  fmsSeoPageType: string;
+  landingPage: string;
+  referrer: string;
+  source: string;
+  sourcePageSlug: string;
+  submittedAt: string;
+  submittedFromUrl: string;
+  userLanguage: string;
+  utmCampaign: string;
+  utmContent: string;
+  utmMedium: string;
+  utmSource: string;
+  utmTerm: string;
+};
+
 export type LeadWorkflowStatus =
   | "new"
   | "in_review"
@@ -57,6 +74,7 @@ export type AdminLeadQueueItem = {
   convertedEntityType: string;
   createdDate: string;
   forwardedAt: string;
+  fmsAttribution: FmsLeadAttribution | null;
   id: string;
   importerName: string;
   isFmsApplication: boolean;
@@ -366,6 +384,27 @@ function buildFmsContact(metadata: JsonObject) {
     .join(" | ");
 }
 
+function mapFmsAttribution(metadata: JsonObject): FmsLeadAttribution {
+  const utmCampaign = readString(metadata.utm_campaign);
+
+  return {
+    campaign: utmCampaign || readString(metadata.source_page_slug, "Not tracked"),
+    fmsSeoPageType: readString(metadata.fms_seo_page_type, "Not tracked"),
+    landingPage: readString(metadata.landing_page, "Not tracked"),
+    referrer: readString(metadata.referrer, "Not tracked"),
+    source: readString(metadata.source, "Not tracked"),
+    sourcePageSlug: readString(metadata.source_page_slug, "Not tracked"),
+    submittedAt: formatDate(readString(metadata.submitted_at)),
+    submittedFromUrl: readString(metadata.submitted_from_url, "Not tracked"),
+    userLanguage: readString(metadata.user_language, "Not tracked"),
+    utmCampaign: utmCampaign || "Not tracked",
+    utmContent: readString(metadata.utm_content, "Not tracked"),
+    utmMedium: readString(metadata.utm_medium, "Not tracked"),
+    utmSource: readString(metadata.utm_source, "Not tracked"),
+    utmTerm: readString(metadata.utm_term, "Not tracked"),
+  };
+}
+
 function mapLeadQueueItem(
   lead: LeadRow,
   importer?: Database["public"]["Tables"]["importer_profiles"]["Row"] | null,
@@ -418,6 +457,7 @@ function mapLeadQueueItem(
     convertedEntityType,
     createdDate: formatDate(lead.created_at),
     forwardedAt: formatDate(readString(metadata.forwarded_to_super_admin_at)),
+    fmsAttribution: fmsApplication ? mapFmsAttribution(metadata) : null,
     id: lead.id,
     importerName,
     isFmsApplication: fmsApplication,
@@ -444,6 +484,13 @@ function mapLeadQueueItem(
       readString(metadata.phone),
       readString(metadata.languages),
       readString(metadata.factory_regions),
+      readString(metadata.landing_page),
+      readString(metadata.referrer),
+      readString(metadata.source_page_slug),
+      readString(metadata.submitted_from_url),
+      readString(metadata.utm_campaign),
+      readString(metadata.utm_medium),
+      readString(metadata.utm_source),
     ]
       .join(" ")
       .toLowerCase(),

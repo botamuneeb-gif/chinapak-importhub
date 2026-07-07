@@ -23,6 +23,8 @@ export type FmsSeoPage = {
   title: string;
 };
 
+export type FmsSeoPageType = "hub" | "core" | "city" | "category" | "apply";
+
 export const fmsAcquisitionKeywords = [
   "工厂对接专员",
   "中国采购代理兼职",
@@ -337,4 +339,33 @@ export function getFmsSeoPageBySlug(slugSegments: string[]) {
 
 export function buildFmsPageUrl(path: string) {
   return `https://${brand.domain}${path}`;
+}
+
+export function buildFmsApplyTrackingHref({
+  campaign,
+  pageType,
+  sourcePage,
+}: {
+  campaign?: string;
+  pageType: FmsSeoPageType;
+  sourcePage: string;
+}) {
+  const params = new URLSearchParams({
+    fms_seo_page_type: pageType,
+    source_page: sourcePage,
+    source_page_slug: sourcePage.replace(/^\/+/, "").replaceAll("/", "-") || "fms",
+    utm_campaign:
+      campaign ??
+      (pageType === "city"
+        ? "fms_china_acquisition"
+        : pageType === "category"
+          ? "fms_category_acquisition"
+          : pageType === "hub"
+            ? "fms_hub_acquisition"
+            : "fms_core_acquisition"),
+    utm_medium: "organic_page",
+    utm_source: "fms_seo",
+  });
+
+  return `${ROUTES.fmsApply}?${params.toString()}`;
 }
