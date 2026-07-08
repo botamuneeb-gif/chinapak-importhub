@@ -147,9 +147,9 @@ CTA links from public FMS SEO pages append safe attribution parameters such as:
 
 Optional webmaster verification can be configured through:
 
-- `NEXT_PUBLIC_BAIDU_SITE_VERIFICATION`
-- `NEXT_PUBLIC_BING_SITE_VERIFICATION`
-- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
+- `BAIDU_SITE_VERIFICATION`
+- `BING_SITE_VERIFICATION`
+- `GOOGLE_SITE_VERIFICATION`
 
 No fake verification IDs are rendered when these variables are blank.
 

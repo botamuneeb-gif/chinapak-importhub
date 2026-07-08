@@ -177,9 +177,9 @@ Robots rules are SEO guidance only. Route guards and server actions remain the r
 
 Optional webmaster verification placeholders are available through environment variables:
 
-- `NEXT_PUBLIC_BAIDU_SITE_VERIFICATION`
-- `NEXT_PUBLIC_BING_SITE_VERIFICATION`
-- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
+- `BAIDU_SITE_VERIFICATION`
+- `BING_SITE_VERIFICATION`
+- `GOOGLE_SITE_VERIFICATION`
 
 The app renders verification metadata only when a real value is configured. It does not render fake Baidu, Bing, or Google verification IDs.
 
@@ -188,7 +188,7 @@ The app renders verification metadata only when a real value is configured. It d
 1. Create or log in to Baidu Search Resource Platform.
 2. Add `chinapakimporthub.com`.
 3. Verify ownership using DNS or a real Baidu meta verification value.
-4. Add `NEXT_PUBLIC_BAIDU_SITE_VERIFICATION` in Vercel only if using meta verification.
+4. Add `BAIDU_SITE_VERIFICATION` in Vercel only if using meta verification.
 5. Submit `https://chinapakimporthub.com/sitemap.xml`.
 6. Submit important FMS URLs manually if Baidu offers manual URL submission.
 7. Monitor indexing, crawl errors, blocked URLs, and duplicate metadata.
@@ -198,7 +198,7 @@ The app renders verification metadata only when a real value is configured. It d
 1. Create or log in to Bing Webmaster Tools.
 2. Add `chinapakimporthub.com`.
 3. Verify ownership using DNS or a real Bing meta verification value.
-4. Add `NEXT_PUBLIC_BING_SITE_VERIFICATION` in Vercel only if using meta verification.
+4. Add `BING_SITE_VERIFICATION` in Vercel only if using meta verification.
 5. Submit `https://chinapakimporthub.com/sitemap.xml`.
 6. Inspect representative FMS URLs and request indexing.
 7. Monitor crawl errors and sitemap processing.
@@ -207,7 +207,7 @@ The app renders verification metadata only when a real value is configured. It d
 
 1. Create or log in to Google Search Console.
 2. Add the domain property for `chinapakimporthub.com`.
-3. Prefer DNS verification; use `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` only if meta verification is chosen.
+3. Prefer DNS verification; use `GOOGLE_SITE_VERIFICATION` only if meta verification is chosen.
 4. Submit `https://chinapakimporthub.com/sitemap.xml`.
 5. Inspect `/fms`, `/fms/apply`, and several city/category pages.
 6. Confirm protected portal routes are not indexed.
