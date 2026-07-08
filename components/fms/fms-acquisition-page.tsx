@@ -85,39 +85,23 @@ export function FmsSeoLandingPage({ page }: FmsSeoLandingPageProps) {
     name: brand.name,
     url: `https://${brand.domain}`,
   };
-  const jobPostingJsonLd =
-    page.kind === "core"
-      ? {
-          "@context": "https://schema.org",
-          "@type": "JobPosting",
-          applicantLocationRequirements: {
-            "@type": "Country",
-            name: "China",
-          },
-          datePosted: new Date().toISOString().slice(0, 10),
-          description: `${page.description} Manual review and invitation-only onboarding are required. Public FMS signup is disabled and work is not guaranteed.`,
-          directApply: true,
-          employmentType: "CONTRACTOR",
-          hiringOrganization: {
-            "@type": "Organization",
-            name: brand.name,
-            sameAs: `https://${brand.domain}`,
-          },
-          jobLocationType: "TELECOMMUTE",
-          title: `${page.h1} / Factory Match Specialist`,
-          url: buildFmsPageUrl(ROUTES.fmsApply),
-        }
-      : null;
+  const webPageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    description: page.description,
+    inLanguage: "zh-CN",
+    name: page.title,
+    publisher: {
+      "@type": "Organization",
+      name: brand.name,
+      url: `https://${brand.domain}`,
+    },
+    url: pageUrl,
+  };
 
   return (
     <main className="bg-brand-background" lang="zh-CN">
-      <JsonLd
-        data={[
-          organizationJsonLd,
-          faqJsonLd,
-          ...(jobPostingJsonLd ? [jobPostingJsonLd] : []),
-        ]}
-      />
+      <JsonLd data={[organizationJsonLd, webPageJsonLd, faqJsonLd]} />
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_0.75fr] lg:items-center">
           <div>

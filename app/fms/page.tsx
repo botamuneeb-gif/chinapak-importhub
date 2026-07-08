@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { ROUTES, brand } from "@/config/brand";
 import {
   buildFmsApplyTrackingHref,
-  buildFmsPageUrl,
   fmsAcquisitionKeywords,
   fmsSeoPages,
 } from "@/config/fms-acquisition";
@@ -71,6 +70,19 @@ export default function FmsPage() {
     },
     {
       "@context": "https://schema.org",
+      "@type": "WebPage",
+      description: metadata.description,
+      inLanguage: "zh-CN",
+      name: metadata.title,
+      publisher: {
+        "@type": "Organization",
+        name: brand.name,
+        url: `https://${brand.domain}`,
+      },
+      url: `https://${brand.domain}${ROUTES.fms}`,
+    },
+    {
+      "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: [
         {
@@ -90,27 +102,6 @@ export default function FmsPage() {
           name: "FMS 可以直接联系进口商吗？",
         },
       ],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "JobPosting",
-      applicantLocationRequirements: {
-        "@type": "Country",
-        name: "China",
-      },
-      datePosted: new Date().toISOString().slice(0, 10),
-      description:
-        "Factory Match Specialist / sourcing support contractor opportunity for China-based candidates. Applications are manually reviewed. Public FMS signup is disabled and work is not guaranteed.",
-      directApply: true,
-      employmentType: "CONTRACTOR",
-      hiringOrganization: {
-        "@type": "Organization",
-        name: brand.name,
-        sameAs: `https://${brand.domain}`,
-      },
-      jobLocationType: "TELECOMMUTE",
-      title: "Factory Match Specialist",
-      url: buildFmsPageUrl(ROUTES.fmsApply),
     },
   ];
 

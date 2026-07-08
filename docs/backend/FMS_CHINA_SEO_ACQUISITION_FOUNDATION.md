@@ -134,7 +134,9 @@ Candidate update links under `/fms/application-update/[token]` are not SEO landi
 
 ## China Indexing And Tracking Readiness
 
-The FMS SEO layer now includes Chinese-first metadata, `zh_CN` Open Graph locale, FAQ structured data, conservative JobPosting structured data on the hub/core FMS pages, and tracked CTA links into `/fms/apply`.
+The FMS SEO layer now includes Chinese-first metadata, `zh_CN` Open Graph locale, safe Organization/WebPage/FAQ structured data, and tracked CTA links into `/fms/apply`.
+
+Google Search Console reported non-critical Job Postings warnings for missing `validThrough` and `baseSalary` when FMS pages used JobPosting JSON-LD. Because FMS is invite-only, project-based sourcing support and does not have publicly fixed compensation or a real application deadline, JobPosting schema has been removed rather than filled with fake salary or fake expiration values.
 
 CTA links from public FMS SEO pages append safe attribution parameters such as:
 

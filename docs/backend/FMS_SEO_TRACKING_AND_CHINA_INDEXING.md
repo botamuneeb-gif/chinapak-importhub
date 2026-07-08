@@ -121,19 +121,22 @@ FMS pages must not claim guaranteed income, guaranteed employment, automatic app
 The FMS hub and SEO pages render safe structured data:
 
 - `Organization`
+- `WebPage`
 - `FAQPage`
-- `JobPosting` on the FMS hub and core FMS opportunity pages only
 
-The JobPosting data is intentionally conservative:
+`JobPosting` JSON-LD is intentionally not rendered for FMS acquisition pages.
 
-- work type is contractor/sourcing support
-- location is China or remote within China
-- application URL is `/fms/apply`
-- manual review and invitation-only onboarding are stated
-- no guaranteed salary is included
-- no public signup is promised
+Google Search Console previously reported non-critical Job Postings warnings for missing `validThrough` and `baseSalary`. Because FMS is an invite-only, project-based sourcing support role and compensation is not publicly fixed, adding fake salary or fake deadline fields would be misleading. The site therefore avoids JobPosting schema and uses safer Organization, WebPage, and FAQPage structured data instead.
 
-If public compensation rules are later approved, salary fields can be added after legal/business review.
+Only re-enable JobPosting schema later if a page represents a real job posting with a true application deadline, approved compensation details, and business-approved role terms.
+
+After deploying this fix:
+
+1. Open Google Search Console.
+2. Go to the Job Postings enhancement issue.
+3. Confirm live page source no longer contains FMS `JobPosting` JSON-LD.
+4. Use Rich Results Test on `/fms` and core FMS pages.
+5. Click Validate Fix after Google can recrawl the updated pages.
 
 ## Sitemap And Robots
 

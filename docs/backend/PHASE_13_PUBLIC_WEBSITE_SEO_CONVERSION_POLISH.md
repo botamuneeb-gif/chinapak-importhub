@@ -69,7 +69,7 @@ The copy avoids aggressive claims against marketplaces. The safe positioning is:
 - Marketplaces and middle channels may involve multiple layers.
 - ChinaPak ImportHub focuses on Import Project tracking, FMS research, admin-reviewed factory options, and importer-safe factory-side evidence.
 
-Chinese-first FMS pages use Chinese metadata, `zh_CN` Open Graph locale, FMS keyword coverage, FAQ structured data, and conservative JobPosting structured data where appropriate. JobPosting content does not promise guaranteed income, public signup, or automatic approval.
+Chinese-first FMS pages use Chinese metadata, `zh_CN` Open Graph locale, FMS keyword coverage, and safe Organization/WebPage/FAQ structured data. JobPosting structured data is intentionally not used while FMS remains invite-only, project-based sourcing support without publicly fixed compensation or a real application deadline.
 
 ## Public And Private Route Boundary
 
@@ -117,7 +117,7 @@ The site includes JSON-LD for:
 - `Service`
 - `FAQPage` where FAQ content is rendered
 
-FMS acquisition pages include Organization and FAQPage data. The FMS hub and core FMS opportunity pages may include conservative JobPosting data for contractor-style sourcing support in China, without salary guarantees or public signup claims.
+FMS acquisition pages include Organization, WebPage, and FAQPage data. JobPosting JSON-LD should only be reconsidered later if a page represents a real job posting with approved compensation, a true deadline, and business-approved role terms.
 
 Optional Baidu, Bing, and Google webmaster verification meta tags are controlled by env vars and render only when real verification values are configured.
 
