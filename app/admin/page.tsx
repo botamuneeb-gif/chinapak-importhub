@@ -81,6 +81,58 @@ export default function AdminPage() {
         </AdminSectionCard>
       </div>
 
+      <div className="mt-8">
+        <AdminSectionCard title="Launch Operations Watchlist">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {[
+              {
+                href: ROUTES.adminPayments,
+                label: "Payment verification",
+                body: "Review manual payment references before project work starts.",
+              },
+              {
+                href: "/admin/projects?filter=ready_for_fms_assignment",
+                label: "Needs FMS assignment",
+                body: "Open projects that passed payment and admin review gates.",
+              },
+              {
+                href: ROUTES.adminFactorySubmissions,
+                label: "FMS submissions",
+                body: "Approve, reject, or request changes before importer release.",
+              },
+              {
+                href: "/admin/projects?q=report",
+                label: "Reports ready to release",
+                body: "Prepare sanitized importer-safe factory reports.",
+              },
+              {
+                href: "/admin/projects?q=escalated",
+                label: "PM escalations",
+                body: "Review projects escalated by Project Managers.",
+              },
+              {
+                href: ROUTES.adminRefunds,
+                label: "Refund review",
+                body: "Handle manual refund decisions through platform rules.",
+              },
+            ].map((item) => (
+              <Link
+                className="rounded-lg border border-slate-200 bg-brand-background p-4 no-underline transition hover:border-brand-emerald hover:bg-white"
+                href={item.href}
+                key={item.label}
+              >
+                <h3 className="text-sm font-bold text-brand-navy">
+                  {item.label}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-brand-muted">
+                  {item.body}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </AdminSectionCard>
+      </div>
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <AdminSectionCard title="Quick Links">
           <div className="grid gap-3">

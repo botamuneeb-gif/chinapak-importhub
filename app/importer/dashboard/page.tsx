@@ -44,6 +44,35 @@ export default function ImporterDashboardPage() {
           </div>
         </section>
 
+        <section className="grid gap-4 md:grid-cols-3">
+          {[
+            {
+              title: "Next action",
+              body: "Open My Projects to see the latest payment, admin review, FMS, and report step.",
+            },
+            {
+              title: "After payment",
+              body: "Admin verifies payment and reviews the project before any FMS sourcing starts.",
+            },
+            {
+              title: "Report release",
+              body: "Factory options appear only after admin review and safe importer-facing release.",
+            },
+          ].map((item) => (
+            <div
+              className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+              key={item.title}
+            >
+              <h2 className="text-base font-bold text-brand-navy">
+                {item.title}
+              </h2>
+              <p className="mt-2 text-sm leading-7 text-brand-muted">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </section>
+
         <section className="space-y-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>

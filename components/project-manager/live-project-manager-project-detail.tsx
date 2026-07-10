@@ -313,6 +313,34 @@ export function LiveProjectManagerProjectDetail({
         </div>
       </section>
 
+      <section className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-lg border border-brand-emerald bg-emerald-50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">
+            Current PM marker
+          </p>
+          <p className="mt-2 text-base font-bold text-brand-navy">
+            {detail.managerWorkflow.label}
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">
+            Escalation status
+          </p>
+          <p className="mt-2 text-base font-bold text-brand-navy">
+            {detail.managerWorkflow.escalationStatus}
+          </p>
+        </div>
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">
+            Next safe action
+          </p>
+          <p className="mt-2 text-sm font-bold leading-6 text-brand-navy">
+            Add an internal note, update the PM marker, or escalate to Admin
+            when a restricted decision is needed.
+          </p>
+        </div>
+      </section>
+
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-6">
           <DetailCard title="Project Summary">

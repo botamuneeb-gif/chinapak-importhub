@@ -22,6 +22,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/fms/china/*`, `/fms/categories/*` | Public | City/category FMS acquisition SEO pages. Indexable and linked to `/fms/apply` with safe attribution parameters. |
 | `/fms/opportunities/*` | Public | Existing FMS recruitment SEO pages retained for compatibility. |
 | `/factories/export-to-pakistan`, `/factories/find-pakistani-buyers`, `/factories/partnership` | Public | Factory opportunity pages remain future/invitation-only; no public factory signup activation. |
+| `/manifest.webmanifest`, `/icons/*` | Public | Installable PWA assets only. No service worker/offline cache is enabled for private portal data. |
 
 ## Authentication Entry
 

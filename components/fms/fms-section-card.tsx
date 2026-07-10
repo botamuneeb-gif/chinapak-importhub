@@ -9,7 +9,7 @@ type FmsSectionCardProps = {
 export function FmsSectionCard({ children, id, title }: FmsSectionCardProps) {
   return (
     <section
-      className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+      className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
       id={id}
     >
       <h2 className="text-xl font-bold text-brand-navy">{title}</h2>

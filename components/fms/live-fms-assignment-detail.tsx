@@ -396,6 +396,15 @@ export function LiveFmsAssignmentDetail({
         </div>
       </div>
 
+      <div className="mb-6 rounded-lg border border-brand-emerald bg-emerald-50 p-4 text-sm leading-7 text-brand-navy shadow-sm">
+        <h2 className="text-base font-bold">Mobile FMS checklist</h2>
+        <p className="mt-2">
+          Capture supplier name, quotation, MOQ, lead time, product match notes,
+          risk notes, and evidence while you work. Submit everything to Admin
+          review first; importer contact details are never shown here.
+        </p>
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <div className="space-y-6">
           <FmsSectionCard id="brief" title="1. Assignment Brief">
@@ -442,7 +451,7 @@ export function LiveFmsAssignmentDetail({
             <MilestoneChecklist milestones={assignment.milestones} />
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <button
-                className="min-h-12 rounded-lg border border-brand-navy bg-white px-5 py-3 font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald disabled:cursor-not-allowed disabled:opacity-55"
+                className="min-h-12 w-full rounded-lg border border-brand-navy bg-white px-5 py-3 font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
                 disabled={!canAccept || isMutating}
                 onClick={() => void updateProgress("accept")}
                 type="button"
@@ -450,7 +459,7 @@ export function LiveFmsAssignmentDetail({
                 Accept Assignment
               </button>
               <button
-                className="min-h-12 rounded-lg bg-brand-emerald px-5 py-3 font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-55"
+                className="min-h-12 w-full rounded-lg bg-brand-emerald px-5 py-3 font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
                 disabled={!canStartResearch || isMutating}
                 onClick={() => void updateProgress("start_research")}
                 type="button"
@@ -581,7 +590,7 @@ export function LiveFmsAssignmentDetail({
 
               <div className="space-y-3">
                 <button
-                  className="min-h-12 rounded-lg bg-brand-emerald px-5 py-3 font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-55"
+                  className="min-h-12 w-full rounded-lg bg-brand-emerald px-5 py-3 font-bold text-white transition hover:bg-brand-navy disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
                   disabled={isMutating}
                   type="submit"
                 >

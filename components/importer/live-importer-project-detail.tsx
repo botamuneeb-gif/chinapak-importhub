@@ -221,6 +221,44 @@ export function LiveImporterProjectDetail({
       </section>
 
       <Section
+        description="The importer portal highlights the safest next step for this project. Keep payments, files, reports, and support references inside the platform."
+        title="Next Required Action"
+      >
+        <div className="rounded-lg border border-brand-gold bg-amber-50 p-4 text-brand-navy">
+          <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">
+            Recommended now
+          </p>
+          <p className="mt-2 text-base font-bold leading-7">
+            {detail.statusSummary.nextSteps[0] ??
+              detail.statusSummary.description}
+          </p>
+          <p className="mt-2 text-sm leading-7 text-brand-muted">
+            {detail.statusSummary.description}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <Link
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-emerald px-4 py-2 text-sm font-bold text-white no-underline transition hover:bg-brand-navy"
+            href={ROUTES.paymentsManual}
+          >
+            Payment Help
+          </Link>
+          <Link
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-brand-navy bg-white px-4 py-2 text-sm font-bold text-brand-navy no-underline transition hover:border-brand-emerald hover:text-brand-emerald"
+            href={ROUTES.importerNotifications}
+          >
+            Notifications
+          </Link>
+          <Link
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-brand-navy no-underline transition hover:border-brand-emerald hover:text-brand-emerald"
+            href={ROUTES.importerReports}
+          >
+            Reports
+          </Link>
+        </div>
+      </Section>
+
+      <Section
         description="This is the importer-safe project summary. Private admin notes, FMS details, and factory contact records are not shown here."
         title="Project Summary"
       >

@@ -191,7 +191,7 @@ export function PortalNotificationTray({
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 z-50 mt-3 w-[min(92vw,24rem)] rounded-lg border border-slate-200 bg-white p-4 shadow-xl">
+        <div className="fixed left-3 right-3 top-20 z-50 rounded-lg border border-slate-200 bg-white p-4 shadow-xl sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-[min(92vw,24rem)]">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-bold text-brand-navy">

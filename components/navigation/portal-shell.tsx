@@ -159,6 +159,56 @@ function QuickActions({
   );
 }
 
+function MobileBottomNav({
+  ariaLabel,
+  items,
+  pathname,
+}: {
+  ariaLabel: string;
+  items: PortalNavItem[];
+  pathname: string;
+}) {
+  const mobileItems = items.filter(isNavigable);
+
+  if (mobileItems.length === 0) {
+    return null;
+  }
+
+  return (
+    <nav
+      aria-label={ariaLabel}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2 shadow-[0_-10px_30px_rgba(11,31,58,0.12)] backdrop-blur print:hidden lg:hidden"
+    >
+      <div className="mx-auto flex max-w-3xl gap-2 overflow-x-auto pb-1">
+        {mobileItems.map((item) => {
+          const active =
+            item.href === "/" ? pathname === item.href : pathname.startsWith(item.href);
+
+          return (
+            <Link
+              className={cn(
+                "inline-flex min-h-12 min-w-[5.75rem] shrink-0 flex-col items-center justify-center rounded-lg border px-3 py-2 text-center text-[11px] font-bold leading-tight no-underline transition",
+                active
+                  ? "border-brand-emerald bg-emerald-50 text-brand-emerald"
+                  : "border-slate-200 bg-white text-brand-navy hover:border-brand-gold",
+              )}
+              href={item.href}
+              key={`${item.label}-${item.href}-bottom`}
+            >
+              <span className="line-clamp-2">{item.label}</span>
+              {item.badge ? (
+                <span className="mt-1 text-[10px] text-brand-muted">
+                  {item.badge}
+                </span>
+              ) : null}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
 export function PortalShell({ children, role }: PortalShellProps) {
   const config = portalRoleConfigs[role];
   const pathname = usePathname();
@@ -309,30 +359,20 @@ export function PortalShell({ children, role }: PortalShellProps) {
                 </button>
               </div>
             </div>
-
-            <nav
-              aria-label={`${config.roleLabel} mobile navigation`}
-              className="border-t border-slate-200 bg-brand-navy px-4 py-3 lg:hidden"
-            >
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {config.navItems.map((item) => (
-                  <NavLink
-                    item={item}
-                    key={`${item.label}-${item.href}-mobile`}
-                    mobile
-                    pathname={pathname}
-                  />
-                ))}
-              </div>
-            </nav>
           </header>
 
-          <div className="w-full min-w-0 px-3 py-5 print:p-0 sm:px-4 lg:px-5">
+          <div className="w-full min-w-0 px-3 py-5 pb-28 print:p-0 sm:px-4 lg:px-5 lg:pb-5">
             {showQuickActions ? (
               <QuickActions actions={config.quickActions} pathname={pathname} />
             ) : null}
             {children}
           </div>
+
+          <MobileBottomNav
+            ariaLabel={`${config.roleLabel} mobile app navigation`}
+            items={config.navItems}
+            pathname={pathname}
+          />
         </div>
       </div>
     </div>

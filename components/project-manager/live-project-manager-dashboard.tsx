@@ -151,6 +151,35 @@ export function LiveProjectManagerDashboard() {
         ))}
       </section>
 
+      <section className="grid gap-4 md:grid-cols-3">
+        {[
+          {
+            title: "Project-flow focus",
+            body: "Use the queue to identify missing importer details, stale reviews, and projects ready for Admin review.",
+          },
+          {
+            title: "Escalate safely",
+            body: "Escalate restricted payment, FMS assignment, report release, or refund decisions to Admin instead of taking them here.",
+          },
+          {
+            title: "Mobile operations",
+            body: "Open a project card to add internal notes, set safe markers, and keep the timeline clear from the field.",
+          },
+        ].map((item) => (
+          <div
+            className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+            key={item.title}
+          >
+            <h2 className="text-base font-bold text-brand-navy">
+              {item.title}
+            </h2>
+            <p className="mt-2 text-sm leading-7 text-brand-muted">
+              {item.body}
+            </p>
+          </div>
+        ))}
+      </section>
+
       <ProjectList
         emptyText="No projects currently need Project Manager attention."
         projects={data.needsAttention}

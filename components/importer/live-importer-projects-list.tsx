@@ -218,6 +218,17 @@ export function LiveImporterProjectsList({
               {project.statusSummary.description}
             </p>
 
+            {project.statusSummary.nextSteps[0] ? (
+              <div className="mt-4 rounded-lg border border-brand-gold bg-amber-50 p-3">
+                <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">
+                  Next action
+                </p>
+                <p className="mt-1 text-sm font-bold leading-6 text-brand-navy">
+                  {project.statusSummary.nextSteps[0]}
+                </p>
+              </div>
+            ) : null}
+
             <div className="mt-5 flex flex-col gap-2 sm:flex-row">
               <Link
                 className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-emerald px-4 py-2 text-sm font-bold text-white no-underline transition hover:bg-brand-navy"

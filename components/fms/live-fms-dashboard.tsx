@@ -140,10 +140,21 @@ export function LiveFmsDashboard() {
           </div>
         </FmsSectionCard>
 
-        <FmsSectionCard title="Recent Submission Status">
-          <div className="rounded-lg border border-slate-200 bg-brand-background p-4 text-sm leading-7 text-brand-muted">
-            Factory option submissions remain disabled in Phase 5. FMS users can
-            view assignments and update assignment progress only.
+        <FmsSectionCard title="Mobile Field Workflow">
+          <div className="grid gap-3">
+            {[
+              "Open an assignment before contacting or researching suppliers.",
+              "Enter quotation, MOQ, lead time, match notes, and risk notes from the assignment workspace.",
+              "Upload evidence only through the approved file panel when available.",
+              "Submit factory options to Admin review first. Importers never receive FMS contact details.",
+            ].map((item) => (
+              <div
+                className="rounded-lg border border-slate-200 bg-brand-background p-3 text-sm font-semibold leading-6 text-brand-muted"
+                key={item}
+              >
+                {item}
+              </div>
+            ))}
           </div>
         </FmsSectionCard>
       </div>
