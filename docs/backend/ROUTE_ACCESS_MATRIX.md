@@ -80,7 +80,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/project-manager`, `/project-manager/dashboard` | Project Manager | Limited project-flow dashboard. No Admin/Super Admin privileges. |
-| `/project-manager/projects`, `/project-manager/projects/[projectId]` | Project Manager | Safe project operational view, internal notes, workflow markers, and Admin escalation only. No payment verification, FMS assignment, FMS submission approval, report release, refunds, or user management. |
+| `/project-manager/projects`, `/project-manager/projects/[projectId]` | Project Manager | Safe project operational view, lifecycle follow-up, internal notes, workflow markers, and Admin escalation only. No payment verification, FMS assignment, FMS submission approval, report release, refunds, or user management. |
 | `/project-manager/notifications` | Project Manager | Own direct/role notifications and escalation/project-flow notices. |
 
 ## Super Admin Portal
@@ -111,4 +111,5 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/files/*` | No public page; server actions only | File access requires role checks and short-lived signed URLs. |
 | `/documents/*` | No public document index | Document routes are explicit importer/admin routes only. |
 | `/notifications/*` | Role scoped | Importer/FMS/admin/project-manager/super-admin/agent notifications are scoped by profile/role. Portal tray uses the same notification actions and role checks. |
-| `/api/*` | Internal/future | No current API route directory; disallowed in robots as a future private boundary. |
+| `/api/cron/project-lifecycle-alerts` | Internal cron only | Requires `Authorization: Bearer CRON_SECRET`. Runs stuck-project alert scan and returns counts only. No public project data is exposed. |
+| `/api/*` | Internal/future | Disallowed in robots as a future private boundary unless a route is explicitly documented as public. |

@@ -7,6 +7,7 @@ import {
   type ProjectManagerDashboardData,
   type ProjectManagerProjectListItem,
 } from "@/app/project-manager/projects/actions";
+import { LiveProjectManagerLifecycleAlerts } from "@/components/project-manager/live-project-manager-lifecycle-alerts";
 import { ProjectManagerStatus } from "@/components/project-manager/project-manager-status";
 import { ROUTES } from "@/config/brand";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -179,6 +180,8 @@ export function LiveProjectManagerDashboard() {
           </div>
         ))}
       </section>
+
+      <LiveProjectManagerLifecycleAlerts />
 
       <ProjectList
         emptyText="No projects currently need Project Manager attention."

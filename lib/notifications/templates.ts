@@ -192,6 +192,11 @@ export function getNotificationTemplate(
         title: "Role mismatch warning",
         message: `Potential role/profile mismatch detected. Super Admin review is recommended.`,
       };
+    case "project_lifecycle_alert":
+      return {
+        title: "Project lifecycle alert",
+        message: `${projectCode} needs operational follow-up. Review the recommended action before changing any payment, FMS, or report state.`,
+      };
     case "project_manager_project_updated":
       return {
         title: "Project Manager update",

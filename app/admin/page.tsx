@@ -4,6 +4,7 @@ import { AdminProjectLookup } from "@/components/admin/admin-project-lookup";
 import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminStatCard } from "@/components/admin/admin-stat-card";
+import { LiveProjectLifecycleAlerts } from "@/components/admin/live-project-lifecycle-alerts";
 import {
   adminProjects,
   adminStats,
@@ -43,6 +44,10 @@ export default function AdminPage() {
 
       <div className="mt-8">
         <AdminProjectLookup />
+      </div>
+
+      <div className="mt-8">
+        <LiveProjectLifecycleAlerts />
       </div>
 
       <div className="mt-8">

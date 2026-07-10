@@ -76,6 +76,7 @@ Project Manager can:
   - `escalated_to_admin`
 - Escalate a project to Admin with reason, urgency, and internal note.
 - Receive Project Manager notifications.
+- View `Projects Needing Follow-up` lifecycle alerts on the dashboard.
 
 ## Prohibited Actions
 
@@ -113,6 +114,16 @@ It also:
 - Sets the Project Manager workflow marker to `escalated_to_admin`.
 - Creates an Admin notification linking to `/admin/projects/[projectCode]`.
 - Writes an audit log.
+
+## Lifecycle Alerts
+
+Project Manager dashboard includes a lifecycle alert section powered by `lib/projects/project-lifecycle-alerts.ts`.
+
+Project Manager-safe alerts include stuck importer information, stale project updates, open PM escalations, and restricted workflow actions that require Admin escalation.
+
+When an alert points to a restricted action such as payment verification, FMS assignment, factory submission approval, report release, or refund handling, the Project Manager UI shows escalation guidance only. It does not show Admin-only mutation controls.
+
+See `docs/backend/PROJECT_LIFECYCLE_AUTOMATION_AND_ALERTS.md` for thresholds, notification dedupe behavior, and cron readiness.
 
 ## Audit Logging
 
@@ -163,6 +174,7 @@ Existing high-risk Super Admin user/role actions continue to use their existing 
 - Project Manager can set a safe workflow marker.
 - Project Manager can escalate to Admin.
 - Admin receives escalation notification.
+- Project Manager sees lifecycle follow-up alerts without Admin-only controls.
 - Project Manager mutation actions create audit logs.
 - No payment verification/FMS assignment/report release/refund/user-management controls are visible.
 - `npm run lint`, `npm run typecheck`, and `npm run build` pass.

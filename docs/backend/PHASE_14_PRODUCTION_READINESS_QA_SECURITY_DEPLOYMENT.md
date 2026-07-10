@@ -56,6 +56,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 SUPABASE_JWT_SECRET=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+CRON_SECRET=
 EMAIL_DELIVERY_MODE=disabled
 EMAIL_FROM_NAME=ChinaPak ImportHub
 EMAIL_FROM_ADDRESS=no-reply@chinapakimporthub.com
@@ -80,6 +81,7 @@ Production notes:
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` publicly.
 - Never prefix service role key with `NEXT_PUBLIC_`.
 - Keep `EMAIL_DELIVERY_MODE=disabled` until a provider is tested in staging.
+- Set `CRON_SECRET` only if enabling protected cron calls such as the project lifecycle alert scan.
 
 ## Supabase Migration And Storage Checklist
 
@@ -241,6 +243,8 @@ Findings:
 - `docs/backend/ROLE_ACCOUNT_MANAGEMENT.md`
 - `docs/backend/SUPER_ADMIN_USER_MANAGEMENT.md`
 - `docs/backend/PHASE_13_PUBLIC_WEBSITE_SEO_CONVERSION_POLISH.md`
+- `docs/backend/PROJECT_MANAGER_ROLE_WORKFLOW.md`
+- `docs/backend/PROJECT_LIFECYCLE_AUTOMATION_AND_ALERTS.md`
 
 ## Final Build Checks
 
