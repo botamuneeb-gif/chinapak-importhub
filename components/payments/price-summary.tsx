@@ -32,7 +32,11 @@ export function PriceSummary({
         <div className="border-b border-slate-200 pb-3">
           <dt className="font-semibold text-brand-navy">Selected add-ons</dt>
           <dd className="mt-2 text-brand-muted">
-            {selectedAddOns.map((addOn) => `${addOn.name} (${addOn.price})`).join(", ")}
+            {selectedAddOns.length > 0
+              ? selectedAddOns
+                  .map((addOn) => `${addOn.name} (${addOn.price})`)
+                  .join(", ")
+              : "No add-ons selected yet"}
           </dd>
         </div>
         <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">

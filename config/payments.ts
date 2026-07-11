@@ -1,5 +1,5 @@
 import type { AddOnService, PricingPackage } from "@/config/pricing";
-import { addOnServices, pricingPackages } from "@/config/pricing";
+import { pricingPackages } from "@/config/pricing";
 
 export type PaymentStatus =
   | "Awaiting Payment"
@@ -70,11 +70,11 @@ export const paymentStatusCards: Array<{
   },
   {
     status: "Refunded",
-    detail: "Full refund has been recorded in placeholder data.",
+    detail: "Full refund has been recorded after admin review.",
   },
   {
     status: "Partially Refunded",
-    detail: "Admin-reviewed milestone refund placeholder.",
+    detail: "Admin-reviewed milestone refund has been recorded.",
   },
 ];
 
@@ -82,26 +82,20 @@ export const paymentMethods: PaymentMethod[] = [
   {
     id: "bank-transfer",
     name: "Bank Transfer",
-    status: "Manual verification placeholder",
-    note: "Bank transfer proof will later be verified by admin.",
+    status: "Manual admin verification",
+    note: "Submit the transfer reference through the importer portal for Admin review.",
   },
   {
     id: "easypaisa",
     name: "Easypaisa",
-    status: "Gateway future",
-    note: "Local mobile wallet flow placeholder.",
+    status: "Manual admin verification",
+    note: "Submit the wallet reference and payer details. Do not share OTPs or account passwords.",
   },
   {
     id: "jazzcash",
     name: "JazzCash",
-    status: "Gateway future",
-    note: "Local mobile wallet flow placeholder.",
-  },
-  {
-    id: "card",
-    name: "Debit/Credit Card Future",
-    status: "Future gateway",
-    note: "Card payment integration is not connected yet.",
+    status: "Manual admin verification",
+    note: "Submit the wallet reference and payer details for Admin verification before FMS work starts.",
   },
 ];
 
@@ -112,11 +106,11 @@ export const checkoutSummary: {
   subtotal: string;
   estimatedTotal: string;
 } = {
-  projectId: "CPH-2026-0010",
+  projectId: "Your Project ID appears after submission",
   selectedPackage: pricingPackages[1],
-  selectedAddOns: [addOnServices[0], addOnServices[4]],
-  subtotal: "PKR 52,000",
-  estimatedTotal: "PKR 52,000",
+  selectedAddOns: [],
+  subtotal: "Package fee shown after selection",
+  estimatedTotal: "Admin-confirmed invoice total",
 };
 
 export const invoices: InvoiceRecord[] = [
@@ -249,19 +243,19 @@ export const invoices: InvoiceRecord[] = [
 ];
 
 export const failedPaymentReasons = [
-  "Bank declined",
-  "Gateway timeout",
-  "Wrong details",
-  "Network issue",
-  "Payment limit",
+  "Reference not found",
+  "Amount mismatch",
+  "Wrong invoice",
+  "Unclear payer details",
+  "Duplicate reference",
 ] as const;
 
 export const refundStatuses = [
-  "Request submitted placeholder",
+  "Request submitted",
   "Admin review pending",
   "FMS assignment check",
   "Milestone review if assigned",
-  "Refund, reassignment, or support decision placeholder",
+  "Refund, reassignment, or support decision",
 ] as const;
 
 export function getInvoiceById(invoiceId: string) {

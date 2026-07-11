@@ -129,14 +129,27 @@ export type AdminLiveProjectDetail = {
   };
   project: AdminLiveProjectListItem;
   requirements: {
+    attribution: {
+      campaign: string;
+      landingPage: string;
+      selectedPackage: string;
+      submittedFrom: string;
+      utmMedium: string;
+      utmSource: string;
+    };
     budget: string;
+    customizationNeeds: string;
+    destinationCityPakistan: string;
     importExperience: string;
     inputMethod: string;
+    preferredChinaRegion: string;
     productDetails: string;
     productLinks: string;
+    qualityConcerns: string;
     quantity: string;
     qualityLevel: string;
     specialNotes: string;
+    targetBudget: string;
   };
   timeline: Array<{
     id?: string;
@@ -2451,6 +2464,8 @@ export async function getAdminImportProjectAction(
       project,
       approvedSubmissionsResult.submissions.length,
     );
+    const requirementMetadata = toJsonObject(requirement?.metadata);
+    const attribution = toJsonObject(requirementMetadata.conversion_attribution);
 
     return {
       ok: true,
@@ -2558,17 +2573,51 @@ export async function getAdminImportProjectAction(
         },
         project: projectListItem,
         requirements: {
+          attribution: {
+            campaign: readString(attribution.utm_campaign, "Not captured"),
+            landingPage: readString(attribution.landing_page, "Not captured"),
+            selectedPackage: readString(
+              attribution.selected_package,
+              packageRow?.package_code ?? "Not captured",
+            ),
+            submittedFrom: readString(
+              attribution.submitted_from_url,
+              "Not captured",
+            ),
+            utmMedium: readString(attribution.utm_medium, "Not captured"),
+            utmSource: readString(attribution.utm_source, "Not captured"),
+          },
           budget: requirement?.budget_range ?? "Not provided",
+          customizationNeeds: readString(
+            requirementMetadata.customization_needs,
+            "Not provided",
+          ),
+          destinationCityPakistan: readString(
+            requirementMetadata.destination_city_pakistan,
+            "Not provided",
+          ),
           importExperience: requirement?.import_experience ?? "Not provided",
           inputMethod:
             requirement?.input_methods.join(", ") || "Input method pending",
+          preferredChinaRegion: readString(
+            requirementMetadata.preferred_china_region,
+            "Not provided",
+          ),
           productDetails:
             requirement?.product_description ?? "Product details pending",
           productLinks:
             requirement?.product_links.join(", ") || "No product link provided",
+          qualityConcerns: readString(
+            requirementMetadata.quality_concerns,
+            "Not provided",
+          ),
           quantity: requirement?.quantity ?? "Not provided",
           qualityLevel: requirement?.quality_level ?? "Not provided",
           specialNotes: requirement?.special_notes ?? "No special notes",
+          targetBudget: readString(
+            requirementMetadata.target_budget,
+            "Not provided",
+          ),
         },
         timeline:
           timelineRows.length > 0

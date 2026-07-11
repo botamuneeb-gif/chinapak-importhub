@@ -181,6 +181,18 @@ The manual send:
 
 Project Manager does not see this button.
 
+## Importer Payment Reminder Boundary
+
+Daily operations digest remains internal-only for Admin, Super Admin, and Project Manager.
+
+Importer payment reminders are separate from the daily digest and live in:
+
+```text
+lib/importer/importer-payment-followups.ts
+```
+
+That helper may create internal payment follow-up notifications and, only when explicitly enabled by a future caller, importer reminder emails. The daily digest cron does not send public/importer/FMS emails.
+
 ## Audit Logging
 
 Audit actions:
@@ -213,4 +225,5 @@ Audit logs do not store passwords, tokens, API keys, invite links, or private co
 - Cron route returns counts only.
 - No importer/FMS/factory private contact data is included.
 - No public/importer/FMS emails are sent by this digest.
+- Importer payment reminder helper remains separate from daily digest and does not grant Project Manager payment verification powers.
 - `npm run lint`, `npm run typecheck`, and `npm run build` pass.

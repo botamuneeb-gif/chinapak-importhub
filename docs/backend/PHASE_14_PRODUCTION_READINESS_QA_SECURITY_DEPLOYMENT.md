@@ -235,6 +235,21 @@ Findings:
 - Urdu public copy uses `lang`, `dir`, and `.urdu-text` helpers where applicable.
 - No private project IDs, invoice IDs, reports, files, or user directory routes are included in the sitemap.
 
+## Importer Conversion And Payment Readiness
+
+Importer conversion/payment readiness is documented in:
+
+- `docs/backend/IMPORTER_CONVERSION_AND_PAYMENT_READINESS.md`
+
+Production boundary:
+
+- Package CTAs may preselect `/importer/start?package=...`.
+- Importer submission attribution is stored only in existing project/lead metadata.
+- Manual payment references remain Admin/Super Admin verified.
+- Project Manager cannot verify payments, mark payment paid, reject payment, or bypass Admin review.
+- No card/bank credentials, OTPs, or sensitive payment data should be collected in forms or uploads.
+- No payment gateway is connected in this phase.
+
 ## Related Documents
 
 - `docs/backend/ROUTE_ACCESS_MATRIX.md`
@@ -246,6 +261,7 @@ Findings:
 - `docs/backend/PROJECT_MANAGER_ROLE_WORKFLOW.md`
 - `docs/backend/PROJECT_LIFECYCLE_AUTOMATION_AND_ALERTS.md`
 - `docs/backend/DAILY_OPERATIONS_DIGEST_AND_REMINDERS.md`
+- `docs/backend/IMPORTER_CONVERSION_AND_PAYMENT_READINESS.md`
 
 ## Final Build Checks
 

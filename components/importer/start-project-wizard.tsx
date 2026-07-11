@@ -2,11 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import type { ChangeEvent, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { uploadImporterProjectFileAction } from "@/app/files/actions";
 import {
   saveUnpaidLeadAction,
   submitImportProjectAction,
+  type ImporterConversionAttribution,
   type StartProjectDraftInput,
 } from "@/app/importer/start/actions";
 import { AddOnCard } from "@/components/importer/add-on-card";
@@ -27,27 +28,33 @@ type FinalStatus = "idle" | "project-created" | "lead-saved";
 const initialDraft: StartProjectDraftInput = {
   addOnIds: [],
   budgetId: "",
+  customizationNeeds: "",
+  destinationCityPakistan: "",
   experienceId: "",
   packageId: "factory-match-plus",
+  preferredChinaRegion: "",
+  productCategory: "",
   productDetails: "",
   productLink: "",
+  qualityConcerns: "",
   quantity: "",
   qualityLevelId: "",
   requirementFileCount: 0,
   selectedLeadReasonId: "",
   specialNotes: "",
+  targetBudget: "",
   voiceNoteFileName: "",
 };
 
 const stepTitles = [
-  "Product Input",
-  "Import Budget",
-  "Quantity and Requirements",
-  "Import Experience",
+  "Product Details",
+  "Budget Readiness",
+  "Quantity and Destination",
+  "Supplier Preferences",
   "Package Selection",
   "Add-ons",
-  "Order Summary",
-  "Payment or Save Lead",
+  "Review Summary",
+  "Payment Readiness",
 ];
 
 function MethodCard({
@@ -152,6 +159,34 @@ function isAllowedFile(
   return allowedTypes.has(file.type) || allowedExtensions.has(getExtension(file.name));
 }
 
+function isSupportedPackageId(value: string | null) {
+  return Boolean(
+    value && importProjectFlow.packages.some((plan) => plan.id === value),
+  );
+}
+
+function captureAttribution(): ImporterConversionAttribution {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const sourcePage =
+    params.get("source_page") || params.get("sourcePage") || window.location.pathname;
+
+  return {
+    landingPage: sourcePage,
+    referrer: document.referrer || "",
+    selectedPackage: params.get("package") || "",
+    sourcePageSlug: sourcePage,
+    submittedFromUrl: window.location.href,
+    utmCampaign: params.get("utm_campaign") || "",
+    utmContent: params.get("utm_content") || "",
+    utmMedium: params.get("utm_medium") || "",
+    utmSource: params.get("utm_source") || "",
+  };
+}
+
 export function StartProjectWizard() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
@@ -164,6 +199,8 @@ export function StartProjectWizard() {
   const [createdInvoiceCode, setCreatedInvoiceCode] = useState("");
   const [createdLeadCode, setCreatedLeadCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentReadinessConfirmed, setPaymentReadinessConfirmed] =
+    useState(false);
   const [requirementFiles, setRequirementFiles] = useState<File[]>([]);
   const [voiceNoteFile, setVoiceNoteFile] = useState<File | null>(null);
   const [uploadWarning, setUploadWarning] = useState("");
@@ -191,6 +228,27 @@ export function StartProjectWizard() {
   const progressPercent = Math.round(
     (currentStep / importProjectFlow.totalSteps) * 100,
   );
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const packageParam = params.get("package");
+    const attribution = captureAttribution();
+
+    setDraft((previous) => {
+      const nextPackageId = isSupportedPackageId(packageParam)
+        ? packageParam ?? previous.packageId
+        : previous.packageId;
+
+      return {
+        ...previous,
+        attribution: {
+          ...attribution,
+          selectedPackage: nextPackageId,
+        },
+        packageId: nextPackageId,
+      };
+    });
+  }, []);
 
   function updateDraft(partial: Partial<StartProjectDraftInput>) {
     setDraft((previous) => ({ ...previous, ...partial }));
@@ -412,6 +470,13 @@ export function StartProjectWizard() {
   }
 
   async function submitPaidIntentProject() {
+    if (!paymentReadinessConfirmed) {
+      setValidationMessage(
+        "Please confirm that you understand manual payment must be verified by Admin before factory sourcing starts.",
+      );
+      return;
+    }
+
     setLeadReasonVisible(false);
     setSubmissionError("");
     setUploadWarning("");
@@ -427,6 +492,13 @@ export function StartProjectWizard() {
 
     const submissionDraft: StartProjectDraftInput = {
       ...draft,
+      attribution: {
+        ...draft.attribution,
+        selectedPackage: draft.packageId,
+        submittedAt: new Date().toISOString(),
+        submittedFromUrl:
+          typeof window === "undefined" ? "" : window.location.href,
+      },
       requirementFileCount: requirementFiles.length,
       voiceNoteFileName: voiceNoteFile?.name ?? "",
     };
@@ -470,6 +542,13 @@ export function StartProjectWizard() {
 
     const leadDraft: StartProjectDraftInput = {
       ...draft,
+      attribution: {
+        ...draft.attribution,
+        selectedPackage: draft.packageId,
+        submittedAt: new Date().toISOString(),
+        submittedFromUrl:
+          typeof window === "undefined" ? "" : window.location.href,
+      },
       requirementFileCount: requirementFiles.length,
       voiceNoteFileName: voiceNoteFile?.name ?? "",
     };
@@ -522,6 +601,29 @@ export function StartProjectWizard() {
             />
           </div>
         </div>
+
+        <section className="mb-5 rounded-lg border border-brand-gold bg-amber-50 p-4 text-brand-navy shadow-sm">
+          <p className="text-sm font-bold text-brand-emerald">
+            Import Project readiness
+          </p>
+          <div className="mt-3 grid gap-3 text-sm leading-7 md:grid-cols-5">
+            {[
+              "Product details",
+              "Supplier preferences",
+              "Attachments",
+              "Package/payment readiness",
+              "Review and submit",
+            ].map((item) => (
+              <div className="rounded-lg bg-white/70 p-3 font-semibold" key={item}>
+                {item}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-sm leading-7 text-brand-muted">
+            Factory matching starts only after Admin verifies payment and reviews
+            the project. FMS never contacts importers directly.
+          </p>
+        </section>
 
         {currentStep === 1 ? (
           <WizardStep
@@ -604,6 +706,22 @@ export function StartProjectWizard() {
                   placeholder="مثلاً: بچوں کے school bags، medium size، better quality..."
                   rows={5}
                   value={draft.productDetails}
+                />
+                <label
+                  className="mt-4 block text-sm font-semibold text-brand-navy"
+                  htmlFor="product-category"
+                >
+                  Product category (optional)
+                </label>
+                <input
+                  className={fieldClasses()}
+                  id="product-category"
+                  onChange={(event) =>
+                    updateDraft({ productCategory: event.target.value })
+                  }
+                  placeholder="Electronics, garments, toys, home goods..."
+                  type="text"
+                  value={draft.productCategory ?? ""}
                 />
               </MethodCard>
 
@@ -695,6 +813,22 @@ export function StartProjectWizard() {
                 />
               ))}
             </div>
+            <label
+              className="mt-5 block text-sm font-semibold text-brand-navy"
+              htmlFor="target-budget"
+            >
+              Target product budget or price range (optional)
+            </label>
+            <input
+              className={fieldClasses()}
+              id="target-budget"
+              onChange={(event) =>
+                updateDraft({ targetBudget: event.target.value })
+              }
+              placeholder="Example: PKR 700 per piece, USD 2-3 FOB, or Admin will confirm"
+              type="text"
+              value={draft.targetBudget ?? ""}
+            />
           </WizardStep>
         ) : null}
 
@@ -724,6 +858,27 @@ export function StartProjectWizard() {
               </div>
 
               <div>
+                <label
+                  className="block text-sm font-semibold text-brand-navy"
+                  htmlFor="destination-city"
+                >
+                  Destination city in Pakistan (optional)
+                </label>
+                <input
+                  className={fieldClasses()}
+                  id="destination-city"
+                  onChange={(event) =>
+                    updateDraft({
+                      destinationCityPakistan: event.target.value,
+                    })
+                  }
+                  placeholder="Karachi, Lahore, Islamabad, Faisalabad..."
+                  type="text"
+                  value={draft.destinationCityPakistan ?? ""}
+                />
+              </div>
+
+              <div>
                 <p className="text-sm font-semibold text-brand-navy">
                   Preferred quality level
                 </p>
@@ -739,6 +894,25 @@ export function StartProjectWizard() {
                     />
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label
+                  className="block text-sm font-semibold text-brand-navy"
+                  htmlFor="quality-concerns"
+                >
+                  Quality concerns (optional)
+                </label>
+                <textarea
+                  className={fieldClasses()}
+                  id="quality-concerns"
+                  onChange={(event) =>
+                    updateDraft({ qualityConcerns: event.target.value })
+                  }
+                  placeholder="Material, finishing, safety, packaging, sample, or durability concerns..."
+                  rows={4}
+                  value={draft.qualityConcerns ?? ""}
+                />
               </div>
 
               <div className="lg:col-span-2">
@@ -777,6 +951,32 @@ export function StartProjectWizard() {
                   title={experience.label}
                 />
               ))}
+            </div>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              <label className="grid gap-2 text-sm font-semibold text-brand-navy">
+                Preferred China city/province (optional)
+                <input
+                  className={fieldClasses()}
+                  onChange={(event) =>
+                    updateDraft({ preferredChinaRegion: event.target.value })
+                  }
+                  placeholder="Guangzhou, Shenzhen, Yiwu, Foshan, any suitable region..."
+                  type="text"
+                  value={draft.preferredChinaRegion ?? ""}
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold text-brand-navy">
+                Customization, branding, or packaging needs (optional)
+                <textarea
+                  className={fieldClasses()}
+                  onChange={(event) =>
+                    updateDraft({ customizationNeeds: event.target.value })
+                  }
+                  placeholder="Logo printing, color, packaging, labeling, MOQ concerns, or supplier preferences..."
+                  rows={4}
+                  value={draft.customizationNeeds ?? ""}
+                />
+              </label>
             </div>
           </WizardStep>
         ) : null}
@@ -833,14 +1033,20 @@ export function StartProjectWizard() {
             <SummaryCard
               addOns={selectedAddOns}
               budget={selectedBudget?.label ?? "Not selected"}
+              customizationNeeds={draft.customizationNeeds}
+              destinationCityPakistan={draft.destinationCityPakistan}
               experience={selectedExperience?.label ?? "Not selected"}
               packagePlan={selectedPackage}
+              preferredChinaRegion={draft.preferredChinaRegion}
+              productCategory={draft.productCategory}
               productDetails={draft.productDetails}
               productLink={draft.productLink}
+              qualityConcerns={draft.qualityConcerns}
               quantity={draft.quantity}
               qualityLevel={selectedQuality?.label ?? "Not selected"}
               requirementFileCount={requirementFiles.length}
               specialNotes={draft.specialNotes}
+              targetBudget={draft.targetBudget}
               voiceNoteFileName={voiceNoteFile?.name ?? ""}
             />
           </WizardStep>
@@ -852,6 +1058,29 @@ export function StartProjectWizard() {
             heading="Payment or Save Lead"
             stepLabel="Step 8 — Payment or Save Lead"
           >
+            <div className="mb-5 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
+              <p className="font-bold">Before factory sourcing starts</p>
+              <ul className="mt-2 grid gap-2">
+                <li>Admin must verify the manual payment reference.</li>
+                <li>Admin must review and approve the Import Project.</li>
+                <li>FMS will never contact you directly or collect payment.</li>
+              </ul>
+              <label className="mt-4 flex items-start gap-3 font-semibold">
+                <input
+                  checked={paymentReadinessConfirmed}
+                  className="mt-1 h-5 w-5 rounded border-slate-300"
+                  onChange={(event) =>
+                    setPaymentReadinessConfirmed(event.target.checked)
+                  }
+                  type="checkbox"
+                />
+                <span>
+                  I understand payment is manual/admin-verified and factory
+                  sourcing starts only after payment and Admin review gates pass.
+                </span>
+              </label>
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               <button
                 className="rounded-lg border border-brand-emerald bg-brand-emerald p-5 text-start text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-brand-navy hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold disabled:cursor-not-allowed disabled:opacity-60"
@@ -956,6 +1185,14 @@ export function StartProjectWizard() {
                       variant="secondary"
                     >
                       Track Project
+                    </Button>
+                  ) : null}
+                  {createdInvoiceCode ? (
+                    <Button
+                      href={`${ROUTES.paymentsManual}?invoice=${createdInvoiceCode}`}
+                      variant="primary"
+                    >
+                      Complete payment
                     </Button>
                   ) : null}
                   <Button

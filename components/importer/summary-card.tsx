@@ -3,14 +3,20 @@ import type { ImportAddOn, ImportPackage } from "@/config/import-project";
 type SummaryCardProps = {
   addOns: readonly ImportAddOn[];
   budget: string;
+  customizationNeeds?: string;
+  destinationCityPakistan?: string;
   experience: string;
   packagePlan: ImportPackage;
+  preferredChinaRegion?: string;
+  productCategory?: string;
   productDetails: string;
   productLink: string;
+  qualityConcerns?: string;
   quantity: string;
   qualityLevel: string;
   requirementFileCount: number;
   specialNotes: string;
+  targetBudget?: string;
   voiceNoteFileName: string;
 };
 
@@ -32,14 +38,20 @@ function SummaryRow({
 export function SummaryCard({
   addOns,
   budget,
+  customizationNeeds,
+  destinationCityPakistan,
   experience,
   packagePlan,
+  preferredChinaRegion,
+  productCategory,
   productDetails,
   productLink,
+  qualityConcerns,
   quantity,
   qualityLevel,
   requirementFileCount,
   specialNotes,
+  targetBudget,
   voiceNoteFileName,
 }: SummaryCardProps) {
   const productSummary = [
@@ -62,10 +74,37 @@ export function SummaryCard({
 
       <dl className="mt-5">
         <SummaryRow label="Product details summary" value={productSummary} />
+        {productCategory ? (
+          <SummaryRow label="Product category" value={productCategory} />
+        ) : null}
         <SummaryRow label="Budget" value={budget} />
+        {targetBudget ? (
+          <SummaryRow label="Target product budget" value={targetBudget} />
+        ) : null}
         <SummaryRow label="Quantity" value={quantity} />
+        {destinationCityPakistan ? (
+          <SummaryRow
+            label="Destination city in Pakistan"
+            value={destinationCityPakistan}
+          />
+        ) : null}
         <SummaryRow label="Quality level" value={qualityLevel} />
+        {qualityConcerns ? (
+          <SummaryRow label="Quality concerns" value={qualityConcerns} />
+        ) : null}
         <SummaryRow label="Experience level" value={experience} />
+        {preferredChinaRegion ? (
+          <SummaryRow
+            label="Preferred China city/province"
+            value={preferredChinaRegion}
+          />
+        ) : null}
+        {customizationNeeds ? (
+          <SummaryRow
+            label="Customization or packaging needs"
+            value={customizationNeeds}
+          />
+        ) : null}
         <SummaryRow
           label="Selected package"
           value={`${packagePlan.name} — ${packagePlan.price}`}

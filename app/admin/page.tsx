@@ -83,6 +83,54 @@ export default function AdminPage() {
             Admin reminder: no FMS work begins until payment is completed and
             admin review marks the Import Project ready for assignment.
           </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {[
+              {
+                body: "Check projects where no payment reference has been submitted yet.",
+                href: "/admin/projects?q=awaiting_payment",
+                label: "Projects awaiting payment",
+              },
+              {
+                body: "Review submitted manual references before marking payment verified.",
+                href: ROUTES.adminPayments,
+                label: "Payment proof pending verification",
+              },
+              {
+                body: "Open paid projects that still need Admin project approval.",
+                href: "/admin/projects?q=paid%20admin%20review",
+                label: "Paid projects awaiting Admin approval",
+              },
+              {
+                body: "Move approved and paid projects toward FMS assignment.",
+                href: "/admin/projects?filter=ready_for_fms_assignment",
+                label: "Paid projects awaiting FMS assignment",
+              },
+              {
+                body: "Handle rejected or unclear payment references with safe importer notes.",
+                href: `${ROUTES.adminPayments}?filter=needs_correction`,
+                label: "Payment issues needing correction",
+              },
+              {
+                body: "Review Project Manager escalations without giving PM payment powers.",
+                href: "/admin/projects?q=escalated",
+                label: "PM escalations",
+              },
+            ].map((item) => (
+              <Link
+                className="rounded-lg border border-slate-200 bg-white p-4 no-underline transition hover:border-brand-emerald"
+                href={item.href}
+                key={item.label}
+              >
+                <h3 className="text-sm font-bold text-brand-navy">
+                  {item.label}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-brand-muted">
+                  {item.body}
+                </p>
+              </Link>
+            ))}
+          </div>
         </AdminSectionCard>
       </div>
 

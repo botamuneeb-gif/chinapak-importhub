@@ -268,10 +268,22 @@ export function LiveImporterProjectDetail({
           <FieldCard label="Package" value={detail.packageName} />
           <FieldCard label="Desired quantity" value={detail.requirements.quantity} />
           <FieldCard label="Budget range" value={detail.requirements.budgetRange} />
+          <FieldCard
+            label="Target budget"
+            value={detail.requirements.targetBudget}
+          />
+          <FieldCard
+            label="Destination city"
+            value={detail.requirements.destinationCityPakistan}
+          />
           <FieldCard label="Quality level" value={detail.requirements.qualityLevel} />
           <FieldCard
             label="Importer experience"
             value={detail.requirements.importExperience}
+          />
+          <FieldCard
+            label="Preferred China region"
+            value={detail.requirements.preferredChinaRegion}
           />
           <FieldCard label="Created" value={detail.createdAt} />
           <FieldCard label="Last updated" value={detail.updatedAt} />
@@ -290,6 +302,12 @@ export function LiveImporterProjectDetail({
             </p>
             <p className="mt-2 text-sm leading-7 text-brand-muted">
               Special notes: {detail.requirements.specialNotes}
+            </p>
+            <p className="mt-2 text-sm leading-7 text-brand-muted">
+              Quality concerns: {detail.requirements.qualityConcerns}
+            </p>
+            <p className="mt-2 text-sm leading-7 text-brand-muted">
+              Customization/packaging: {detail.requirements.customizationNeeds}
             </p>
           </div>
         </div>
@@ -358,6 +376,19 @@ export function LiveImporterProjectDetail({
       </Section>
 
       <Section description={detail.paymentPanelNotice} title="Payment And Invoice">
+        <div className="mb-4 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
+          <p className="font-bold">Payment state</p>
+          <p className="mt-1">
+            Current payment status:{" "}
+            <span className="font-bold">{detail.paymentStatus}</span>. Factory
+            matching/report work stays blocked until Admin verifies payment and
+            the project passes Admin review.
+          </p>
+          <p className="mt-2 text-brand-muted">
+            Submit only transaction reference details. Do not upload or type
+            bank passwords, OTPs, card numbers, or private credentials.
+          </p>
+        </div>
         {detail.invoices.length === 0 ? (
           <Notice>
             Invoice is not available yet. If you recently submitted the project,

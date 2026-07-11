@@ -60,6 +60,64 @@ function Notice({ children }: { children: React.ReactNode }) {
   );
 }
 
+const paymentReadinessStates = [
+  {
+    body: "Invoice is ready, but no manual payment reference has been submitted yet.",
+    title: "Awaiting payment",
+  },
+  {
+    body: "Importer submits bank/Easypaisa/JazzCash reference details through this portal.",
+    title: "Proof submitted",
+  },
+  {
+    body: "Admin checks the reference manually. FMS work remains blocked.",
+    title: "Verification pending",
+  },
+  {
+    body: "Payment is marked verified by Admin, then project review and FMS assignment rules continue.",
+    title: "Payment verified",
+  },
+  {
+    body: "If Admin cannot verify the reference, submit corrected details from the invoice or manual payment page.",
+    title: "Needs correction",
+  },
+];
+
+function PaymentReadinessChecklist() {
+  return (
+    <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+      <p className="text-sm font-bold text-brand-emerald">
+        Manual payment readiness
+      </p>
+      <h2 className="mt-1 text-xl font-bold text-brand-navy">
+        What happens after payment
+      </h2>
+      <div className="mt-4 grid gap-3 md:grid-cols-5">
+        {paymentReadinessStates.map((state) => (
+          <article
+            className="rounded-lg border border-slate-200 bg-brand-background p-3"
+            key={state.title}
+          >
+            <h3 className="text-sm font-bold text-brand-navy">
+              {state.title}
+            </h3>
+            <p className="mt-2 text-xs font-semibold leading-5 text-brand-muted">
+              {state.body}
+            </p>
+          </article>
+        ))}
+      </div>
+      <div className="mt-4">
+        <Notice>
+          Do not share card numbers, banking passwords, OTPs, CNIC images, or
+          private account credentials in payment notes. Admin only needs enough
+          transaction reference detail to verify the manual payment.
+        </Notice>
+      </div>
+    </section>
+  );
+}
+
 function Field({
   label,
   name,
@@ -151,6 +209,7 @@ export function LiveImporterInvoices() {
 
   return (
     <div className="grid gap-4">
+      <PaymentReadinessChecklist />
       {invoices.map((invoice) => (
         <article
           className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
@@ -367,6 +426,8 @@ export function LiveImporterInvoiceDetail({
 
   return (
     <div className="grid gap-6">
+      <PaymentReadinessChecklist />
+
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
         <Link
           className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-emerald px-4 py-2 text-sm font-bold text-white no-underline transition hover:bg-brand-navy"
@@ -635,6 +696,8 @@ export function LiveManualPaymentPage() {
 
   return (
     <div className="grid gap-5">
+      <PaymentReadinessChecklist />
+
       <label className="grid gap-2 rounded-lg border border-slate-200 bg-white p-4 text-sm font-bold text-brand-navy shadow-sm">
         Select invoice
         <select

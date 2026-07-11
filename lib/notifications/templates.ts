@@ -32,6 +32,36 @@ export function getNotificationTemplate(
         title: "Import Project submitted",
         message: `${projectCode} محفوظ ہو گیا ہے۔ Payment verification اور admin review کے بعد sourcing work start ہو سکے گا۔`,
       };
+    case "importer_project_received":
+      return {
+        title: "Import Project received",
+        message: `${projectCode} was received. Your next step is to review the invoice/payment instructions and submit a manual payment reference for Admin verification.`,
+      };
+    case "importer_payment_instructions":
+      return {
+        title: "Payment instructions ready",
+        message: `${invoiceCode} is ready for ${projectCode}. Submit your manual payment reference only through the platform; never share card numbers, banking passwords, OTPs, or private account credentials.`,
+      };
+    case "importer_payment_proof_received":
+      return {
+        title: "Payment proof received",
+        message: `${invoiceCode} payment reference was received. Admin verification is pending before factory search or FMS work can begin.`,
+      };
+    case "importer_payment_verified":
+      return {
+        title: "Payment verified",
+        message: `${projectCode} payment was verified by Admin. The project still follows Admin review before any FMS assignment or factory search proceeds.`,
+      };
+    case "importer_payment_needs_correction":
+      return {
+        title: "Payment needs correction",
+        message: `${projectCode} payment reference needs correction or more information. Review the Admin message and submit corrected payment details through the platform.`,
+      };
+    case "importer_payment_reminder":
+      return {
+        title: "Payment reminder",
+        message: `${projectCode} is still awaiting payment verification. Submit the manual payment reference when ready so Admin can review it before sourcing begins.`,
+      };
     case "invoice_issued":
       return {
         title: "Invoice issued",

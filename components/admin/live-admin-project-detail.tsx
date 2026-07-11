@@ -456,14 +456,34 @@ export function LiveAdminProjectDetail({
                 value={project.requirements.inputMethod}
               />
               <DetailRow label="Import budget" value={project.requirements.budget} />
+              <DetailRow
+                label="Target product budget"
+                value={project.requirements.targetBudget}
+              />
               <DetailRow label="Quantity" value={project.requirements.quantity} />
+              <DetailRow
+                label="Destination city in Pakistan"
+                value={project.requirements.destinationCityPakistan}
+              />
               <DetailRow
                 label="Quality level"
                 value={project.requirements.qualityLevel}
               />
               <DetailRow
+                label="Quality concerns"
+                value={project.requirements.qualityConcerns}
+              />
+              <DetailRow
                 label="Importer experience"
                 value={project.requirements.importExperience}
+              />
+              <DetailRow
+                label="Preferred China city/province"
+                value={project.requirements.preferredChinaRegion}
+              />
+              <DetailRow
+                label="Customization/packaging needs"
+                value={project.requirements.customizationNeeds}
               />
               <DetailRow
                 label="Selected package"
@@ -482,6 +502,19 @@ export function LiveAdminProjectDetail({
               <DetailRow
                 label="Estimated delivery timeframe"
                 value={project.package.delivery}
+              />
+              <DetailRow
+                label="Importer source / campaign"
+                value={[
+                  `Landing: ${project.requirements.attribution.landingPage}`,
+                  `UTM: ${project.requirements.attribution.utmSource} / ${project.requirements.attribution.utmMedium}`,
+                  `Campaign: ${project.requirements.attribution.campaign}`,
+                  `Selected package: ${project.requirements.attribution.selectedPackage}`,
+                ].join(" | ")}
+              />
+              <DetailRow
+                label="Submitted from URL"
+                value={project.requirements.attribution.submittedFrom}
               />
             </dl>
           </AdminSectionCard>

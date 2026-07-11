@@ -9,19 +9,39 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 export type StartProjectDraftInput = {
   addOnIds: string[];
+  attribution?: ImporterConversionAttribution;
   budgetId: string;
+  customizationNeeds?: string;
+  destinationCityPakistan?: string;
   experienceId: string;
   packageId: string;
+  preferredChinaRegion?: string;
+  productCategory?: string;
   productDetails: string;
   productLink: string;
+  qualityConcerns?: string;
   quantity: string;
   requirementFileCount: number;
   qualityLevelId: string;
   selectedLeadReasonId: string;
   specialNotes: string;
+  targetBudget?: string;
   usedPhotoPlaceholder?: boolean;
   usedVoicePlaceholder?: boolean;
   voiceNoteFileName: string;
+};
+
+export type ImporterConversionAttribution = {
+  landingPage?: string;
+  referrer?: string;
+  selectedPackage?: string;
+  sourcePageSlug?: string;
+  submittedAt?: string;
+  submittedFromUrl?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  utmMedium?: string;
+  utmSource?: string;
 };
 
 export type StartProjectActionResult =
@@ -76,6 +96,44 @@ function cleanText(value: string | undefined) {
   return value?.trim() ?? "";
 }
 
+function cleanMetadataText(value: string | undefined, maxLength = 500) {
+  const cleaned = cleanText(value).replace(/\s+/g, " ");
+
+  return cleaned ? cleaned.slice(0, maxLength) : null;
+}
+
+function cleanSubmittedAt(value: string | undefined) {
+  if (!value) {
+    return new Date().toISOString();
+  }
+
+  const parsed = new Date(value);
+
+  return Number.isNaN(parsed.getTime())
+    ? new Date().toISOString()
+    : parsed.toISOString();
+}
+
+function buildConversionAttribution(draft: StartProjectDraftInput) {
+  const attribution = draft.attribution;
+
+  return {
+    landing_page: cleanMetadataText(attribution?.landingPage),
+    referrer: cleanMetadataText(attribution?.referrer),
+    selected_package: cleanMetadataText(
+      attribution?.selectedPackage || draft.packageId,
+      120,
+    ),
+    source_page_slug: cleanMetadataText(attribution?.sourcePageSlug, 180),
+    submitted_at: cleanSubmittedAt(attribution?.submittedAt),
+    submitted_from_url: cleanMetadataText(attribution?.submittedFromUrl, 500),
+    utm_campaign: cleanMetadataText(attribution?.utmCampaign, 180),
+    utm_content: cleanMetadataText(attribution?.utmContent, 180),
+    utm_medium: cleanMetadataText(attribution?.utmMedium, 120),
+    utm_source: cleanMetadataText(attribution?.utmSource, 120),
+  };
+}
+
 function findLabel<T extends { id: string; label: string }>(
   items: readonly T[],
   id: string,
@@ -85,9 +143,10 @@ function findLabel<T extends { id: string; label: string }>(
 
 function getProductSummary(draft: StartProjectDraftInput) {
   const details = cleanText(draft.productDetails);
+  const category = cleanText(draft.productCategory);
 
   if (details) {
-    return details.slice(0, 220);
+    return [category, details].filter(Boolean).join(" | ").slice(0, 220);
   }
 
   const link = cleanText(draft.productLink);
@@ -98,7 +157,7 @@ function getProductSummary(draft: StartProjectDraftInput) {
 
   const inputMethods = getInputMethods(draft);
   return inputMethods.length > 0
-    ? `Product details provided through ${inputMethods.join(", ")}.`
+    ? `${category ? `${category}: ` : ""}Product details provided through ${inputMethods.join(", ")}.`
     : "Product details pending.";
 }
 
@@ -289,12 +348,23 @@ function buildDraftMetadata(draft: StartProjectDraftInput) {
   return {
     budget_id: draft.budgetId,
     budget_label: selectedBudget,
+    conversion_attribution: buildConversionAttribution(draft),
+    customization_needs: cleanMetadataText(draft.customizationNeeds, 1000),
+    destination_city_pakistan: cleanMetadataText(
+      draft.destinationCityPakistan,
+      180,
+    ),
     quality_level_id: draft.qualityLevelId,
     quality_level_label: selectedQuality,
     experience_id: draft.experienceId,
     experience_label: selectedExperience,
+    preferred_china_region: cleanMetadataText(draft.preferredChinaRegion, 180),
+    product_category: cleanMetadataText(draft.productCategory, 180),
+    quality_concerns: cleanMetadataText(draft.qualityConcerns, 1000),
     selected_addon_ids: draft.addOnIds,
     selected_addon_codes: selectedAddOnCodes,
+    selected_package_id: draft.packageId,
+    target_budget: cleanMetadataText(draft.targetBudget, 180),
     has_manual_description: hasManualDescription,
     has_product_url: hasProductUrl,
     has_voice_note: hasVoiceNote,
@@ -476,6 +546,18 @@ export async function submitImportProjectAction(
           type: "project_submitted",
         },
         {
+          actionUrl: `/importer/projects/${project.project_code}`,
+          actorProfileId: importer.context.profileId,
+          invoiceId: invoiceResult.data.invoice.id,
+          projectId: project.id,
+          recipientProfileId: importer.context.profileId,
+          templateContext: {
+            invoiceCode: invoiceResult.data.invoice.invoice_code,
+            projectCode: project.project_code,
+          },
+          type: "importer_project_received",
+        },
+        {
           actionUrl: `/invoices/${invoiceResult.data.invoice.invoice_code}`,
           actorProfileId: importer.context.profileId,
           invoiceId: invoiceResult.data.invoice.id,
@@ -486,6 +568,18 @@ export async function submitImportProjectAction(
             projectCode: project.project_code,
           },
           type: "invoice_issued",
+        },
+        {
+          actionUrl: `/payments/manual?invoice=${invoiceResult.data.invoice.invoice_code}`,
+          actorProfileId: importer.context.profileId,
+          invoiceId: invoiceResult.data.invoice.id,
+          projectId: project.id,
+          recipientProfileId: importer.context.profileId,
+          templateContext: {
+            invoiceCode: invoiceResult.data.invoice.invoice_code,
+            projectCode: project.project_code,
+          },
+          type: "importer_payment_instructions",
         },
         {
           actionUrl: `/admin/projects/${project.project_code}`,

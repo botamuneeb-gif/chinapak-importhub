@@ -15,7 +15,7 @@ export default function PaymentSuccessPage() {
       <PageHero
         eyebrow="Payment status"
         intro="Payment success is shown after admin-verified payment records. Online gateway callbacks are not active for launch."
-        title="Payment Successful"
+        title="Payment Verified by Admin"
       />
 
       <section className="bg-brand-background">
@@ -25,7 +25,10 @@ export default function PaymentSuccessPage() {
             <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
               <div>
                 <dt className="font-bold text-brand-navy">Project ID</dt>
-                <dd className="mt-1 text-brand-muted">CPH-2026-0010</dd>
+                <dd className="mt-1 text-brand-muted">
+                  Check your importer dashboard or invoice detail for the linked
+                  Project ID.
+                </dd>
               </div>
               <div>
                 <dt className="font-bold text-brand-navy">Payment reference</dt>
@@ -35,9 +38,9 @@ export default function PaymentSuccessPage() {
 
             <h2 className="mt-8 text-2xl font-bold text-brand-navy">Next steps</h2>
             <ol className="mt-4 grid gap-3 text-sm leading-7 text-brand-muted">
-              <li>1. Admin review will verify the paid Import Project.</li>
-              <li>2. FMS assignment happens after admin review.</li>
-              <li>3. Project tracking shows approved project milestones.</li>
+              <li>1. Admin confirms the project review gate after payment.</li>
+              <li>2. FMS assignment happens only after Admin approval.</li>
+              <li>3. Project tracking shows payment, FMS, and report milestones.</li>
             </ol>
 
             <div className="mt-6">

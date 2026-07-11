@@ -796,21 +796,36 @@ export async function submitManualPaymentRecordAction(
       }),
     ]);
 
-    await createNotification(
-      {
-        actionUrl: "/admin/payments",
-        actorProfileId: importer.profileId,
-        invoiceId: invoice.id,
-        paymentId: paymentResult.data.id,
-        priority: "high",
-        projectId: invoice.project_id,
-        recipientRole: USER_ROLES.admin,
-        templateContext: {
-          amount: formatMoney(amountPaid),
-          invoiceCode: invoice.invoice_code,
+    await createNotifications(
+      [
+        {
+          actionUrl: "/admin/payments",
+          actorProfileId: importer.profileId,
+          invoiceId: invoice.id,
+          paymentId: paymentResult.data.id,
+          priority: "high",
+          projectId: invoice.project_id,
+          recipientRole: USER_ROLES.admin,
+          templateContext: {
+            amount: formatMoney(amountPaid),
+            invoiceCode: invoice.invoice_code,
+          },
+          type: "manual_payment_submitted",
         },
-        type: "manual_payment_submitted",
-      },
+        {
+          actionUrl: `/invoices/${invoice.invoice_code}`,
+          actorProfileId: importer.profileId,
+          invoiceId: invoice.id,
+          paymentId: paymentResult.data.id,
+          projectId: invoice.project_id,
+          recipientProfileId: importer.profileId,
+          templateContext: {
+            amount: formatMoney(amountPaid),
+            invoiceCode: invoice.invoice_code,
+          },
+          type: "importer_payment_proof_received",
+        },
+      ],
       importer.supabase,
     );
 
@@ -1108,10 +1123,8 @@ export async function reviewManualPaymentAction(
       );
       const notificationType =
         input.decision === "verify"
-          ? "payment_verified"
-          : input.decision === "reject"
-            ? "payment_rejected"
-            : "payment_needs_more_info";
+          ? "importer_payment_verified"
+          : "importer_payment_needs_correction";
 
       if (recipientProfileId) {
         await createNotification(

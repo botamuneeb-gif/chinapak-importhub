@@ -101,13 +101,18 @@ export type ImporterProjectDetail = ImporterProjectListItem & {
   };
   requirements: {
     budgetRange: string;
+    customizationNeeds: string;
+    destinationCityPakistan: string;
     importExperience: string;
     inputMethods: string;
+    preferredChinaRegion: string;
     productDescription: string;
     productLinks: string;
+    qualityConcerns: string;
     quantity: string;
     qualityLevel: string;
     specialNotes: string;
+    targetBudget: string;
   };
   timeline: ImporterProjectTimelineItem[];
 };
@@ -603,6 +608,8 @@ export async function getImporterProjectDetailAction(
       ]);
     });
 
+    const requirementMetadata = toJsonObject(requirement?.metadata);
+
     return {
       ok: true,
       data: {
@@ -685,16 +692,36 @@ export async function getImporterProjectDetailAction(
             },
         requirements: {
           budgetRange: requirement?.budget_range ?? "Not provided",
+          customizationNeeds: readString(
+            requirementMetadata.customization_needs,
+            "Not provided",
+          ),
+          destinationCityPakistan: readString(
+            requirementMetadata.destination_city_pakistan,
+            "Not provided",
+          ),
           importExperience: requirement?.import_experience ?? "Not provided",
           inputMethods:
             requirement?.input_methods.join(", ") || "Input method pending",
+          preferredChinaRegion: readString(
+            requirementMetadata.preferred_china_region,
+            "Not provided",
+          ),
           productDescription:
             requirement?.product_description ?? "Product details pending",
           productLinks:
             requirement?.product_links.join(", ") || "No product link provided",
+          qualityConcerns: readString(
+            requirementMetadata.quality_concerns,
+            "Not provided",
+          ),
           quantity: requirement?.quantity ?? "Not provided",
           qualityLevel: requirement?.quality_level ?? "Not provided",
           specialNotes: requirement?.special_notes ?? "No special notes",
+          targetBudget: readString(
+            requirementMetadata.target_budget,
+            "Not provided",
+          ),
         },
         timeline:
           (timelineResult.data ?? []).length > 0

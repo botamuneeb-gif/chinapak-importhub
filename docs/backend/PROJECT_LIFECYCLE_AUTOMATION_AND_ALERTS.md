@@ -164,6 +164,25 @@ Add `CRON_SECRET` in Vercel environment variables before enabling a production c
 
 Daily digest cron lives separately at `/api/cron/daily-operations-digest` and is scheduled daily in `vercel.json`.
 
+## Importer Payment Follow-Up Readiness
+
+Importer payment follow-up readiness lives in:
+
+```text
+lib/importer/importer-payment-followups.ts
+```
+
+It is reusable server-only code and is not automatically scheduled in this phase.
+
+It can detect:
+
+- Project submitted but no payment action after 24 hours.
+- Manual payment reference submitted but not verified after 12 hours.
+
+It creates role-scoped internal notifications for Admin and Project Manager. Project Manager notifications are advisory and route to Project Manager-safe project pages; they do not allow payment verification.
+
+Importer reminders are deduped by project/date and capped at 3 per project. Importer reminder email delivery is optional and requires a verified importer email plus a caller that explicitly enables sending.
+
 ## Privacy And Security Boundaries
 
 - The helper uses server-only Supabase admin access and returns sanitized operational alerts.
@@ -173,6 +192,7 @@ Daily digest cron lives separately at `/api/cron/daily-operations-digest` and is
 - Admin alerts route only to Admin-authorized pages.
 - Cron output returns counts only, not project data.
 - Alerts never change payment, project approval, FMS assignment, FMS submission approval, report release, or refund status.
+- Importer payment follow-up reminders never auto-verify payment or start FMS work.
 
 ## QA Checklist
 

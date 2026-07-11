@@ -148,6 +148,17 @@ Admin dashboard now includes a Launch Operations Watchlist with mobile-friendly 
 
 Existing Admin controls remain unchanged.
 
+Importer conversion/payment readiness added a compact Admin payment queue surface for:
+
+- Projects awaiting payment
+- Payment proof pending verification
+- Paid projects awaiting Admin approval
+- Paid projects awaiting FMS assignment
+- Payment issues needing correction
+- Project Manager escalations
+
+These links are operational shortcuts only. They do not add Project Manager payment verification powers or payment auto-approval.
+
 ## Notification UX
 
 The existing protected portal notification tray remains role-scoped and polls near-live.
@@ -172,6 +183,7 @@ Confirmed boundaries:
 - No private data is cached offline.
 - No service role key or private token is exposed client-side.
 - Tokenized FMS application update routes remain noindex/private and are not part of the sitemap.
+- Manual payment readiness copy warns users not to submit card numbers, banking passwords, OTPs, CNIC images, or private account credentials.
 
 ## QA Checklist
 

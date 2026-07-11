@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/config/brand";
+import { getImporterPackageDetail } from "@/config/importer-packages";
 import type { PricingPackage } from "@/config/pricing";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,8 @@ type PackageCardProps = {
 };
 
 export function PackageCard({ plan }: PackageCardProps) {
+  const detail = getImporterPackageDetail(plan.id);
+
   return (
     <article
       className={cn(
@@ -34,6 +36,15 @@ export function PackageCard({ plan }: PackageCardProps) {
         {plan.bestForSummary}
       </p>
 
+      <div className="mt-4 rounded-lg border border-slate-200 bg-brand-background p-3">
+        <p className="text-xs font-bold uppercase tracking-wide text-brand-muted">
+          Recommended use
+        </p>
+        <p className="mt-1 text-sm font-semibold leading-6 text-brand-navy">
+          {detail.recommendedUseCase}
+        </p>
+      </div>
+
       <ul className="mt-5 flex-1 space-y-3 text-sm leading-7 text-brand-muted">
         {plan.deliverables.map((item) => (
           <li className="border-s-4 border-brand-emerald ps-3" key={item}>
@@ -46,8 +57,35 @@ export function PackageCard({ plan }: PackageCardProps) {
         Delivery timeframe: {plan.deliveryTimeframe}
       </div>
 
-      <Button className="mt-5" href={ROUTES.importerStart} variant={plan.recommended ? "secondary" : "primary"}>
-        Start Import Project
+      <div className="mt-4 grid gap-4 text-sm">
+        <div>
+          <p className="font-bold text-brand-navy">What importer gets</p>
+          <ul className="mt-2 grid gap-2 leading-6 text-brand-muted">
+            {detail.whatImporterGets.map((item) => (
+              <li className="border-s-4 border-brand-emerald ps-3" key={item}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="font-bold text-brand-navy">Not included</p>
+          <ul className="mt-2 grid gap-2 leading-6 text-brand-muted">
+            {detail.notIncluded.map((item) => (
+              <li className="border-s-4 border-brand-gold ps-3" key={item}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-lg border border-brand-gold bg-amber-50 p-3 text-sm font-semibold leading-6 text-brand-navy">
+        Next step: {detail.expectedNextStep}
+      </div>
+
+      <Button className="mt-5" href={detail.startHref} variant={plan.recommended ? "secondary" : "primary"}>
+        Start with this package
       </Button>
     </article>
   );

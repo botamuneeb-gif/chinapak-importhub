@@ -37,13 +37,22 @@ export function HomeHero() {
           <p className="mt-5 max-w-2xl text-lg leading-9 text-white/90">
             {hero.subheadline}
           </p>
+          <p className="mt-4 max-w-2xl text-sm font-semibold leading-7 text-white/80">
+            Submit your product details, complete Admin-verified manual
+            payment, let FMS gather factory options, then review a sanitized
+            Admin-released report. ChinaPak supports sourcing decisions; it does
+            not guarantee the final factory deal.
+          </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button href={ROUTES.importerStart} variant="gold">
-              {hero.primaryCta}
+              Start Import Project
             </Button>
-            <Button href={ROUTES.verify} variant="lightOutline">
-              {hero.secondaryCta}
+            <Button href={ROUTES.packages} variant="lightOutline">
+              View Packages
+            </Button>
+            <Button href="#how-it-works" variant="lightOutline">
+              How It Works
             </Button>
           </div>
 

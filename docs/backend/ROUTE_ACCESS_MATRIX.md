@@ -42,8 +42,8 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/importer/dashboard` | Importer | Own project/report/payment summary only. |
-| `/importer/start` | Importer | Protected Import Project wizard. Not included in sitemap and marked noindex. |
-| `/importer/projects`, `/importer/projects/[projectId]` | Importer | Own submitted Import Projects only. Shows sanitized project status, timeline, billing links, released report links, and importer-safe files. Raw FMS submissions, FMS contacts, factory contacts, and admin-only notes are hidden. |
+| `/importer/start` | Importer | Protected Import Project wizard. Supports package preselection with safe `?package=` query params and stores importer conversion attribution in project/lead metadata. Not included in sitemap and marked noindex. |
+| `/importer/projects`, `/importer/projects/[projectId]` | Importer | Own submitted Import Projects only. Shows sanitized project status, timeline, payment readiness, billing links, released report links, and importer-safe files. Raw FMS submissions, FMS contacts, factory contacts, attribution, and admin-only notes are hidden. |
 | `/importer/reports`, `/importer/reports/[projectId]` | Importer | Own released reports only. Raw FMS submissions and factory contacts hidden. |
 | `/importer/reports/[projectId]/document` | Importer | Own released report document only; sanitized fields only. |
 | `/importer/messages/*` | Importer | Placeholder controlled messaging; no direct importer-FMS communication. |
@@ -64,7 +64,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/admin` | Admin, Super Admin | Operational dashboard. |
-| `/admin/projects/*` | Admin, Super Admin | Project review, payment verification, assignment, report release, admin documents. |
+| `/admin/projects/*` | Admin, Super Admin | Project review, importer attribution review, payment verification, assignment, report release, admin documents. |
 | `/admin/leads` | Admin, Super Admin | Unpaid leads only; not assignable to FMS. |
 | `/admin/representatives` | Admin, Super Admin | Manual representative records, verification code management, and attempt review. Public lookup uses sanitized server-side verification only. |
 | `/admin/fms` | Admin, Super Admin | FMS directory. Public users cannot create FMS roles. |
@@ -106,7 +106,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/invoices`, `/invoices/[invoiceId]`, `/invoices/[invoiceId]/document` | Importer owner | Own invoices only. Admin equivalents live under `/admin`. |
-| `/payments`, `/payments/manual`, `/payments/[paymentId]/document` | Importer owner | Own manual payment records only. Payment gateway not connected. |
+| `/payments`, `/payments/manual`, `/payments/[paymentId]/document` | Importer owner | Own manual payment records only. Payment gateway not connected. Manual payment references remain Admin/Super Admin verified and do not grant Project Manager payment powers. |
 | `/refunds`, `/refunds/request`, `/refunds/[refundId]/document` | Importer owner | Own refund records only. Admin equivalents live under `/admin`. |
 | `/files/*` | No public page; server actions only | File access requires role checks and short-lived signed URLs. |
 | `/documents/*` | No public document index | Document routes are explicit importer/admin routes only. |

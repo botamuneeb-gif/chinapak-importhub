@@ -2,6 +2,12 @@ import type { Database, Json } from "@/lib/supabase/types";
 
 export type NotificationType =
   | "project_submitted"
+  | "importer_project_received"
+  | "importer_payment_instructions"
+  | "importer_payment_proof_received"
+  | "importer_payment_verified"
+  | "importer_payment_needs_correction"
+  | "importer_payment_reminder"
   | "invoice_issued"
   | "manual_payment_submitted"
   | "payment_verified"
