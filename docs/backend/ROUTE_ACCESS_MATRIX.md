@@ -4,6 +4,29 @@ This matrix documents the intended public/private boundary for ChinaPak ImportHu
 
 Public marketing chrome is shown on public website and auth entry routes only. Protected portal routes use the role-based portal shell and must not render visitor navigation such as Packages, Learn, Login, or Start Import Project.
 
+## Role Permission Matrix
+
+| Permission | Public visitor | Importer | FMS | Admin | Super Admin | Project Manager | Agent |
+|---|---|---|---|---|---|---|---|
+| View own projects | No | Yes, own projects only | Assigned sourcing brief only | Yes, operational queue | Yes | Yes, project-flow view | Assigned leads only |
+| Create import project | No | Yes | No | No | No | No | No |
+| Upload payment proof/reference | No | Yes, own invoices only | No | No | No | No | No |
+| Verify payment | No | No | No | Yes | Yes | No | No |
+| Approve project/admin review | No | No | No | Yes | Yes | No, escalate only | No |
+| Assign FMS | No | No | No | Yes | Yes | No, escalate only | No |
+| Submit factory options | No | No | Yes, assigned FMS work only | No | No | No | No |
+| Review FMS submissions | No | No | No | Yes | Yes | No, follow-up/escalate only | No |
+| Release importer report | No | No | No | Yes | Yes | No | No |
+| Manage users/roles | No | No | No | No | Yes | No | No |
+| Approve FMS applications | No | No | No | Pre-screen and forward only | Yes, final approval/decline | No | No |
+| Create Project Managers | No | No | No | No | Yes | No | No |
+| View lifecycle alerts | No | No | No | Yes, full admin actions | Yes, full admin summary | Yes, PM-safe follow-up actions | No |
+| Run lifecycle alert scan | No | No | No | Yes | Yes | No | No |
+| Send daily digest | No | No | No | Yes | Yes | No | No |
+| View importer private contact info | No | Own account only | No | Yes, operational need | Yes | Limited safe profile summary only | Assigned lead data only |
+| View supplier/factory data | No | Released report only | Own submitted/assigned evidence only | Yes, including admin-only fields | Yes | Safe operational summary only | No |
+| Access cron routes | No | No | No | No UI access; `CRON_SECRET` only | No UI access; `CRON_SECRET` only | No | No |
+
 ## Public Website
 
 | Route group | Allowed access | Notes |
