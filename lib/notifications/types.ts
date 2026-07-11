@@ -35,6 +35,7 @@ export type NotificationType =
   | "user_suspended"
   | "suspicious_access_or_role_mismatch"
   | "project_lifecycle_alert"
+  | "daily_operations_digest"
   | "project_manager_project_updated"
   | "project_manager_project_escalated";
 

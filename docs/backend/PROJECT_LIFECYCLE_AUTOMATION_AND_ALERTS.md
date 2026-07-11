@@ -129,6 +129,8 @@ Access:
 
 The button is not available to Project Manager users.
 
+The Admin dashboard also has `Send daily operations digest now`, which uses lifecycle alerts plus FMS application queues to send internal Admin, Super Admin, and Project Manager digest notifications/emails. See `docs/backend/DAILY_OPERATIONS_DIGEST_AND_REMINDERS.md`.
+
 ## Cron Readiness
 
 A cron-ready route exists:
@@ -160,6 +162,8 @@ Suggested Vercel cron schedule:
 
 Add `CRON_SECRET` in Vercel environment variables before enabling a production cron job.
 
+Daily digest cron lives separately at `/api/cron/daily-operations-digest` and is scheduled daily in `vercel.json`.
+
 ## Privacy And Security Boundaries
 
 - The helper uses server-only Supabase admin access and returns sanitized operational alerts.
@@ -180,6 +184,7 @@ Add `CRON_SECRET` in Vercel environment variables before enabling a production c
 - Timeline events are added only for first alert or severity changes.
 - Cron route rejects missing or incorrect `Authorization`.
 - Cron route works with `Authorization: Bearer <CRON_SECRET>`.
+- Daily operations digest cron and manual send continue to use lifecycle alert data without changing project workflow state.
 - Admin/Super Admin guards remain unchanged.
 - Project Manager cannot access `/admin` or `/super-admin`.
 - FMS private data restrictions remain unchanged.

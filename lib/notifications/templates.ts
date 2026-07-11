@@ -197,6 +197,12 @@ export function getNotificationTemplate(
         title: "Project lifecycle alert",
         message: `${projectCode} needs operational follow-up. Review the recommended action before changing any payment, FMS, or report state.`,
       };
+    case "daily_operations_digest":
+      return {
+        title: "Daily operations digest ready",
+        message:
+          "Today's internal operations digest is ready. Review high-priority items before changing payment, FMS, report, or user state.",
+      };
     case "project_manager_project_updated":
       return {
         title: "Project Manager update",

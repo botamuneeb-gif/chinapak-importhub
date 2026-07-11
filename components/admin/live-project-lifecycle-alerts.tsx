@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   listProjectLifecycleAlertsAction,
   runProjectLifecycleAlertScanAction,
+  sendDailyOperationsDigestNowAction,
   type ProjectLifecycleAlertView,
 } from "@/app/project-lifecycle-alerts/actions";
 import { USER_ROLES } from "@/lib/auth/roles";
@@ -38,6 +39,7 @@ function severityClasses(severity: ProjectLifecycleAlertView["severity"]) {
 
 export function LiveProjectLifecycleAlerts() {
   const [alerts, setAlerts] = useState<ProjectLifecycleAlertView[]>([]);
+  const [isDigestSending, setIsDigestSending] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isScanning, setIsScanning] = useState(false);
   const [message, setMessage] = useState("");
@@ -93,6 +95,30 @@ export function LiveProjectLifecycleAlerts() {
     }
   }
 
+  async function sendDigest() {
+    setIsDigestSending(true);
+    setMessage("");
+
+    try {
+      const accessToken = await getAccessToken();
+      const result = await sendDailyOperationsDigestNowAction(accessToken);
+
+      if (!result.ok) {
+        throw new Error(result.message);
+      }
+
+      setMessage(result.message ?? "Daily operations digest sent.");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Daily operations digest could not be sent.",
+      );
+    } finally {
+      setIsDigestSending(false);
+    }
+  }
+
   useEffect(() => {
     void loadAlerts();
   }, []);
@@ -112,14 +138,26 @@ export function LiveProjectLifecycleAlerts() {
             assign FMS, or release reports automatically.
           </p>
         </div>
-        <button
-          className="min-h-11 rounded-lg border border-brand-emerald px-4 py-2 text-sm font-bold text-brand-emerald transition hover:bg-brand-emerald hover:text-white disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-brand-muted"
-          disabled={isScanning}
-          onClick={() => void runScan()}
-          type="button"
-        >
-          {isScanning ? "Scanning..." : "Run lifecycle alert scan"}
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+          <button
+            className="min-h-11 rounded-lg border border-brand-emerald px-4 py-2 text-sm font-bold text-brand-emerald transition hover:bg-brand-emerald hover:text-white disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-brand-muted"
+            disabled={isScanning}
+            onClick={() => void runScan()}
+            type="button"
+          >
+            {isScanning ? "Scanning..." : "Run lifecycle alert scan"}
+          </button>
+          <button
+            className="min-h-11 rounded-lg bg-brand-navy px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-emerald disabled:cursor-not-allowed disabled:bg-slate-400"
+            disabled={isDigestSending}
+            onClick={() => void sendDigest()}
+            type="button"
+          >
+            {isDigestSending
+              ? "Sending digest..."
+              : "Send daily operations digest now"}
+          </button>
+        </div>
       </div>
 
       {message ? (

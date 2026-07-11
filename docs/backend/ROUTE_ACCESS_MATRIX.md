@@ -112,4 +112,5 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/documents/*` | No public document index | Document routes are explicit importer/admin routes only. |
 | `/notifications/*` | Role scoped | Importer/FMS/admin/project-manager/super-admin/agent notifications are scoped by profile/role. Portal tray uses the same notification actions and role checks. |
 | `/api/cron/project-lifecycle-alerts` | Internal cron only | Requires `Authorization: Bearer CRON_SECRET`. Runs stuck-project alert scan and returns counts only. No public project data is exposed. |
+| `/api/cron/daily-operations-digest` | Internal cron only | Requires `Authorization: Bearer CRON_SECRET`. Sends internal Admin/Super Admin/Project Manager digest notifications/emails and returns counts only. No public/importer/FMS emails or private contact data are exposed. |
 | `/api/*` | Internal/future | Disallowed in robots as a future private boundary unless a route is explicitly documented as public. |

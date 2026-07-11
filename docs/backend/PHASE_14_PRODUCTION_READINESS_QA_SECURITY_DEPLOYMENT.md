@@ -81,7 +81,7 @@ Production notes:
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` publicly.
 - Never prefix service role key with `NEXT_PUBLIC_`.
 - Keep `EMAIL_DELIVERY_MODE=disabled` until a provider is tested in staging.
-- Set `CRON_SECRET` only if enabling protected cron calls such as the project lifecycle alert scan.
+- Set `CRON_SECRET` only if enabling protected cron calls such as the project lifecycle alert scan and daily operations digest.
 
 ## Supabase Migration And Storage Checklist
 
@@ -245,6 +245,7 @@ Findings:
 - `docs/backend/PHASE_13_PUBLIC_WEBSITE_SEO_CONVERSION_POLISH.md`
 - `docs/backend/PROJECT_MANAGER_ROLE_WORKFLOW.md`
 - `docs/backend/PROJECT_LIFECYCLE_AUTOMATION_AND_ALERTS.md`
+- `docs/backend/DAILY_OPERATIONS_DIGEST_AND_REMINDERS.md`
 
 ## Final Build Checks
 

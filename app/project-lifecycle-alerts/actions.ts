@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { ROUTES } from "@/config/brand";
 import { USER_ROLES, hasAllowedRole, type UserRole } from "@/lib/auth/roles";
 import { getProfileForAccessToken } from "@/lib/auth/session";
+import { generateDailyOperationsDigest } from "@/lib/operations/daily-operations-digest";
 import {
   filterLifecycleAlertsForRole,
   formatLifecycleAge,
@@ -50,6 +51,18 @@ export type ProjectLifecycleAlertScanView = {
   notificationsCreated: number;
   notificationsSkipped: number;
   timelineEventsCreated: number;
+};
+
+export type DailyOperationsDigestSendView = {
+  date: string;
+  emailDelivery: {
+    delivered: number;
+    failed: number;
+    queued: number;
+    skipped: number;
+  };
+  notificationsCreated: number;
+  notificationsSkipped: number;
 };
 
 const ALERT_LABELS: Record<ProjectLifecycleAlertType, string> = {
@@ -211,6 +224,54 @@ export async function runProjectLifecycleAlertScanAction(
         error instanceof Error
           ? error.message
           : "Project lifecycle alert scan could not be completed.",
+    };
+  }
+}
+
+export async function sendDailyOperationsDigestNowAction(
+  accessToken: string,
+): Promise<ActionResult<DailyOperationsDigestSendView>> {
+  try {
+    const viewer = await requireLifecycleViewer(accessToken, USER_ROLES.admin);
+
+    if (!viewer.ok) {
+      return viewer;
+    }
+
+    const actorRole = hasAllowedRole(viewer.roles, [USER_ROLES.superAdmin])
+      ? USER_ROLES.superAdmin
+      : USER_ROLES.admin;
+    const result = await generateDailyOperationsDigest({
+      actorRole,
+      actorUserId: viewer.authUserId,
+      mode: "manual",
+      supabase: viewer.supabase,
+    });
+
+    revalidatePath(ROUTES.admin);
+    revalidatePath(ROUTES.adminNotifications);
+    revalidatePath(ROUTES.projectManagerDashboard);
+    revalidatePath(ROUTES.projectManagerNotifications);
+    revalidatePath(ROUTES.superAdmin);
+    revalidatePath(ROUTES.superAdminNotifications);
+
+    return {
+      ok: true,
+      data: {
+        date: result.date,
+        emailDelivery: result.emailDelivery,
+        notificationsCreated: result.notificationsCreated,
+        notificationsSkipped: result.notificationsSkipped,
+      },
+      message: `Daily operations digest sent for ${result.date}. ${result.notificationsCreated} notification(s) created; email queued ${result.emailDelivery.queued}, skipped ${result.emailDelivery.skipped}, failed ${result.emailDelivery.failed}.`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Daily operations digest could not be sent.",
     };
   }
 }
