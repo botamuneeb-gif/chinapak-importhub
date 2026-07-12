@@ -62,6 +62,8 @@ Admin digest includes:
 - FMS submission review
 - report release
 - Project Manager escalations
+
+Report-release digest items rely on lifecycle alerts and should send Admin users to the factory report comparison/readiness workflow. Digest emails must not include raw FMS submissions, Admin-only notes, or factory/private contact details.
 - FMS applications needing Admin review
 
 Project Manager digest includes:
@@ -73,6 +75,7 @@ Project Manager digest includes:
 - restricted Admin actions as follow-up/escalation guidance only
 
 Project Manager digest does not include Admin-only action buttons or links to Admin mutation panels.
+Project Manager report items are read-only follow-up/escalation items; Project Managers cannot score, approve, or release importer reports.
 
 Super Admin digest includes:
 

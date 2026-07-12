@@ -17,6 +17,7 @@ import { DocumentLineItemsTable } from "@/components/documents/document-line-ite
 import { DocumentShell } from "@/components/documents/document-shell";
 import { DocumentVerificationBlock } from "@/components/documents/document-verification-block";
 import { PrintActions } from "@/components/documents/print-actions";
+import { FactoryOptionComparisonTable } from "@/components/reports/factory-option-comparison-table";
 import { ROUTES } from "@/config/brand";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
@@ -430,7 +431,16 @@ function ReportOptionFields({
       "qualityReliabilitySummary",
     ],
     ["Risk summary", option.riskSummary, "riskSummary"],
-  ].filter(([, , key]) => option.visibleFields.includes(key));
+    ["Evidence summary", option.evidenceSummary, "evidenceSummary"],
+    ["Comparison score", `${option.overallScore}/100 · ${option.overallScoreLabel}`, "score"],
+    ["Recommendation", option.recommendationStatusLabel, "recommendation"],
+    ["Risk level", option.riskLevelLabel, "riskLevel"],
+  ].filter(
+    ([, , key]) =>
+      ["evidenceSummary", "recommendation", "riskLevel", "score"].includes(
+        key,
+      ) || option.visibleFields.includes(key),
+  );
 
   return (
     <DefinitionGrid
@@ -500,6 +510,12 @@ export function LiveImporterReportDocument({
             </p>
           </Section>
         ) : null}
+        <Section title="Factory options comparison">
+          <FactoryOptionComparisonTable
+            caption="Printable factory option comparison"
+            options={data.report.options}
+          />
+        </Section>
         <Section title="Approved factory options">
           <div className="grid gap-4">
             {data.report.options.map((option, index) => (

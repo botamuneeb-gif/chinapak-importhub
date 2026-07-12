@@ -66,6 +66,7 @@ Project Manager can:
 - View importer requirements/product information.
 - View package/add-on selections.
 - View safe assignment status without FMS contact details.
+- View read-only factory report progress/readiness labels.
 - View internal timeline and Project Manager notes.
 - Add internal operational notes.
 - Set safe Project Manager workflow markers:
@@ -87,6 +88,7 @@ Project Manager cannot:
 - Final approve or reject projects.
 - Assign or reassign FMS.
 - Approve or reject FMS factory submissions.
+- Score factory options or edit Admin-only report notes.
 - Release importer reports.
 - Issue or approve refunds.
 - Delete projects.

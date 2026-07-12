@@ -9,6 +9,7 @@ import {
 } from "@/app/importer/reports/actions";
 import { ImporterProjectFilesPanel } from "@/components/files/file-panels";
 import { ReportFeedbackPanel } from "@/components/importer/report-feedback-panel";
+import { FactoryOptionComparisonTable } from "@/components/reports/factory-option-comparison-table";
 import { ROUTES } from "@/config/brand";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
@@ -170,7 +171,24 @@ export function LiveImporterReportDetail({
 
       <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="text-xl font-bold text-brand-navy">
-          Approved factory options
+          Factory options comparison
+        </h2>
+        <p className="mt-2 text-sm leading-7 text-brand-muted">
+          This side-by-side view compares admin-reviewed factory options. Scores
+          are platform review indicators only; prices, MOQ, and lead times must
+          be reconfirmed before any order or payment.
+        </p>
+        <div className="mt-4">
+          <FactoryOptionComparisonTable
+            caption="Importer factory option comparison"
+            options={detail.report.options}
+          />
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="text-xl font-bold text-brand-navy">
+          Approved factory option details
         </h2>
         <div className="mt-4 grid gap-4">
           {detail.report.options.map((option, index) => (
@@ -187,6 +205,17 @@ export function LiveImporterReportDetail({
                     Recommended
                   </span>
                 ) : null}
+              </div>
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <OptionField
+                  label="Recommendation"
+                  value={option.recommendationStatusLabel}
+                />
+                <OptionField
+                  label="Comparison score"
+                  value={`${option.overallScore}/100 · ${option.overallScoreLabel}`}
+                />
+                <OptionField label="Risk level" value={option.riskLevelLabel} />
               </div>
               <dl className="mt-4 grid gap-3 md:grid-cols-2">
                 {visible(option, "cityProvince") ? (
@@ -252,6 +281,10 @@ export function LiveImporterReportDetail({
                     value={option.qualityReliabilitySummary}
                   />
                 ) : null}
+                <OptionField
+                  label="Evidence summary"
+                  value={option.evidenceSummary}
+                />
                 {visible(option, "riskSummary") ? (
                   <OptionField label="Risk summary" value={option.riskSummary} />
                 ) : null}
@@ -273,7 +306,16 @@ export function LiveImporterReportDetail({
       ) : null}
 
       <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-bold text-brand-navy">Next steps</h2>
+        <h2 className="text-xl font-bold text-brand-navy">
+          What this report means
+        </h2>
+        <div className="mt-4 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm leading-7 text-brand-navy">
+          ChinaPak provides sourcing support and admin-reviewed factory option
+          research. This report does not guarantee final factory acceptance,
+          customs clearance, shipment delivery, product compliance, or fixed
+          pricing. Final commercial decisions remain with you as the importer.
+        </div>
+        <h3 className="mt-5 text-lg font-bold text-brand-navy">Next steps</h3>
         <ul className="mt-4 grid gap-3">
           {detail.nextSteps.map((step) => (
             <li

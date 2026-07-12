@@ -373,6 +373,21 @@ export function LiveProjectManagerProjectDetail({
             />
           </DetailCard>
 
+          <DetailCard title="Factory Report Progress">
+            <DefinitionGrid
+              rows={[
+                ["Report status", detail.reportReadiness.statusLabel],
+                ["Release readiness", detail.reportReadiness.readinessLabel],
+                ["Reviewed options", String(detail.reportReadiness.optionCount)],
+              ]}
+            />
+            <p className="mt-4 rounded-lg border border-brand-gold bg-amber-50 p-4 text-sm font-semibold leading-6 text-brand-navy">
+              Project Managers can monitor report progress and escalate blockers.
+              FMS submission approval and importer report release remain
+              Admin/Super Admin-only actions.
+            </p>
+          </DetailCard>
+
           <DetailCard title="Operational Timeline">
             {detail.timeline.length === 0 ? (
               <p className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-semibold text-brand-muted">

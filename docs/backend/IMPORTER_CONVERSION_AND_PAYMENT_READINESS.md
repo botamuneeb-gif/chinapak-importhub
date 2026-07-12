@@ -12,6 +12,8 @@ Launch-visible importer pages now guide users toward the real workflow:
 
 The homepage explains that ChinaPak ImportHub helps Pakistani importers submit product details, complete Admin-verified manual payment, let FMS gather factory options, and receive an Admin-released sanitized report.
 
+Factory reports now include a sanitized side-by-side factory option comparison, platform review score, recommendation label, evidence summary, risk notes, and importer-facing disclaimers. Scores are decision-support indicators only and do not guarantee factory reliability, customs clearance, shipment delivery, product compliance, or fixed pricing.
+
 Important boundary copy remains visible:
 
 - ChinaPak supports platform-assisted sourcing decisions.
@@ -190,6 +192,7 @@ Admin project detail shows compact attribution for operational conversion review
 - No project is auto-approved.
 - No FMS assignment is auto-created by payment readiness logic.
 - No report is auto-released.
+- Importer reports expose only sanitized comparison/report fields; Admin-only notes, raw FMS notes, FMS contact details, and factory private contact details remain hidden.
 - FMS cannot see importer private contact details.
 - Project Manager cannot verify payments or access Admin/Super Admin-only controls.
 - Manual payment references remain access-controlled.

@@ -199,6 +199,32 @@ const adminOnlySubmissionFields: Array<{
   },
 ];
 
+function fmsSubmissionFeedbackText(submission: {
+  adminReviewStatus: string;
+  submissionStatus: string;
+}) {
+  const combined =
+    `${submission.submissionStatus} ${submission.adminReviewStatus}`.toLowerCase();
+
+  if (combined.includes("approved")) {
+    return "Admin accepted this option for internal review. Importer-facing report release is controlled by Admin.";
+  }
+
+  if (combined.includes("changes") || combined.includes("clarification")) {
+    return "Admin needs clarification. Update this option only through the assignment workspace; do not contact the importer.";
+  }
+
+  if (combined.includes("rejected")) {
+    return "Admin rejected this option from the current report workflow. Keep any follow-up inside the platform.";
+  }
+
+  if (combined.includes("review")) {
+    return "This option is under Admin review. Admin may request more evidence, quote, MOQ, lead time, or risk details.";
+  }
+
+  return "Submission received. Admin review controls whether this option can be used in an importer-safe report.";
+}
+
 export function LiveFmsAssignmentDetail({
   assignmentCode,
 }: LiveFmsAssignmentDetailProps) {
@@ -643,6 +669,9 @@ export function LiveFmsAssignmentDetail({
                       <p className="mt-2 text-xs font-semibold text-brand-muted">
                         Admin review: {submission.adminReviewStatus} · Submitted{" "}
                         {submission.createdAt}
+                      </p>
+                      <p className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs font-semibold leading-6 text-brand-navy">
+                        {fmsSubmissionFeedbackText(submission)}
                       </p>
                     </div>
                   ))}

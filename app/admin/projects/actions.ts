@@ -2,6 +2,20 @@
 
 import { USER_ROLES, hasAllowedRole } from "@/lib/auth/roles";
 import { getProfileForAccessToken } from "@/lib/auth/session";
+import {
+  buildFactoryReportReadiness,
+  calculateFactoryOverallScore,
+  factoryReportRecommendationLabels,
+  factoryReportRiskLevelLabels,
+  factoryReportScoreCategories,
+  getFactoryRecommendationStatus,
+  getFactoryRiskLevelFromScore,
+  getFactoryScoreLabel,
+  type FactoryReportReadiness,
+  type FactoryReportRecommendationStatus,
+  type FactoryReportRiskLevel,
+  type FactoryReportScoreBreakdown,
+} from "@/config/factory-report-quality";
 import { fmsApplicationSource } from "@/config/fms-acquisition";
 import { ensureInvoiceForProject } from "@/lib/billing/invoice-helpers";
 import { createNotification } from "@/lib/notifications/create-notification";
@@ -189,6 +203,7 @@ export type AdminApprovedFactorySubmission = {
   currency: string;
   customizationAvailability: string;
   estimatedUnitPrice: string;
+  evidenceSummary: string;
   factoryLabel: string;
   mainProducts: string;
   moq: string;
@@ -196,6 +211,7 @@ export type AdminApprovedFactorySubmission = {
   productMatchSummary: string;
   productionLeadTime: string;
   qualityReliabilitySummary: string;
+  riskFlags: string[];
   riskSummary: string;
   sampleAvailability: string;
   submissionCode: string;
@@ -204,7 +220,19 @@ export type AdminApprovedFactorySubmission = {
 };
 
 export type AdminFactoryReportOption = AdminApprovedFactorySubmission & {
+  adminReviewNote: string;
+  adminVisibleOnlyNote: string;
+  importerSafeOptionSummary: string;
+  overallScore: number;
+  overallScoreLabel: string;
+  qualityScore: number;
   recommended: boolean;
+  recommendationStatus: FactoryReportRecommendationStatus;
+  recommendationStatusLabel: string;
+  riskLevel: FactoryReportRiskLevel;
+  riskLevelLabel: string;
+  riskScore: number;
+  scoreBreakdown: FactoryReportScoreBreakdown;
   visibleFields: string[];
 };
 
@@ -215,6 +243,7 @@ export type AdminImporterFactoryReport = {
   importerSafeSummary: string;
   internalReleaseNotes: string;
   options: AdminFactoryReportOption[];
+  readiness: FactoryReportReadiness;
   releasedAt: string | null;
   status: FactoryReportStatus;
   statusLabel: string;
@@ -452,6 +481,103 @@ function trimOptional(value: string | undefined) {
   const trimmed = value?.trim();
 
   return trimmed ? trimmed : undefined;
+}
+
+function hasProvidedReportValue(value: string | undefined) {
+  const normalized = value?.trim().toLowerCase();
+
+  return Boolean(
+    normalized &&
+      normalized !== "not provided" &&
+      normalized !== "not set" &&
+      normalized !== "pending" &&
+      !normalized.includes("not provided") &&
+      !normalized.includes("pending."),
+  );
+}
+
+function scoreForPresence(value: string | undefined, presentScore = 78) {
+  return hasProvidedReportValue(value) ? presentScore : 42;
+}
+
+function parseScoreBreakdown(
+  value: Json | null | undefined,
+  fallback: FactoryReportScoreBreakdown,
+): FactoryReportScoreBreakdown {
+  const object = toJsonObject(value);
+
+  return factoryReportScoreCategories.reduce((breakdown, category) => {
+    breakdown[category.key] = readNumber(
+      object[category.key],
+      fallback[category.key],
+    );
+    return breakdown;
+  }, {} as FactoryReportScoreBreakdown);
+}
+
+function buildFactoryOptionQuality(
+  option: AdminApprovedFactorySubmission,
+  recommended: boolean,
+): Omit<
+  AdminFactoryReportOption,
+  keyof AdminApprovedFactorySubmission | "recommended" | "visibleFields"
+> {
+  const hasPrice = hasProvidedReportValue(option.estimatedUnitPrice);
+  const hasMoq = hasProvidedReportValue(option.moq);
+  const hasLeadTime = hasProvidedReportValue(option.productionLeadTime);
+  const hasProductMatch = hasProvidedReportValue(option.productMatchSummary);
+  const hasEvidence =
+    hasProvidedReportValue(option.evidenceSummary) ||
+    hasProvidedReportValue(option.qualityReliabilitySummary);
+  const hasSupplierClarity =
+    hasProvidedReportValue(option.factoryLabel) &&
+    hasProvidedReportValue(option.cityProvince) &&
+    hasProvidedReportValue(option.mainProducts);
+  const riskText = `${option.riskSummary} ${option.riskFlags.join(" ")}`;
+  const hasRiskReview = hasProvidedReportValue(option.riskSummary);
+  const hasRiskFlag =
+    option.riskFlags.length > 0 ||
+    /\b(high|serious|unclear|unverified|delay|quality|risk|issue)\b/i.test(
+      riskText,
+    );
+
+  const scoreBreakdown: FactoryReportScoreBreakdown = {
+    evidenceQuality: hasEvidence ? 78 : 48,
+    leadTimeSuitability: scoreForPresence(option.productionLeadTime, 76),
+    moqSuitability: scoreForPresence(option.moq, 76),
+    priceCompetitiveness: scoreForPresence(option.estimatedUnitPrice, 76),
+    productMatch: hasProductMatch ? 82 : 45,
+    riskLevel: hasRiskFlag ? 55 : hasRiskReview ? 78 : 62,
+    supplierClarity: hasSupplierClarity ? 80 : 55,
+  };
+  const overallScore = calculateFactoryOverallScore(scoreBreakdown);
+  const riskScore = scoreBreakdown.riskLevel;
+  const riskLevel = hasRiskFlag
+    ? getFactoryRiskLevelFromScore(riskScore)
+    : getFactoryRiskLevelFromScore(overallScore);
+  const hasCriticalGaps = !hasPrice || !hasMoq || !hasLeadTime;
+  const recommendationStatus = getFactoryRecommendationStatus({
+    hasCriticalGaps,
+    overallScore,
+    recommended,
+    riskLevel,
+  });
+
+  return {
+    adminReviewNote: "",
+    adminVisibleOnlyNote: "",
+    importerSafeOptionSummary: option.productMatchSummary,
+    overallScore,
+    overallScoreLabel: getFactoryScoreLabel(overallScore),
+    qualityScore: overallScore,
+    recommendationStatus,
+    recommendationStatusLabel:
+      factoryReportRecommendationLabels[recommendationStatus],
+    riskLevel,
+    riskLevelLabel: factoryReportRiskLevelLabels[riskLevel],
+    riskScore,
+    scoreBreakdown,
+  };
 }
 
 async function getImporterRecipientProfileId(
@@ -865,6 +991,9 @@ function mapApprovedFactorySubmission(
       : "Not provided";
   const estimatedUnitPrice = readString(metadata.estimated_unit_price);
   const currency = readString(metadata.currency, "USD");
+  const riskFlags = Array.isArray(metadata.risk_flags)
+    ? metadata.risk_flags.filter((item): item is string => typeof item === "string")
+    : [];
 
   return {
     cityProvince: submission.city_province ?? "Not provided",
@@ -872,6 +1001,10 @@ function mapApprovedFactorySubmission(
     customizationAvailability: readString(
       metadata.customization_availability,
       "Not provided",
+    ),
+    evidenceSummary: readString(
+      metadata.evidence_notes,
+      "FMS evidence is available for admin review; importer release depends on admin-approved files.",
     ),
     estimatedUnitPrice:
       estimatedUnitPrice ||
@@ -891,6 +1024,7 @@ function mapApprovedFactorySubmission(
       metadata.quality_reliability_notes,
       "Admin-reviewed reliability summary pending.",
     ),
+    riskFlags,
     riskSummary: readString(
       metadata.risk_notes,
       "No specific risk notes were approved for importer view.",
@@ -971,7 +1105,7 @@ function parseFactoryReportFromProject(
         return null;
       }
 
-      return {
+      const baseOption: AdminApprovedFactorySubmission = {
         cityProvince: readString(optionData.cityProvince, "Not provided"),
         currency: readString(optionData.currency, "USD"),
         customizationAvailability: readString(
@@ -981,6 +1115,10 @@ function parseFactoryReportFromProject(
         estimatedUnitPrice: readString(
           optionData.estimatedUnitPrice,
           "Not provided",
+        ),
+        evidenceSummary: readString(
+          optionData.evidenceSummary,
+          "Evidence review pending.",
         ),
         factoryLabel: readString(optionData.factoryLabel, "Factory option"),
         mainProducts: readString(optionData.mainProducts, "Not provided"),
@@ -999,7 +1137,7 @@ function parseFactoryReportFromProject(
           optionData.qualityReliabilitySummary,
           "Admin-reviewed reliability summary pending.",
         ),
-        recommended: optionData.recommended === true,
+        riskFlags: readStringArray(optionData.riskFlags),
         riskSummary: readString(
           optionData.riskSummary,
           "No specific risk notes were approved for importer view.",
@@ -1010,6 +1148,63 @@ function parseFactoryReportFromProject(
         ),
         submissionCode,
         submittedAt: readString(optionData.submittedAt, "Not set"),
+      };
+      const recommended = optionData.recommended === true;
+      const quality = buildFactoryOptionQuality(baseOption, recommended);
+      const scoreBreakdown = parseScoreBreakdown(
+        optionData.scoreBreakdown,
+        quality.scoreBreakdown,
+      );
+      const overallScore = readNumber(
+        optionData.overallScore,
+        calculateFactoryOverallScore(scoreBreakdown),
+      );
+      const riskLevelValue = readString(optionData.riskLevel);
+      const riskLevel: FactoryReportRiskLevel =
+        riskLevelValue === "low" ||
+        riskLevelValue === "medium" ||
+        riskLevelValue === "high" ||
+        riskLevelValue === "needs_review"
+          ? riskLevelValue
+          : getFactoryRiskLevelFromScore(readNumber(optionData.riskScore, overallScore));
+      const recommendationStatusValue = readString(
+        optionData.recommendationStatus,
+      );
+      const recommendationStatus: FactoryReportRecommendationStatus =
+        recommendationStatusValue === "recommended" ||
+        recommendationStatusValue === "backup_option" ||
+        recommendationStatusValue === "needs_clarification" ||
+        recommendationStatusValue === "not_recommended"
+          ? recommendationStatusValue
+          : quality.recommendationStatus;
+
+      return {
+        ...baseOption,
+        adminReviewNote: readString(optionData.adminReviewNote),
+        adminVisibleOnlyNote: readString(optionData.adminVisibleOnlyNote),
+        importerSafeOptionSummary: readString(
+          optionData.importerSafeOptionSummary,
+          quality.importerSafeOptionSummary,
+        ),
+        overallScore,
+        overallScoreLabel: readString(
+          optionData.overallScoreLabel,
+          getFactoryScoreLabel(overallScore),
+        ),
+        qualityScore: readNumber(optionData.qualityScore, overallScore),
+        recommended,
+        recommendationStatus,
+        recommendationStatusLabel: readString(
+          optionData.recommendationStatusLabel,
+          factoryReportRecommendationLabels[recommendationStatus],
+        ),
+        riskLevel,
+        riskLevelLabel: readString(
+          optionData.riskLevelLabel,
+          factoryReportRiskLevelLabels[riskLevel],
+        ),
+        riskScore: readNumber(optionData.riskScore, quality.riskScore),
+        scoreBreakdown,
         visibleFields: normalizeVisibleFields(
           readStringArray(optionData.visibleFields),
         ),
@@ -1018,14 +1213,22 @@ function parseFactoryReportFromProject(
     .filter((option): option is AdminFactoryReportOption => Boolean(option));
 
   const status = statusValue as FactoryReportStatus;
+  const adminRecommendation = readString(report.adminRecommendation);
+  const importerSafeSummary = readString(report.importerSafeSummary);
+  const readiness = buildFactoryReportReadiness({
+    adminRecommendation,
+    importerSafeSummary,
+    options,
+  });
 
   return {
-    adminRecommendation: readString(report.adminRecommendation),
+    adminRecommendation,
     comparisonNotes: readString(report.comparisonNotes),
     contactFirewallCheckedAt: readString(report.contactFirewallCheckedAt),
-    importerSafeSummary: readString(report.importerSafeSummary),
+    importerSafeSummary,
     internalReleaseNotes: readString(report.internalReleaseNotes),
     options,
+    readiness,
     releasedAt: readString(report.releasedAt) || null,
     status,
     statusLabel: FACTORY_REPORT_STATUS_LABELS[status],
@@ -1905,12 +2108,21 @@ export async function saveFactoryReportForImporterAction(
       if (!submission) {
         throw new Error("Approved submission lookup failed.");
       }
+      const recommended =
+        submission.submissionCode === recommendedSubmissionCode;
+      const quality = buildFactoryOptionQuality(submission, recommended);
 
       return {
         ...submission,
-        recommended: submission.submissionCode === recommendedSubmissionCode,
+        ...quality,
+        recommended,
         visibleFields,
       };
+    });
+    const readiness = buildFactoryReportReadiness({
+      adminRecommendation,
+      importerSafeSummary,
+      options,
     });
 
     const firewallFields = [
@@ -1925,6 +2137,14 @@ export async function saveFactoryReportForImporterAction(
           value: visibleFields.includes("productMatchSummary")
             ? option.productMatchSummary
             : "",
+        },
+        {
+          label: `${option.submissionCode} importer-safe option summary`,
+          value: option.importerSafeOptionSummary,
+        },
+        {
+          label: `${option.submissionCode} evidence summary`,
+          value: option.evidenceSummary,
         },
         {
           label: `${option.submissionCode} product category`,
@@ -2000,6 +2220,7 @@ export async function saveFactoryReportForImporterAction(
       importerSafeSummary,
       internalReleaseNotes,
       options,
+      readiness,
       releasedAt:
         intent === "release"
           ? existingReport?.releasedAt ?? now

@@ -192,6 +192,7 @@ Importer reminders are deduped by project/date and capped at 3 per project. Impo
 - Admin alerts route only to Admin-authorized pages.
 - Cron output returns counts only, not project data.
 - Alerts never change payment, project approval, FMS assignment, FMS submission approval, report release, or refund status.
+- Report-release alerts now point Admin users to the report release panel where the factory option comparison and release readiness checklist must be reviewed before importer release.
 - Importer payment follow-up reminders never auto-verify payment or start FMS work.
 
 ## QA Checklist

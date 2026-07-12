@@ -812,6 +812,14 @@ function collectReportFields(report: ImporterReportDetail) {
         label: `${option.factoryLabel} price`,
         value: option.estimatedUnitPrice,
       },
+      {
+        label: `${option.factoryLabel} evidence summary`,
+        value: option.evidenceSummary,
+      },
+      {
+        label: `${option.factoryLabel} recommendation`,
+        value: option.recommendationStatusLabel,
+      },
       { label: `${option.factoryLabel} MOQ`, value: option.moq },
       {
         label: `${option.factoryLabel} samples`,
@@ -832,6 +840,10 @@ function collectReportFields(report: ImporterReportDetail) {
       {
         label: `${option.factoryLabel} reliability`,
         value: option.qualityReliabilitySummary,
+      },
+      {
+        label: `${option.factoryLabel} risk level`,
+        value: option.riskLevelLabel,
       },
       { label: `${option.factoryLabel} risk`, value: option.riskSummary },
     ]),

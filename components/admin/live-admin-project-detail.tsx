@@ -19,11 +19,14 @@ import { AdminSectionCard } from "@/components/admin/admin-section-card";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { AdminTabs } from "@/components/admin/admin-tabs";
+import { ReportReleaseReadinessCard } from "@/components/admin/report-release-readiness-card";
 import { AdminProjectFilesPanel } from "@/components/files/file-panels";
 import { LiveProjectReportFeedbackPanel } from "@/components/admin/live-project-report-feedback-panel";
 import { ProjectTimeline } from "@/components/admin/project-timeline";
 import { ReviewChecklist } from "@/components/admin/review-checklist";
+import { FactoryOptionComparisonTable } from "@/components/reports/factory-option-comparison-table";
 import { ActionFeedback } from "@/components/ui/action-feedback";
+import { buildFactoryReportReadiness } from "@/config/factory-report-quality";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type LiveAdminProjectDetailProps = {
@@ -391,6 +394,34 @@ export function LiveAdminProjectDetail({
   const reportCanWithdraw =
     project.factoryReport.currentReport?.status === "released_to_importer" ||
     project.factoryReport.currentReport?.status === "updated";
+  const selectedReportSubmissions =
+    project.factoryReport.availableSubmissions.filter((submission) =>
+      selectedReportSubmissionCodes.includes(submission.submissionCode),
+    );
+  const selectedReportReadiness = buildFactoryReportReadiness({
+    adminRecommendation: reportRecommendation,
+    importerSafeSummary: reportSummary,
+    options: selectedReportSubmissions.map((submission) => ({
+      ...submission,
+      recommended:
+        submission.submissionCode === recommendedReportSubmissionCode,
+    })),
+  });
+  const approvedComparisonOptions =
+    project.factoryReport.currentReport?.options.length
+      ? project.factoryReport.currentReport.options
+      : project.factoryReport.availableSubmissions.map((submission) => ({
+          ...submission,
+          recommendationStatusLabel: selectedReportSubmissionCodes.includes(
+            submission.submissionCode,
+          )
+            ? submission.submissionCode === recommendedReportSubmissionCode
+              ? "Selected as recommended"
+              : "Selected for report"
+            : "Available for review",
+          recommended:
+            submission.submissionCode === recommendedReportSubmissionCode,
+        }));
 
   return (
     <AdminShell
@@ -958,6 +989,23 @@ export function LiveAdminProjectDetail({
 
             <div className="mt-5">
               <h3 className="text-base font-bold text-brand-navy">
+                Side-by-side factory option comparison
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-brand-muted">
+                Compare approved FMS submissions before deciding which options
+                should appear in the importer-safe report. Scores are
+                decision-support only and do not guarantee factory performance.
+              </p>
+              <div className="mt-3">
+                <FactoryOptionComparisonTable
+                  caption="Admin factory option comparison"
+                  options={approvedComparisonOptions}
+                />
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <h3 className="text-base font-bold text-brand-navy">
                 Approved FMS submissions
               </h3>
               {project.factoryReport.availableSubmissions.length > 0 ? (
@@ -1040,6 +1088,18 @@ export function LiveAdminProjectDetail({
                             <ReportPreviewField
                               label="Price/MOQ"
                               value={`${submission.estimatedUnitPrice} ${submission.currency} / ${submission.moq}`}
+                            />
+                            <ReportPreviewField
+                              label="Evidence summary"
+                              value={submission.evidenceSummary}
+                            />
+                            <ReportPreviewField
+                              label="Risk flags"
+                              value={
+                                submission.riskFlags.length > 0
+                                  ? submission.riskFlags.join(", ")
+                                  : "No FMS risk flags submitted"
+                              }
                             />
                           </dl>
                         </div>
@@ -1158,6 +1218,10 @@ export function LiveAdminProjectDetail({
               </div>
             </div>
 
+            <div className="mt-5">
+              <ReportReleaseReadinessCard readiness={selectedReportReadiness} />
+            </div>
+
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <button
                 className="min-h-12 rounded-lg border border-brand-navy bg-white px-5 py-3 font-bold text-brand-navy transition hover:border-brand-emerald hover:text-brand-emerald disabled:cursor-not-allowed disabled:opacity-55"
@@ -1179,7 +1243,8 @@ export function LiveAdminProjectDetail({
                 disabled={
                   isMutating ||
                   !project.factoryReport.canRelease ||
-                  selectedReportSubmissionCodes.length === 0
+                  selectedReportSubmissionCodes.length === 0 ||
+                  selectedReportReadiness.status === "not_ready"
                 }
                 onClick={() =>
                   void runFactoryReportAction(
@@ -1220,6 +1285,17 @@ export function LiveAdminProjectDetail({
                   Status: {project.factoryReport.currentReport.statusLabel}.
                   Version {project.factoryReport.currentReport.version}.
                 </p>
+                <div className="mt-4">
+                  <ReportReleaseReadinessCard
+                    readiness={project.factoryReport.currentReport.readiness}
+                  />
+                </div>
+                <div className="mt-4">
+                  <FactoryOptionComparisonTable
+                    caption="Current importer report comparison"
+                    options={project.factoryReport.currentReport.options}
+                  />
+                </div>
                 <div className="mt-4 grid gap-3">
                   {project.factoryReport.currentReport.options.map((option) => (
                     <div
@@ -1234,6 +1310,11 @@ export function LiveAdminProjectDetail({
                           <AdminStatusBadge status="Recommended" />
                         ) : null}
                       </div>
+                      <p className="mt-2 text-sm font-semibold text-brand-muted">
+                        {option.recommendationStatusLabel} ·{" "}
+                        {option.overallScore}/100 · {option.overallScoreLabel} ·
+                        Risk: {option.riskLevelLabel}
+                      </p>
                       <dl className="mt-3 grid gap-3 md:grid-cols-2">
                         {option.visibleFields.includes("cityProvince") ? (
                           <ReportPreviewField

@@ -2,6 +2,17 @@
 
 import { USER_ROLES, hasAllowedRole } from "@/lib/auth/roles";
 import { getProfileForAccessToken } from "@/lib/auth/session";
+import {
+  calculateFactoryOverallScore,
+  factoryReportRecommendationLabels,
+  factoryReportRiskLevelLabels,
+  factoryReportScoreCategories,
+  getFactoryRiskLevelFromScore,
+  getFactoryScoreLabel,
+  type FactoryReportRecommendationStatus,
+  type FactoryReportRiskLevel,
+  type FactoryReportScoreBreakdown,
+} from "@/config/factory-report-quality";
 import { createNotification } from "@/lib/notifications/create-notification";
 import { detectContactRiskInFields } from "@/lib/security/contact-firewall";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
@@ -27,17 +38,25 @@ export type ImporterReportOption = {
   currency: string;
   customizationAvailability: string;
   estimatedUnitPrice: string;
+  evidenceSummary: string;
   factoryLabel: string;
   mainProducts: string;
   moq: string;
+  overallScore: number;
+  overallScoreLabel: string;
   packagingNotes: string;
   productCategory: string;
   productMatchSummary: string;
   productionLeadTime: string;
   qualityReliabilitySummary: string;
   recommended: boolean;
+  recommendationStatus: FactoryReportRecommendationStatus;
+  recommendationStatusLabel: string;
+  riskLevel: FactoryReportRiskLevel;
+  riskLevelLabel: string;
   riskSummary: string;
   sampleAvailability: string;
+  scoreBreakdown: FactoryReportScoreBreakdown;
   visibleFields: string[];
 };
 
@@ -192,6 +211,17 @@ function readStringArray(value: Json | null | undefined) {
     : [];
 }
 
+function parseScoreBreakdown(
+  value: Json | null | undefined,
+): FactoryReportScoreBreakdown {
+  const object = toJsonObject(value);
+
+  return factoryReportScoreCategories.reduce((breakdown, category) => {
+    breakdown[category.key] = readNumber(object[category.key], 65);
+    return breakdown;
+  }, {} as FactoryReportScoreBreakdown);
+}
+
 function normalizeVisibleFields(value: string[]) {
   const allowed = new Set<string>(SAFE_FIELDS);
   const selected = value.filter((field) => allowed.has(field));
@@ -251,6 +281,33 @@ function parseReleasedReport(
         return null;
       }
 
+      const scoreBreakdown = parseScoreBreakdown(optionData.scoreBreakdown);
+      const calculatedScore = calculateFactoryOverallScore(scoreBreakdown);
+      const overallScore = readNumber(
+        optionData.overallScore,
+        calculatedScore,
+      );
+      const riskLevelValue = readString(optionData.riskLevel);
+      const riskLevel: FactoryReportRiskLevel =
+        riskLevelValue === "low" ||
+        riskLevelValue === "medium" ||
+        riskLevelValue === "high" ||
+        riskLevelValue === "needs_review"
+          ? riskLevelValue
+          : getFactoryRiskLevelFromScore(overallScore);
+      const recommendationStatusValue = readString(
+        optionData.recommendationStatus,
+      );
+      const recommendationStatus: FactoryReportRecommendationStatus =
+        recommendationStatusValue === "recommended" ||
+        recommendationStatusValue === "backup_option" ||
+        recommendationStatusValue === "needs_clarification" ||
+        recommendationStatusValue === "not_recommended"
+          ? recommendationStatusValue
+          : optionData.recommended === true
+            ? "recommended"
+            : "backup_option";
+
       return {
         cityProvince: readString(optionData.cityProvince, "Not provided"),
         currency: readString(optionData.currency, "USD"),
@@ -262,9 +319,18 @@ function parseReleasedReport(
           optionData.estimatedUnitPrice,
           "Not provided",
         ),
+        evidenceSummary: readString(
+          optionData.evidenceSummary,
+          "Evidence reviewed by ChinaPak Admin.",
+        ),
         factoryLabel,
         mainProducts: readString(optionData.mainProducts, "Not provided"),
         moq: readString(optionData.moq, "Not provided"),
+        overallScore,
+        overallScoreLabel: readString(
+          optionData.overallScoreLabel,
+          getFactoryScoreLabel(overallScore),
+        ),
         packagingNotes: readString(optionData.packagingNotes, "Not provided"),
         productCategory: readString(optionData.productCategory, "Not provided"),
         productMatchSummary: readString(
@@ -280,6 +346,16 @@ function parseReleasedReport(
           "Admin-reviewed reliability summary pending.",
         ),
         recommended: optionData.recommended === true,
+        recommendationStatus,
+        recommendationStatusLabel: readString(
+          optionData.recommendationStatusLabel,
+          factoryReportRecommendationLabels[recommendationStatus],
+        ),
+        riskLevel,
+        riskLevelLabel: readString(
+          optionData.riskLevelLabel,
+          factoryReportRiskLevelLabels[riskLevel],
+        ),
         riskSummary: readString(
           optionData.riskSummary,
           "No risk notes were released.",
@@ -288,6 +364,7 @@ function parseReleasedReport(
           optionData.sampleAvailability,
           "Not provided",
         ),
+        scoreBreakdown,
         visibleFields: normalizeVisibleFields(
           readStringArray(optionData.visibleFields),
         ),

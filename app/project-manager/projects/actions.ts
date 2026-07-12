@@ -98,6 +98,12 @@ export type ProjectManagerProjectDetail = {
     price: string;
   };
   project: ProjectManagerProjectListItem;
+  reportReadiness: {
+    optionCount: number;
+    readinessLabel: string;
+    status: string;
+    statusLabel: string;
+  };
   requirements: {
     budget: string;
     importExperience: string;
@@ -232,6 +238,30 @@ function getRequirementProduct(
     requirement?.product_description?.slice(0, 90) ??
     "Product details pending"
   );
+}
+
+function getReportReadiness(metadata: Json | null | undefined) {
+  const report = toJsonObject(toJsonObject(metadata).phase_7_factory_report);
+  const status = readString(report.status);
+  const readiness = toJsonObject(report.readiness);
+  const options = Array.isArray(report.options) ? report.options : [];
+  const statusLabel =
+    status === "released_to_importer"
+      ? "Released to Importer"
+      : status === "updated"
+        ? "Updated and Released"
+        : status === "draft"
+          ? "Draft"
+          : status === "withdrawn"
+            ? "Withdrawn"
+            : "Not started";
+
+  return {
+    optionCount: options.length,
+    readinessLabel: readString(readiness.statusLabel, "Report not started"),
+    status: status || "not_started",
+    statusLabel,
+  };
 }
 
 function mapListItem(
@@ -595,6 +625,7 @@ export async function getProjectManagerProjectDetailAction(
         price: formatPrice(packageRow?.price_pkr),
       },
       project: listItem,
+      reportReadiness: getReportReadiness(project.metadata),
       requirements: {
         budget: requirement?.budget_range ?? "Not provided",
         importExperience: requirement?.import_experience ?? "Not provided",

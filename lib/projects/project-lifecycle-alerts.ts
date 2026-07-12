@@ -569,7 +569,7 @@ export async function getProjectLifecycleAlerts(
         alerts.push(
           makeAlert({
             adminRecommendedAction:
-              "Prepare and release an importer-safe report from approved FMS submissions. Keep raw FMS/factory contact data hidden.",
+              "Open the report release panel, complete the factory option comparison/readiness checklist, and release an importer-safe report. Keep raw FMS/factory contact data hidden.",
             ageInHours: age,
             alertType: "report_release_stuck",
             currentStage: "report_release",
@@ -580,7 +580,7 @@ export async function getProjectLifecycleAlerts(
             productTitle,
             project,
             projectManagerRecommendedAction:
-              "Escalate to Admin because report release is an Admin-only action.",
+              "Escalate to Admin because scoring, FMS submission approval, and report release are Admin-only actions.",
             relatedRoute: adminRoute(project.project_code, "#report-release"),
             severity: "high",
             targetRoles: [USER_ROLES.admin, USER_ROLES.projectManager],

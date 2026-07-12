@@ -174,6 +174,7 @@ Security rules confirmed in code/docs:
 - Raw FMS submissions remain admin-only.
 - Factory sensitive contact data is separated in `factory_sensitive_contacts`.
 - Importer-facing report/document actions re-run or reuse contact firewall checks.
+- Factory report comparison/scoring is stored in sanitized report metadata only. Importer reports/documents show safe comparison, evidence, recommendation, and risk fields while hiding Admin-only notes, raw FMS notes, FMS contacts, and factory private contact details.
 - File preview/download uses short-lived signed URLs after role and visibility checks.
 - Super Admin user management is guarded at route and server-action level.
 

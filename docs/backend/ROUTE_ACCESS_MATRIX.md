@@ -67,8 +67,8 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | `/importer/dashboard` | Importer | Own project/report/payment summary only. |
 | `/importer/start` | Importer | Protected Import Project wizard. Supports package preselection with safe `?package=` query params and stores importer conversion attribution in project/lead metadata. Not included in sitemap and marked noindex. |
 | `/importer/projects`, `/importer/projects/[projectId]` | Importer | Own submitted Import Projects only. Shows sanitized project status, timeline, payment readiness, billing links, released report links, and importer-safe files. Raw FMS submissions, FMS contacts, factory contacts, attribution, and admin-only notes are hidden. |
-| `/importer/reports`, `/importer/reports/[projectId]` | Importer | Own released reports only. Raw FMS submissions and factory contacts hidden. |
-| `/importer/reports/[projectId]/document` | Importer | Own released report document only; sanitized fields only. |
+| `/importer/reports`, `/importer/reports/[projectId]` | Importer | Own released reports only. Shows sanitized factory option comparison, recommendation labels, evidence summaries, risk notes, and disclaimers. Raw FMS submissions, FMS contacts, factory contacts, and Admin-only notes hidden. |
+| `/importer/reports/[projectId]/document` | Importer | Own released report document only; sanitized comparison/report fields only. |
 | `/importer/messages/*` | Importer | Placeholder controlled messaging; no direct importer-FMS communication. |
 | `/importer/notifications` | Importer | Own direct notifications only. |
 
@@ -87,7 +87,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/admin` | Admin, Super Admin | Operational dashboard. |
-| `/admin/projects/*` | Admin, Super Admin | Project review, importer attribution review, payment verification, assignment, report release, admin documents. |
+| `/admin/projects/*` | Admin, Super Admin | Project review, importer attribution review, payment verification, assignment, FMS submission comparison/scoring, report readiness checklist, report release, admin documents. |
 | `/admin/leads` | Admin, Super Admin | Unpaid leads only; not assignable to FMS. |
 | `/admin/representatives` | Admin, Super Admin | Manual representative records, verification code management, and attempt review. Public lookup uses sanitized server-side verification only. |
 | `/admin/fms` | Admin, Super Admin | FMS directory. Public users cannot create FMS roles. |
@@ -103,7 +103,7 @@ Public marketing chrome is shown on public website and auth entry routes only. P
 | Route group | Allowed access | Notes |
 |---|---|---|
 | `/project-manager`, `/project-manager/dashboard` | Project Manager | Limited project-flow dashboard. No Admin/Super Admin privileges. |
-| `/project-manager/projects`, `/project-manager/projects/[projectId]` | Project Manager | Safe project operational view, lifecycle follow-up, internal notes, workflow markers, and Admin escalation only. No payment verification, FMS assignment, FMS submission approval, report release, refunds, or user management. |
+| `/project-manager/projects`, `/project-manager/projects/[projectId]` | Project Manager | Safe project operational view, read-only report progress, lifecycle follow-up, internal notes, workflow markers, and Admin escalation only. No payment verification, FMS assignment, FMS submission approval, report release, refunds, or user management. |
 | `/project-manager/notifications` | Project Manager | Own direct/role notifications and escalation/project-flow notices. |
 
 ## Super Admin Portal

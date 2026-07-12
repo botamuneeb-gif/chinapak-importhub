@@ -105,7 +105,7 @@ export function getNotificationTemplate(
     case "factory_report_released":
       return {
         title: "Factory report ready",
-        message: `${projectCode} کا approved factory report آپ کے importer portal میں ready ہے۔ Factory contact details اس stage پر share نہیں کی جاتیں۔`,
+        message: `${projectCode} factory report is ready in your importer portal with admin-reviewed comparison, recommendation, risk notes, and next steps. Factory/FMS contact details are not shared at this stage.`,
       };
     case "factory_report_withdrawn":
       return {
@@ -165,7 +165,7 @@ export function getNotificationTemplate(
     case "fms_clarification_requested":
       return {
         title: "Clarification requested",
-        message: `Admin requested sourcing clarification for ${assignmentCode}. Do not contact the importer directly.`,
+        message: `Admin requested sourcing clarification for ${assignmentCode}. Review the missing quote, MOQ, lead time, evidence, or risk details in the FMS workspace. Do not contact the importer directly.`,
       };
     case "new_project_submitted":
       return {
